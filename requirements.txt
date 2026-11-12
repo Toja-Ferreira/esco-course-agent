@@ -7,6 +7,7 @@ snowballstemmer==3.1.1
 sentence-transformers==6.0.1
 transformers==5.16.1
 tokenizers==0.23.2
+scipy==1.18.1   # occupation search (sparse TF-IDF matrix)
 # torch: 2.14.0 locally (CUDA build); the ZeroGPU Space needs 2.13.0. Install per machine.
 
 # agent

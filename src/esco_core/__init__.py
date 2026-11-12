@@ -7,7 +7,8 @@ No reranking. tests/test_parity.py checks this reproduces the linker's output.
 """
 
 from esco_core.linker import SkillHit, SkillLinker
+from esco_core.occupations import OccupationIndex
 
 LINKER_COMMIT = "3645d54f296c9dfc51f7a883071c8d98d22326ba"
 
-__all__ = ["SkillHit", "SkillLinker", "LINKER_COMMIT"]
+__all__ = ["SkillHit", "SkillLinker", "OccupationIndex", "LINKER_COMMIT"]
