@@ -1,0 +1,6 @@
+# torch 2.13.0: newest version ZeroGPU accepts (linker env is 2.14.0; the parity check shows if that matters)
+torch==2.13.0
+transformers==5.16.1
+sentence-transformers==6.0.1
+psutil
+spaces
