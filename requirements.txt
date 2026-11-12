@@ -1,0 +1,18 @@
+# esco_core: pinned to esco-skill-linker's environment (commit 3645d54f)
+numpy==2.5.2
+pandas==3.0.5
+pyarrow==25.0.1
+rank-bm25==0.2.2
+snowballstemmer==3.1.1
+sentence-transformers==6.0.1
+transformers==5.16.1
+tokenizers==0.23.2
+# torch: 2.14.0 locally (CUDA build); the ZeroGPU Space needs 2.13.0. Install per machine.
+
+# agent
+langgraph
+langchain-deepseek
+python-dotenv
+
+# dev
+pytest
