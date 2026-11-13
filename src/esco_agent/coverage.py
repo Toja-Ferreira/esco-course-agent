@@ -115,10 +115,13 @@ class CoverageResult:
 
 
 async def judge_coverage(llm, sentences: list[str], occupation: str,
-                         skill_labels: list[str]) -> CoverageResult:
-    """llm: a chat model already bound to JSON output (async .ainvoke)."""
+                         skill_labels: list[str],
+                         prompt_template: str = PROMPT) -> CoverageResult:
+    """llm: a chat model already bound to JSON output (async .ainvoke).
+    prompt_template: PROMPT (an occupation's requirements) or another template
+    with the same {sentences} / {skills} fields and the same reply format."""
     numbers = set(range(1, len(skill_labels) + 1))
-    prompt = PROMPT.format(
+    prompt = prompt_template.format(
         sentences="\n".join(f"{i}. {s}" for i, s in enumerate(sentences, 1)),
         occupation=occupation,
         skills="\n".join(f"{i}. {s}" for i, s in enumerate(skill_labels, 1)),

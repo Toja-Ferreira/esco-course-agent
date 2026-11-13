@@ -1,3 +1,0 @@
-agent
-esco_core
-server
