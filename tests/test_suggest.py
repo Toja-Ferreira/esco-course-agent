@@ -3,8 +3,9 @@
 import asyncio
 import json
 
-from esco_agent.suggest import (QUERY_PROMPT, SUGGEST_PROMPT, gather_candidates,
-                                propose_queries, sentence_queries, suggest_skills,
+from esco_agent.suggest import (QUERY_PROMPT, SUGGEST_PROMPT, gather_candidates, judge_line,
+                                load_sections, numbered_sentences, propose_queries,
+                                sentence_queries, stability, suggest_skills,
                                 unique_sentences)
 
 COURSE = "Students write programs in C. They debug code with gdb.\n- pointers and memory"
@@ -31,7 +32,8 @@ def test_judge_filters_candidates_and_attaches_evidence():
     r = asyncio.run(suggest_skills(CANDS, llm, COURSE))
     assert [s["label"] for s in r["suggested"]] == ["debug software", "computer programming"]
     assert [s["label"] for s in r["rejected"]] == ["Objective-C"]
-    assert r["suggested"][0]["evidence"] == [{"sentence": 2, "text": "They debug code with gdb."}]
+    assert r["suggested"][0]["evidence"] == [
+        {"sentence": 2, "section": "Course", "text": "They debug code with gdb."}]
     assert all(e["text"] in COURSE for s in r["suggested"] for e in s["evidence"])
     assert r["first_attempt_valid"] and r["suggested"][0]["score"] == 0.61
     assert "1. Objective-C" in llm.prompts[0] and "3. pointers and memory" in llm.prompts[0]
@@ -98,3 +100,58 @@ def test_many_candidates_are_judged_in_batches():
     r = asyncio.run(suggest_skills(cands, EchoJudge(), "Students write programs in C."))
     assert EchoJudge.calls == 3 and r["judge_calls"] == 3
     assert len(r["suggested"]) == 70 and [s["id"] for s in r["suggested"]] == [str(i) for i in range(70)]
+
+
+SECTIONS = {"Learning outcomes": "Students write programs in C. They use strings and pointers.",
+            "Contents": "Students write programs in C.\n- dynamic memory\n- text files"}
+
+
+def test_sections_are_numbered_across_fields_and_deduplicated():
+    sents = numbered_sentences(SECTIONS)
+    assert [(s["section"], s["text"]) for s in sents] == [
+        ("Learning outcomes", "Students write programs in C."),
+        ("Learning outcomes", "They use strings and pointers."),
+        ("Contents", "dynamic memory"), ("Contents", "text files")]
+
+
+def test_evidence_cites_its_section_and_judge_sees_definitions():
+    cands = [{"id": "s", "label": "types of strings", "type": "knowledge", "score": 0.9,
+              "description": "Vibrating elements that generate sounds in string instruments."},
+             {"id": "m", "label": "memory", "type": "knowledge", "score": 0.5}]
+    llm = Scripted(reply((1, "missing", []), (2, "covered", [3])))
+    r = asyncio.run(suggest_skills(cands, llm, SECTIONS))
+    prompt = llm.prompts[0]
+    assert "1. types of strings: Vibrating elements that generate sounds" in prompt
+    assert "2. memory\n" in prompt                      # no definition -> label only
+    assert "3. [Contents] dynamic memory" in prompt
+    assert r["suggested"][0]["evidence"] == [
+        {"sentence": 3, "section": "Contents", "text": "dynamic memory"}]
+
+    llm = Scripted(reply((1, "missing", []), (2, "missing", [])))
+    asyncio.run(suggest_skills(cands, llm, SECTIONS, use_descriptions=False))
+    assert "Vibrating" not in llm.prompts[0]
+
+
+def test_long_definitions_are_cut_at_a_word():
+    line = judge_line({"label": "x", "description": "word " * 200})
+    assert len(line) < 270 and line.endswith("word…")
+
+
+def test_load_sections(tmp_path):
+    j = tmp_path / "c.json"
+    j.write_text(json.dumps({"Learning outcomes": " a ", "Contents": "b", "Empty": " "}))
+    assert load_sections(str(j)) == {"Learning outcomes": "a", "Contents": "b"}
+    t = tmp_path / "c.txt"
+    t.write_text("plain text\n")
+    assert load_sections(str(t)) == {"Course": "plain text"}
+
+
+def test_stability_counts_flips():
+    def run(sug, rej):
+        mk = lambda ids: [{"id": i, "label": i.upper()} for i in ids]
+        return {"suggested": mk(sug), "rejected": mk(rej), "unverified": []}
+    st = stability([run("ab", "c"), run("ac", "b"), run("a", "")])
+    assert st["runs"] == 3 and st["always"] == 1 and st["unstable"] == 2
+    assert [(r["label"], r["suggested"], r["candidate"]) for r in st["rows"]] == [
+        ("A", 3, 3), ("B", 1, 2), ("C", 1, 2)]
+    assert st["judge_flips"] == 2

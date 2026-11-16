@@ -1,0 +1,29 @@
+
+LLM QUERIES (20): understand C programmes; design C programmes; implement C programmes; apply structured programming principles; use Unix/Linux environments autonomously; compile programmes via command line; execute programmes via command line; understand the software development cycle; analyse problems; decompose solutions into functions and modules; use control structures; use arrays; use pointers; use strings; use data structures; manipulate files; manage dynamic memory; organise code; document code; test code
+
+SUGGESTED (9 of 83 candidates, 3 judge calls)
+  + apply basic programming skills  [skill/competence]
+      1. The course aims to develop students' ability to understand, design and implement programmes in C language, app
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + computer programming  [knowledge]
+      1. The course aims to develop students' ability to understand, design and implement programmes in C language, app
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + think analytically  [skill/competence]  <- query: apply structured programming principles
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + work independently  [skill/competence]  <- query: use Unix/Linux environments autonomously
+      2. The aim is for students to become autonomous in the use of Unix/Linux environments, master the process of comp
+  + systems development life-cycle  [knowledge]  <- query: understand the software development cycle
+      2. The aim is for students to become autonomous in the use of Unix/Linux environments, master the process of comp
+  + create solutions to problems  [skill/competence]  <- query: analyse problems | decompose solutions into functions and modules
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + address problems critically  [skill/competence]  <- query: analyse problems
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + information structure  [knowledge]  <- query: use data structures
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + perform software unit testing  [skill/competence]  <- query: test code
+      4. The course also aims to foster good practices in organisation, documentation and code testing, promoting the r
+
+REJECTED by the judge (74)
+  Objective-C (0.79); C++ (0.83); C# (0.71); teach computer science (0.57); SAS language (0.55); Perl (0.54); COBOL (0.54); Common Lisp (0.53); prepare examinations for vocational courses (0.52); compile course material (0.52); teach engineering principles (0.50); develop data processing applications (0.48); Assembly (computer programming) (0.44); Microsoft Visual C++ (0.87); use CAM software (0.69); design drill programmes (0.76); develop training programmes (0.63); design application interfaces (0.60); implement care programmes for children (0.78); develop social security programmes (0.71); use object-oriented programming (0.70); use functional programming (1.00); use automatic programming (0.62); APL (0.60); perform manual work autonomously (0.92); use scripting programming (0.83); automatic control system (0.76); compile library lists (0.71); compile GIS-data (0.66); compile drinks menu (0.63); compile detailed collection inventory (0.63); execute sports training programme (0.72); use concurrent programming (0.60); use logic programming (0.47); iterative development (0.71); manage packaging development cycle from concept to launch (0.62); develop software prototype (0.60); analyse health problems within a given community (0.81); replicate customer software issues (0.76); software components libraries (0.90); adjust solutions' consistency (0.82); develop solutions to information issues (0.53); operate control panels (0.73); operate computerised control systems (0.63); design control systems (0.61); manage obstacle control (0.60); utilise regular expressions (0.72); use software libraries (0.50); field-programmable gate arrays (0.45); refer service users to community resources (0.60); use geographic memory (0.80); control reorder points (0.45); types of strings (0.92); thread wire (0.83); tune stringed musical instruments (0.77); data models (0.89); use query languages (0.84); use databases (0.84); operate file for deburring (0.98); file documents (0.93); create digital files (0.90); manage digital documents (0.81); use translation memory software (0.90); develop translation memory software (0.84); manage storage operations (0.60); assign codes to product items (0.96); adhere to organisational code of ethics (0.60); organise a repertoire (0.59); organise wires (0.58); products coding system (0.94); publicity code (0.81); military code (0.79); develop code exploits (0.58); debug software (0.55)
+
+judge reply valid on first attempt: True

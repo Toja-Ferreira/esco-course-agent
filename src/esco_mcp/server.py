@@ -77,21 +77,28 @@ def _full(id_or_uri: str, prefix: str) -> str:
 # --- tools --------------------------------------------------------------------
 
 @mcp.tool()
-def link_text(text: str, k: int = 20) -> dict:
+def link_text(text: str, k: int = 20, include_descriptions: bool = False) -> dict:
     """Find the ESCO skills a text describes, best match first.
 
     Use on a course description (or any passage of it). Returns up to k skills
     with id, label, type ("skill/competence" or "knowledge") and a relevance
     score in [0, 1]. Scores rank skills within one call; they are not
     probabilities and are not comparable across calls.
+    include_descriptions adds ESCO's definition of each skill; use it when a
+    label alone is ambiguous ("types of strings" is about musical instruments).
     """
     if not text.strip():
         raise ToolError("text is empty")
     k = max(1, min(int(k), MAX_LINK_K))
     hits = _get("linker").link(text, k=k)
-    return {"skills": [{"id": _short(h.uri), "label": h.label,
-                        "type": h.skill_type, "score": round(h.score, 3)}
-                       for h in hits]}
+    skills = []
+    for h in hits:
+        skill = {"id": _short(h.uri), "label": h.label,
+                 "type": h.skill_type, "score": round(h.score, 3)}
+        if include_descriptions:
+            skill["description"] = h.description
+        skills.append(skill)
+    return {"skills": skills}
 
 
 @mcp.tool()

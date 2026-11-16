@@ -1,0 +1,39 @@
+
+LLM QUERIES (20): understand C programmes; design C programmes; implement C programmes; apply structured programming principles; use Unix/Linux environments autonomously; compile programmes via command line; execute programmes via command line; understand the software development cycle; analyse problems; break down solutions into functions and modules; use control structures; use arrays; use pointers; use strings; use data structures; manipulate files; manage dynamic memory; organise code in multiple files; use make; apply code documentation and testing practices
+
+SUGGESTED (11 of 82 candidates, 3 judge calls)
+  + apply basic programming skills  [skill/competence]
+      1. The course aims to develop students' ability to understand, design and implement programmes in C language, app
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+      5. The C Programming course introduces the fundamentals of structured programming, integrating the use of Unix/Li
+  + computer programming  [knowledge]
+      1. The course aims to develop students' ability to understand, design and implement programmes in C language, app
+      5. The C Programming course introduces the fundamentals of structured programming, integrating the use of Unix/Li
+      6. The essential concepts of the C language are covered: programme structure, data types, operators and flow cont
+  + think analytically  [skill/competence]  <- query: apply structured programming principles
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + work independently  [skill/competence]  <- query: use Unix/Linux environments autonomously
+      2. The aim is for students to become autonomous in the use of Unix/Linux environments, master the process of comp
+  + systems development life-cycle  [knowledge]  <- query: understand the software development cycle
+      2. The aim is for students to become autonomous in the use of Unix/Linux environments, master the process of comp
+  + create solutions to problems  [skill/competence]  <- query: analyse problems | break down solutions into functions and modules
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + address problems critically  [skill/competence]  <- query: analyse problems
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+  + types of strings  [knowledge]  <- query: use strings
+      3. By the end of the course, students should be able to analyse problems, break down solutions into functions and
+      7. Skills are developed in modularisation with functions, use of arrays, pointers, strings and structures (struct
+  + implement ICT coding conventions  [skill/competence]  <- query: apply code documentation and testing practices
+      1. The course aims to develop students' ability to understand, design and implement programmes in C language, app
+      4. The course also aims to foster good practices in organisation, documentation and code testing, promoting the r
+      9. The course aims to provide students with a solid foundation for understanding, developing and testing small an
+  + perform software unit testing  [skill/competence]  <- query: apply code documentation and testing practices
+      4. The course also aims to foster good practices in organisation, documentation and code testing, promoting the r
+      9. The course aims to provide students with a solid foundation for understanding, developing and testing small an
+  + provide software testing documentation  [skill/competence]  <- query: apply code documentation and testing practices
+      4. The course also aims to foster good practices in organisation, documentation and code testing, promoting the r
+
+REJECTED by the judge (71)
+  C++ (0.88); Objective-C (0.87); C# (0.81); prepare examinations for vocational courses (0.55); use object-oriented programming (0.70); teach computer science (0.50); Common Lisp (0.47); COBOL (0.47); SAS language (0.43); Microsoft Visual C++ (0.87); develop data processing applications (0.42); compile course material (0.41); Assembly (computer programming) (0.40); use CAM software (0.69); design drill programmes (0.76); develop training programmes (0.63); design application interfaces (0.60); implement care programmes for children (0.78); develop social security programmes (0.71); use functional programming (1.00); use automatic programming (0.62); APL (0.60); perform manual work autonomously (0.92); use scripting programming (0.83); automatic control system (0.76); compile library lists (0.71); compile GIS-data (0.66); compile drinks menu (0.63); compile detailed collection inventory (0.63); execute sports training programme (0.72); use concurrent programming (0.60); use logic programming (0.47); iterative development (0.71); manage packaging development cycle from concept to launch (0.62); develop software prototype (0.60); analyse health problems within a given community (0.81); replicate customer software issues (0.76); software components libraries (0.81); adjust solutions' consistency (0.73); develop solutions to information issues (0.59); operate control panels (0.73); operate computerised control systems (0.63); design control systems (0.61); manage obstacle control (0.60); utilise regular expressions (0.72); use software libraries (0.50); field-programmable gate arrays (0.45); refer service users to community resources (0.60); use geographic memory (0.80); control reorder points (0.45); thread wire (0.83); tune stringed musical instruments (0.77); data models (0.89); use query languages (0.84); use databases (0.84); information structure (0.84); operate file for deburring (0.98); file documents (0.93); create digital files (0.90); manage digital documents (0.81); use translation memory software (0.90); develop translation memory software (0.84); manage storage operations (0.60); keep personal administration (0.69); assign codes to product items (0.66); organise wires (0.60); fabricate metal parts (0.65); create model (0.60); use traditional carpet making techniques (0.59); create craft prototypes (0.55); apply publicity code (0.66)
+
+judge reply valid on first attempt: True

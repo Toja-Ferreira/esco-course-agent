@@ -44,6 +44,7 @@ class SkillHit:
     label: str
     skill_type: str   # ESCO: "skill/competence" or "knowledge"
     score: float      # fused score, in [0, 1]
+    description: str = ""   # ESCO's own definition of the skill
 
 
 class SkillLinker:
@@ -65,6 +66,7 @@ class SkillLinker:
             alt.setdefault(uri, []).append(label)
 
         self.label = preferred
+        self.description = description
         self.skill_type = dict(zip(skills["conceptUri"], skills["skillType"]))
 
         docs = build_documents(list(self.uris), preferred, alt, description)
@@ -92,5 +94,6 @@ class SkillLinker:
 
     def link(self, text: str, k: int = 10) -> list[SkillHit]:
         ranked = self.first_stage(clean(text))[:k]
-        return [SkillHit(u, self.label.get(u, u), self.skill_type.get(u, ""), s)
+        return [SkillHit(u, self.label.get(u, u), self.skill_type.get(u, ""), s,
+                         self.description.get(u) or "")
                 for u, s in ranked]
