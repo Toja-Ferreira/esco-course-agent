@@ -1,0 +1,16 @@
+input: Learning Outcomes, Contents | judge sees: label only
+
+STABILITY over 5 runs (suggested per run: [9, 7, 9, 9, 6])
+  5/5  apply basic programming skills
+  5/5  computer programming
+  5/5  create solutions to problems
+  5/5  organise information, objects and resources
+  5/5  perform software unit testing
+  5/5  think analytically
+  3/5  address problems critically   (a candidate in 5 runs)
+  3/5  types of strings   (a candidate in 5 runs)
+  2/5  systems development life-cycle   (a candidate in 5 runs)
+  2/5  work independently   (a candidate in 2 runs)
+
+suggested in every run: 6   in some runs only: 4   of those, same candidate judged differently: 3
+judge replies valid on first attempt: 5/5 runs

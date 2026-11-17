@@ -12,6 +12,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 esco_core = ["stopwords_en.txt"]
+esco_agent = ["web/static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

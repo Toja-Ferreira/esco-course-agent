@@ -1,0 +1,12 @@
+input: Learning Outcomes, Contents | judge sees: label + ESCO definition
+
+STABILITY over 5 runs (suggested per run: [5, 5, 5, 6, 6])
+  5/5  computer programming
+  5/5  create solutions to problems
+  5/5  perform software unit testing
+  5/5  systems development life-cycle
+  5/5  think analytically
+  2/5  implement ICT coding conventions   (a candidate in 2 runs)
+
+suggested in every run: 5   in some runs only: 1   of those, same candidate judged differently: 0
+judge replies valid on first attempt: 5/5 runs

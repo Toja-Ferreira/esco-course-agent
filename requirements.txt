@@ -19,5 +19,9 @@ langgraph
 langchain-deepseek
 python-dotenv
 
+# web page
+fastapi==0.162.5
+uvicorn==0.54.0
+
 # dev
 pytest

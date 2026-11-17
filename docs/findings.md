@@ -129,6 +129,34 @@ POF stores page sections as separate fields. Same pipeline on three inputs (`res
   - One quote was shown with a leading "…" (a cut sentence). The automatic grounding check must allow for cut quotes or the agent must quote whole sentences.
   - Whether every skill named in the "ESCO has nothing" paragraph came from a tool result was not verified (the trace was truncated).
 
+## 2026-11-17 · Labels vs definitions, rerun with verified files (n = 1, C course, 5 runs each)
+
+On 16 Nov the source files had been installed by copy-pasting from a preview, which altered some characters (checksums differed from the originals, and a unit-test judge reply was rejected that is accepted with the original files). **Treat the 16 Nov numbers above, and the 16 Nov conversation, as provisional.** Rerun after installing byte-identical files (`results/2026-11-17_c-course_labels_x5.txt`, `..._definitions_x5.txt`):
+
+| Judge sees | Suggested per run | In every run | In some runs only | Same candidate judged differently | *types of strings* | *systems development life-cycle* |
+|---|---|---|---|---|---|---|
+| Label only | 9, 7, 9, 9, 6 | 6 | 4 | 3 | 3/5 | 2/5 |
+| Label + definition | 5, 5, 5, 6, 6 | 5 | 1 | 0 | 0/5 | 5/5 |
+
+- Same direction as the first run, and clearer: with definitions the wrong-sense skill never appears (3/5 from labels), no candidate received different verdicts across runs (3 from labels), and the only unstable skill (*implement ICT coding conventions*, 2/5) was accepted every time it was a candidate, so that instability comes from the query step.
+- The cost is unchanged: *apply basic programming skills* and *organise information, objects and resources* are 5/5 from labels and 0/5 with definitions. The first is plausibly a real loss.
+- Recall is still low: five or six suggestions.
+- Lesson recorded for the methods section: results are tied to exact prompt text; record a checksum or the commit hash with every reported run.
+
+## 2026-11-16 · Built, not yet run with the real model: occupations and gaps, text suggestions, web page
+
+- Occupations are ranked from the **accepted** list (TF-IDF search from v1), and a gap check sorts an occupation's essential skills into: on the list / shown by the text but not on the list (numbered, with evidence) / not in the text.
+- Text suggestions: for one skill the text does not show, the model drafts one or two sentences for a named section; the draft is added to that section and the same judge is run on the revised course. It counts as verified only if the judge now finds the skill **and cites the new text**. One redraft on failure; a failed check is reported to the teacher as failed. The page is never changed; accepted changes are exported. A teacher's rewording is checked again.
+- **Limitation to state in the paper:** drafter and checker are the same model, so "verified" means consistent with our own judge. The draft prompt forbids restating the skill's name, but a draft written to satisfy the judge can still pass without being a good course description. The teacher's accept / edit / reject decision is the real measure.
+- Numbers the log now supports: share of drafts that pass the check (first try / after redraft), share accepted, share edited by the teacher, and whether edited text still passes.
+- Web page (`esco_agent.webapp`): asks for the teacher's own list of expected skills **before** any suggestion and saves it with the session (never shown to the model); one MCP server and one graph for all visitors, one conversation thread each; session file rewritten after every turn.
+
+## 2026-11-17 · Custom web page for the teacher test (built, not yet run with the real model)
+
+Replaces the Gradio page. FastAPI + one static page in UA colours. Three screens: (1) email, stored only as a salted HMAC, and the teacher's expected skills, required, never sent to the assistant; (2) chat: the course name, learning outcomes and contents are collected with fixed messages (checks: empty, Portuguese, whole page, too short/long), then the first suggestions and the conversation, with suggestion buttons and a clickable skill list (definition, evidence, origin, ESCO link, keep/remove); (3) closing questions (SUS + 5 statements + 2 open) with the expected list, final list and conversation shown alongside.
+- Logged in addition to the agent's events: whether a message started from a suggestion button, and whether each keep/remove came from the chat or a list button.
+- SUS items are the standard English wording; a validated Portuguese version must be added before Portuguese-speaking teachers answer (do not use an ad-hoc translation for a reported score).
+
 ---
 
 ## Open questions and things not yet measured
@@ -136,6 +164,7 @@ POF stores page sections as separate fields. Same pipeline on three inputs (`res
 - Everything above rests on one or two courses. Needed before tuning anything: a handful of courses, some outside computing, with expected skills written down **before** looking at any system's output.
 - Whether the judge needs ESCO skill descriptions, not just labels. Leading candidate for the next change: it would address the word-sense acceptances (*types of strings*) and the borderline rejections.
 - Judge stability: how often the same skill gets the same verdict across repeated runs, before and after adding descriptions.
+- Every run file should record the commit hash and the served model; neither is written by `suggest` yet.
 - Candidate settings (15 whole-text, 4 per query, 30 per judge batch) are starting guesses.
 - The model alias `deepseek-chat` moves; pin the model before any reported run.
 - Teacher test design: what is logged; consent or ethics approval; whether each teacher uses both POF's current flow and the assistant.
