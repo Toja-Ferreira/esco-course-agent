@@ -220,6 +220,18 @@
   .change .txt { border-left: 3px solid var(--lime); padding: 2px 0 2px 10px; color: var(--text); white-space: pre-wrap; }
   .change ul, .occ ul { margin: 2px 0 4px; padding-left: 18px; }
   .change .check { font-size: 12.5px; margin: 8px 0 0; }
+  .change .ba { margin-top: 8px; }
+  .change .ba > summary { cursor: pointer; color: var(--text); font-weight: 600; font-size: 13px;
+                          list-style: none; display: inline-flex; gap: 6px; align-items: center; padding: 0; }
+  .change .ba > summary::-webkit-details-marker { display: none; }
+  .change .ba > summary::after { content: none; }
+  .change .ba > summary::before { content: "›"; color: var(--lime); font-size: 16px; transition: transform .15s; }
+  .change .ba[open] > summary::before { transform: rotate(90deg); }
+  .change .ba > summary:hover { text-decoration: underline; text-decoration-color: var(--lime); }
+  .change .h2 { margin: 8px 0 2px; color: var(--grey-3); font-size: 12.5px; }
+  .change .sec { white-space: pre-wrap; max-height: 220px; overflow-y: auto; background: var(--bg);
+                 border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 13px; }
+  .change .sec mark { background: var(--lime-soft); color: var(--text); border-bottom: 2px solid var(--lime); padding: 0 1px; }
   .change .check.ok::before { content: "✓ "; color: var(--lime); font-weight: 800; }
   .change .check.bad::before { content: "✕ "; color: var(--warn); font-weight: 800; }
   .change .why { color: var(--warn); font-size: 12.5px; margin: 4px 0 0; }
@@ -478,6 +490,8 @@ const T = {
       rejected: "Rejeitada: nada foi alterado.",
     },
     modeShow: "Mostrar o que já ensina", modeTeach: "Ensinar algo novo",
+    baShow: "Ver antes e depois", baBefore: "Antes", baAfter: "Depois (o texto novo está destacado)",
+    resultSections: "Secções com as alterações aceites (para colar na página)",
     occupations: "Ocupações", occLead: n => `Ordenadas pelas ${n} competências da sua lista.`,
     occMatched: "Ligada a", occIsco: "Grupo ISCO", occEsco: "Ver na ESCO ↗",
     occGap: (on, all) => `${on} de ${all} competências essenciais na lista`,
@@ -539,6 +553,8 @@ const T = {
       rejected: "Rejected: nothing was changed.",
     },
     modeShow: "Show what it already teaches", modeTeach: "Teach something new",
+    baShow: "See before and after", baBefore: "Before", baAfter: "After (the new text is highlighted)",
+    resultSections: "Sections with the accepted changes (to paste into the page)",
     occupations: "Occupations", occLead: n => `Ranked by the ${n} skills on your list.`,
     occMatched: "Linked to", occIsco: "ISCO group", occEsco: "View on ESCO ↗",
     occGap: (on, all) => `${on} of ${all} essential skills on the list`,
@@ -917,6 +933,10 @@ function changeCard(c, open) {
       ${c.add_to_course.length ? `<p class="h">${s.toAdd}</p><ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
       <p class="h">${c.status === "accepted" ? s.chAcceptedText : s.chProposedText} ${c.edited ? s.chEdited : ""}</p>
       <div class="txt">${esc(c.text)}</div>
+      ${c.section_text ? `<details class="ba"><summary>${s.baShow}</summary>
+        <p class="h2">${s.baBefore} · ${esc(c.section)}</p><div class="sec">${esc(c.section_text)}</div>
+        <p class="h2">${s.baAfter}</p><div class="sec">${esc(c.section_text.trimEnd())}\n<mark>${esc(c.text)}</mark></div>
+      </details>` : ""}
       <p class="check ${c.verified ? "ok" : "bad"}">${c.verified ? s.chCheckOk : s.chCheckFail}</p>
       ${!c.verified && c.reason ? `<p class="why">${s.failedBecause} ${esc(c.reason)}</p>` : ""}
     </div></details>`;
@@ -1150,6 +1170,9 @@ function resultText() {
     r.skills.map(k => `- ${k.label}${k.in_text ? "" : ` (${s.notInText})`}: ${k.url}`).join("\n");
   if ((r.text_changes || []).length)
     out += `\n\n${s.resultChanges}\n` + r.text_changes.map(c => `- ${c.label} (${c.section}): ${c.text}`).join("\n");
+  const after = Object.entries(r.sections_after || {});
+  if (after.length)
+    out += `\n\n${s.resultSections}\n` + after.map(([sec, text]) => `\n[${sec}]\n${text}`).join("\n");
   return out.trim();
 }
 async function submitAnswers(q) {

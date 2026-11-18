@@ -83,6 +83,35 @@ def hash_email(email: str, salt: bytes) -> str:
 
 # --- what the page shows ------------------------------------------------------
 
+def sections_after(state: dict) -> dict:
+    """The sections that have accepted text changes, with the new text at the end
+    (the same place the check put it). The course page itself is never changed."""
+    out = {}
+    for c in state.get("text_changes") or []:
+        if c["status"] == "accepted":
+            base = out.get(c["section"], (state.get("sections") or {}).get(c["section"], ""))
+            out[c["section"]] = base.rstrip() + "\n" + c["text"]
+    return out
+
+
+def gap_now(gap: dict | None, known: list[dict]) -> dict | None:
+    """An occupation's gap against the list as it is now (not as it was when checked)."""
+    if not gap or not isinstance(gap.get("essential"), list):
+        return gap
+    number = {s["id"]: n for n, s in enumerate(known, 1)}
+    on_list, in_text, missing = 0, [], []
+    for sk in gap["essential"]:
+        n = number.get(sk["id"])
+        if n and known[n - 1]["status"] == "accepted":
+            on_list += 1
+        elif n and sk["in_text"]:
+            in_text.append({"number": n, "label": sk["label"]})
+        else:
+            missing.append(sk["label"])
+    return {"essential": len(gap["essential"]), "on_list": on_list,
+            "in_text": in_text, "not_in_text": missing}
+
+
 def panel(state: dict) -> dict:
     """The skill list and suggested text changes, as the page renders them."""
     skills = []
@@ -99,13 +128,14 @@ def panel(state: dict) -> dict:
                 "skill_number": skill_no.get(c.get("skill_id")),
                 "edited": bool(c.get("edited_by_teacher")),
                 "add_to_course": c.get("add_to_course") or [], "section": c["section"],
+                "section_text": (state.get("sections") or {}).get(c["section"], ""),
                 "text": c["text"], "verified": c["verified"], "reason": c.get("reason", ""),
                 "status": c["status"]}
                for n, c in enumerate(state.get("text_changes") or [], 1)]
     occupations = [{"rank": r, "label": o["label"], "isco_group": o.get("isco_group", ""),
                     "matched_on": [m["label"] for m in o.get("top_matching_skills", [])][:4],
                     "url": OCCUPATION_PAGE + quote(OCCUPATION_URI + o["id"], safe=""),
-                    "gap": o.get("gap")}
+                    "gap": gap_now(o.get("gap"), state.get("known") or [])}
                    for r, o in enumerate(state.get("occupations") or [], 1)]
     return {"skills": skills, "text_changes": changes, "occupations": occupations}
 
@@ -416,7 +446,7 @@ class Sessions:
         replies = [m.content for m in state["messages"][before + 1:]
                    if m.type == "ai" and m.content]
         reply = "\n\n".join(replies) or "…"
-        issues = check_reply(reply, state)
+        issues = check_reply(reply, state, earlier=before)
         self._say(s, "assistant", reply, **({"grounding_issues": issues} if issues else {}))
         await graph.aupdate_state(self._config(s), {"events": [
             {"t": _now(), "type": "grounding", "ok": not issues, "issues": issues}]},
@@ -500,7 +530,8 @@ class Sessions:
                     "course_name": s["course_name"], "questions": questions(s["language"]),
                     "questions_by_language": {lang: questions(lang) for lang in ("pt", "en")},
                     "text_changes": [c for c in panel(state)["text_changes"]
-                                     if c["status"] == "accepted"]}
+                                     if c["status"] == "accepted"],
+                    "sections_after": sections_after(state)}
 
     async def answers(self, sid: str, raw: dict) -> dict:
         s = self.get(sid)

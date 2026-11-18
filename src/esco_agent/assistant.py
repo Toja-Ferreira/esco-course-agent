@@ -581,11 +581,14 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                 else:
                     offered[skill["id"]] = _entry(skill, origin, False)
                     missing.append((None, offered[skill["id"]]))
-        # stored with the occupation, so the page can show it in the list
-        occupations[occupation - 1] = {**occupations[occupation - 1], "gap": {
-            "essential": len(occ["essential"]), "on_list": len(on_list),
-            "in_text": [{"number": n, "label": k["label"]} for n, k in in_text],
-            "not_in_text": [k["label"] for _, k in missing]}}
+        # stored with the occupation: which essential skills, and whether the course
+        # text shows each. The page works out "on the list" from the list as it is
+        # now, so keeping a skill afterwards updates the card without a new check.
+        number = _number(w)
+        occupations[occupation - 1] = {**occupations[occupation - 1], "gap": {"essential": [
+            {"id": sk["id"], "label": sk["label"],
+             "in_text": bool(number.get(sk["id"]) and known[number[sk["id"]] - 1]["in_text"])}
+            for sk in occ["essential"]]}}
         event = {"t": _now(), "type": "gap", "occupation": occ["id"],
                  "essential": len(occ["essential"]), "on_list": len(on_list),
                  "in_text_not_on_list": [k["id"] for _, k in in_text],

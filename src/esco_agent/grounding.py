@@ -7,8 +7,12 @@ each reply against what the session actually contains:
 
   - every quotation of four or more words must appear (ignoring case, spacing
     and punctuation at the ends) in the course text, a tool result, the
-    session's skills and text changes, or the teacher's own messages; a quote
+    session's skills and text changes, the teacher's own messages, or the
+    assistant's earlier replies (with their own quotations removed, so an
+    unsupported quote cannot become supported by being repeated); a quote
     shortened with "…" is checked piece by piece;
+  - a quoted question ("Ask 'what is missing for 1?'") is a suggestion to the
+    teacher, not a citation, and is not checked;
   - every "number N" / "número N" must be a skill that exists.
 
 A reply that fails is still shown, marked, and the issue is logged: the
@@ -19,7 +23,7 @@ from __future__ import annotations
 
 import re
 
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 QUOTE = re.compile(r'"([^"\n]{12,})"|“([^”\n]{12,})”|«([^»\n]{12,})»')
 NUMBER = re.compile(r"\b(?:n[úu]mero|number|n\.?º)\s*(\d{1,3})\b", re.I)
@@ -31,12 +35,17 @@ def _norm(text: str) -> str:
     return " ".join(re.sub(r"[^\w'\s-]", " ", text).split())
 
 
-def haystack(state: dict) -> str:
-    """Everything a reply may legitimately quote."""
+def haystack(state: dict, earlier: int | None = None) -> str:
+    """Everything a reply may legitimately quote. `earlier`: how many messages came
+    before this turn; the assistant's replies among them may be quoted back."""
     parts = list((state.get("sections") or {}).values())
-    for m in state.get("messages") or []:
-        if isinstance(m, (ToolMessage, HumanMessage)) and isinstance(m.content, str):
+    for i, m in enumerate(state.get("messages") or []):
+        if not isinstance(m.content, str):
+            continue
+        if isinstance(m, (ToolMessage, HumanMessage)):
             parts.append(m.content)
+        elif isinstance(m, AIMessage) and earlier is not None and i < earlier:
+            parts.append(QUOTE.sub(" ", m.content))
     for s in list(state.get("known") or []) + list((state.get("offered") or {}).values()):
         parts += [s.get("label", ""), s.get("description", "")]
         parts += [e.get("text", "") for e in s.get("evidence", [])]
@@ -45,12 +54,14 @@ def haystack(state: dict) -> str:
     return _norm("\n".join(parts))
 
 
-def check_reply(reply: str, state: dict) -> list[dict]:
+def check_reply(reply: str, state: dict, earlier: int | None = None) -> list[dict]:
     """Problems found in one reply, as [{"kind", "text"}]; empty if none."""
-    hay = haystack(state)
+    hay = haystack(state, earlier)
     issues = []
     for m in QUOTE.finditer(reply):
         quote = next(g for g in m.groups() if g)
+        if quote.rstrip(" .'\"’”").endswith("?"):
+            continue                         # a question the teacher could ask
         pieces = [p for p in re.split(r"…|\.\.\.", quote) if len(p.split()) >= MIN_WORDS]
         missing = [p for p in pieces if _norm(p) not in hay]
         if missing:

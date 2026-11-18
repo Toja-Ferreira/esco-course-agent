@@ -30,6 +30,22 @@ def test_real_quotes_pass_and_invented_ones_are_flagged():
     assert issues == [{"kind": "quote_not_found", "text": "students build compilers from scratch in Rust"}]
 
 
+def test_suggested_questions_and_earlier_replies_are_not_flagged():
+    # the two false alarms of the 18 Nov VM session
+    assert check_reply('Ask "what does number 1 lack?" to see the missing skills.', STATE) == []
+    earlier = {**STATE, "messages": STATE["messages"] + [
+        AIMessage("Ask about gaps to see an occupation's essential skills. The course \"teaches "
+                  "Rust compilers in depth\" says so."),
+        HumanMessage("what isn't in the text?"), AIMessage("current reply")]}
+    reply = "My closing line, “to see an occupation's essential skills”, was a suggestion."
+    assert check_reply(reply, earlier, earlier=3) == []
+    # an earlier reply's own unsupported quote does not become supported by repetition
+    again = 'As I said, the course "teaches Rust compilers in depth".'
+    assert check_reply(again, earlier, earlier=3)[0]["kind"] == "quote_not_found"
+    # without `earlier`, the assistant's replies are not quotable (the current one is among them)
+    assert check_reply(reply, earlier)[0]["kind"] == "quote_not_found"
+
+
 def test_skill_numbers_must_exist():
     assert check_reply("Porquê a número 1? Because…", STATE) == []
     assert check_reply("Keep number 7 too.", STATE) == [{"kind": "unknown_skill_number", "text": "number 7"}]

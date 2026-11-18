@@ -341,3 +341,12 @@ def test_course_name_on_the_first_screen_skips_that_question(tmp_path):
     bad = c.post("/api/session", json={"email": "t@ua.pt", "course_name": "line\nline\nline",
                                        "expected": "programar em C"})
     assert bad.status_code == 400
+
+
+def test_sections_after_add_accepted_changes_at_the_end():
+    from esco_agent.web.app import sections_after
+    state = {"sections": {"Contents": "Pointers.\n", "Learning outcomes": "Write C."},
+             "text_changes": [{"section": "Contents", "text": "Unit tests.", "status": "accepted"},
+                              {"section": "Contents", "text": "Rejected.", "status": "rejected"},
+                              {"section": "Contents", "text": "Test reports.", "status": "accepted"}]}
+    assert sections_after(state) == {"Contents": "Pointers.\nUnit tests.\nTest reports."}

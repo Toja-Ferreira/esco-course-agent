@@ -231,3 +231,10 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 - Occupations are listed in the panel after they are ranked, with the skills each is linked to, an ESCO link and, once checked, the gap (essential skills on the list, in the text but not on the list, not in the text). The gap is stored with the occupation (state), not only as an event.
 - Skill and occupation names in the assistant's replies are links that open the item in the panel.
 - Portuguese wording: "ocupações" only (ESCO's own term), not "profissões".
+
+## 2026-11-18 — Second VM session (C course, real model)
+
+- Occupation card went stale: after keeping skill 9, "software tester" still listed it as missing until the teacher asked again. The gap is now stored raw (each essential skill and whether the text shows it) and recomputed from the current list, so the card updates at once.
+- Two false grounding warnings: the check flagged the assistant's suggested question ("Ask 'what does number 1 lack?'") and, next turn, its quote of its own earlier reply. Quoted questions are no longer checked, and the assistant's earlier replies may be quoted, with their own quotations removed so an unsupported quote cannot become supported by repetition. The flagged-reply rate reported in the paper should use the corrected check (both warnings in this session were false).
+- Text changes: a "before and after" view of the section, new text highlighted; the end result includes each changed section in full, ready to paste.
+- The text suggestions in this session (teach: execute software tests, report test findings) both passed the check; the teacher accepted one.
