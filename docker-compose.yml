@@ -10,10 +10,9 @@ services:
       HOST: 0.0.0.0
       PORT: "8090"
       ESCO_AUTH: pof
-      POF_API_URL: http://host.docker.internal:5181   # POF's backend on the host
+      POF_API_URL: http://<pof-backend-host>:<port>   # POF's backend container, on POF's network
       ESCO_DATA_DIR: /app/data
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    networks: [default, pof]               # the VM's firewall blocks containers -> host ports
     ports:
       - "127.0.0.1:8090:8090"
     user: "${APP_UID:-1000}:${APP_GID:-1000}"          # owner of results/ and hf-cache/
@@ -26,3 +25,8 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
+
+networks:
+  pof:
+    external: true
+    name: ${POF_NETWORK:-<pof-docker-network>}     # `docker inspect pof-backend` shows it

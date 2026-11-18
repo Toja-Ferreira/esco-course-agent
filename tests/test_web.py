@@ -82,6 +82,9 @@ def test_whole_session_from_start_to_answers(tmp_path):
     both = review["questions_by_language"]
     assert both["pt"]["scale"][0] == "Discordo totalmente" and both["en"]["scale"][0] == "Strongly disagree"
     assert [o["key"] for o in both["pt"]["open"]] == ["most_useful", "distrust", "comments"]
+    assert both["pt"]["sus"][0] == "Acho que gostaria de utilizar este produto com frequência."
+    assert both["pt"]["sus_language"] == "pt" and both["en"]["sus_language"] == "en"
+    assert len(both["pt"]["sus"]) == 10
     assert review["text_changes"] == []
 
     assert c.post("/api/message", json={"session": sid, "text": "mais"}).status_code == 400

@@ -218,3 +218,8 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 - Closing page: SUS showed in English inside a Portuguese page (no validated Portuguese SUS yet) and did not follow POF's language switch. Now it follows the switch, keeps answers already given, and records the language shown (`questions_language`, `sus_language`). The English SUS stays until a validated Portuguese version is added.
 - Added an optional free-text "anything else?" question.
 - The JSON download for teachers was replaced by the result in plain text (final list with ESCO links, accepted text changes) with a "Copy" button: the JSON was for us, not for teachers. The download endpoint stays (owner-only) for our checks.
+
+## 2026-11-18 — Deployed on the VM; validated Portuguese SUS
+
+- Deployed on the university VM next to POF: Docker (the VM's Python is 3.8), `127.0.0.1:8090`, nginx `/esco/`. The VM's firewall blocks containers from reaching host ports, so the app joins POF's Docker network and calls `<pof-backend-host>:<port>`. UA login and the POF tab work.
+- SUS in Portuguese: the validated European Portuguese version (Martins et al. 2015, Procedia Computer Science 67, doi:10.1016/j.procs.2015.09.273), wording as published ("produto"). Portuguese pages now show it; `sus_language` records which version each teacher answered.

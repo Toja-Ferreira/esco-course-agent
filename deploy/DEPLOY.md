@@ -60,13 +60,13 @@ Checks:
 ```bash
 curl -s 127.0.0.1:8090/api/me; echo                    # {"mode": "pof", ...}
 # POF's backend reachable from the container (expect "HTTP Error 401"):
-docker exec esco-assistant python -c "import urllib.request as u; u.urlopen('http://host.docker.internal:5181/api/auth/user/')"
+docker exec esco-assistant python -c "import urllib.request as u; u.urlopen('http://<pof-backend-host>:<port>/api/auth/user/')"
 # download the embedding model now, not on the first teacher's message:
 docker exec esco-assistant python -c "from esco_core.dense import MODEL_ID, MODEL_REVISION; from sentence_transformers import SentenceTransformer; SentenceTransformer(MODEL_ID, revision=MODEL_REVISION); print('model ok')"
 ```
-If the second check times out instead of giving 401, the firewall blocks
-Docker from reaching the host. The fix is to join POF's Docker network and use
-`POF_API_URL: http://<pof-backend-host>:<port>` instead.
+The app joins POF's Docker network (`<pof-docker-network>`) to reach POF's backend; the
+VM's firewall blocks containers from reaching ports on the host. If POF's network
+has another name (`docker inspect pof-backend`), set `POF_NETWORK=<name>` in `.env`.
 
 ## 4. nginx
 

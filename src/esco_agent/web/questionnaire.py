@@ -2,9 +2,8 @@
 
 SUS: the System Usability Scale (Brooke, 1996), 10 items, 1-5, scored 0-100.
 The items are the standard English wording. BEFORE THE TEST: if teachers answer
-in Portuguese, replace SUS_PT with a published, validated Portuguese version
-(do not use an ad-hoc translation for a reported score). Until then the English
-items are shown in both languages.
+in Portuguese, SUS_PT is the published, validated European Portuguese version
+(never an ad-hoc translation, for a reported score).
 """
 
 from __future__ import annotations
@@ -21,7 +20,22 @@ SUS_EN = [
     "I felt very confident using the system.",
     "I needed to learn a lot of things before I could get going with this system.",
 ]
-SUS_PT: list[str] | None = None   # validated Portuguese SUS goes here
+# European Portuguese SUS, validated: Martins, Rosa, Queirós, Silva & Rocha (2015),
+# "European Portuguese Validation of the System Usability Scale (SUS)",
+# Procedia Computer Science 67, 293-300, doi:10.1016/j.procs.2015.09.273.
+# Wording kept exactly as published ("produto"), so the validation applies.
+SUS_PT: list[str] | None = [
+    "Acho que gostaria de utilizar este produto com frequência.",
+    "Considerei o produto mais complexo do que necessário.",
+    "Achei o produto fácil de utilizar.",
+    "Acho que necessitaria de ajuda de um técnico para conseguir utilizar este produto.",
+    "Considerei que as várias funcionalidades deste produto estavam bem integradas.",
+    "Achei que este produto tinha muitas inconsistências.",
+    "Suponho que a maioria das pessoas aprenderia a utilizar rapidamente este produto.",
+    "Considerei o produto muito complicado de utilizar.",
+    "Senti-me muito confiante a utilizar este produto.",
+    "Tive que aprender muito antes de conseguir lidar com este produto.",
+]
 
 STATEMENTS = {
     "evidence": {
