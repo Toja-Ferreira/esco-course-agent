@@ -523,6 +523,10 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         progress("find_occupations", isco_prefix=prefix)
         occupations = await esco.search_occupations([s["id"] for s in accepted], prefix,
                                                     OCCUPATIONS_K)
+        # keep a gap already checked for an occupation that is still in the ranking
+        old_gaps = {o["id"]: o["gap"] for o in w["occupations"] if o.get("gap")}
+        occupations = [{**o, "gap": old_gaps[o["id"]]} if o["id"] in old_gaps else o
+                       for o in occupations]
         w["occupations"] = occupations
         shown = [{"rank": r, "label": o["label"], "isco_group": o["isco_group"],
                   "score": o["score"],
@@ -577,6 +581,11 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                 else:
                     offered[skill["id"]] = _entry(skill, origin, False)
                     missing.append((None, offered[skill["id"]]))
+        # stored with the occupation, so the page can show it in the list
+        occupations[occupation - 1] = {**occupations[occupation - 1], "gap": {
+            "essential": len(occ["essential"]), "on_list": len(on_list),
+            "in_text": [{"number": n, "label": k["label"]} for n, k in in_text],
+            "not_in_text": [k["label"] for _, k in missing]}}
         event = {"t": _now(), "type": "gap", "occupation": occ["id"],
                  "essential": len(occ["essential"]), "on_list": len(on_list),
                  "in_text_not_on_list": [k["id"] for _, k in in_text],

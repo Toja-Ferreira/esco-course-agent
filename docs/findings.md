@@ -223,3 +223,11 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 
 - Deployed on the university VM next to POF: Docker (the VM's Python is 3.8), `127.0.0.1:8090`, nginx `/esco/`. The VM's firewall blocks containers from reaching host ports, so the app joins POF's Docker network and calls `<pof-backend-host>:<port>`. UA login and the POF tab work.
 - SUS in Portuguese: the validated European Portuguese version (Martins et al. 2015, Procedia Computer Science 67, doi:10.1016/j.procs.2015.09.273), wording as published ("produto"). Portuguese pages now show it; `sus_language` records which version each teacher answered.
+
+## 2026-11-18 — Panel and chat links (after the first VM session)
+
+- The list now scrolls to what is new (skills, text changes, occupations) and highlights it. Calmer card hover (border and arrow, no shadow jump).
+- Text changes open and close; each says what happened (to decide / accepted, skill N is on the list / failed, needs the teacher's wording / rejected), which skill, where the text goes (end of which section), what to add to the course (teach), the text, and the check result with its reason.
+- Occupations are listed in the panel after they are ranked, with the skills each is linked to, an ESCO link and, once checked, the gap (essential skills on the list, in the text but not on the list, not in the text). The gap is stored with the occupation (state), not only as an event.
+- Skill and occupation names in the assistant's replies are links that open the item in the panel.
+- Portuguese wording: "ocupações" only (ESCO's own term), not "profissões".

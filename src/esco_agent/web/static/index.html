@@ -173,20 +173,24 @@
   aside h2:first-child { margin-top: 0; }
   .count { background: var(--lime); color: var(--black); border-radius: 999px; padding: 0 9px; font-size: 13px; }
   .empty { color: var(--grey-3); font-size: 14px; }
-  .skill { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; background: var(--surface);
-           transition: border-color .15s, box-shadow .15s, transform .08s; }
-  .skill:hover { border-color: var(--field-line); box-shadow: 0 2px 8px rgba(0,0,0,.07); }
-  .skill[open] { box-shadow: 0 2px 10px rgba(0,0,0,.08); }
-  .skill summary { transition: background .12s; border-radius: 8px; }
-  .skill summary:hover { background: var(--bg); }
-  .skill summary:active { background: var(--lime-soft); }
-  .skill summary::after { content: "▸"; color: var(--lime); transition: transform .15s; margin-left: 4px; }
-  .skill[open] summary::after { transform: rotate(90deg); }
-  .skill.flash { animation: flash 1.2s ease-out; }
-  @keyframes flash { 0% { background: var(--lime-soft); border-color: var(--lime); } 100% { background: var(--surface); } }
+  /* skill, text-change and occupation cards: calm hover (border and arrow), no jumping shadow */
+  .skill, .change, .occ { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; background: var(--surface);
+                          transition: border-color .15s ease, background-color .15s ease; }
+  .skill:hover, .change:hover, .occ:hover { border-color: color-mix(in srgb, var(--lime) 70%, var(--line)); }
+  .skill[open], .change[open], .occ[open] { border-color: var(--lime); }
+  .skill summary, .change summary, .occ summary { list-style: none; cursor: pointer; padding: 9px 12px;
+    display: flex; gap: 8px; align-items: baseline; border-radius: 8px; }
+  .skill summary::-webkit-details-marker, .change summary::-webkit-details-marker, .occ summary::-webkit-details-marker { display: none; }
+  .skill summary:active, .change summary:active, .occ summary:active { background: var(--lime-soft); }
+  .skill summary::after, .change summary::after, .occ summary::after { content: "›"; color: var(--grey-3); font-size: 18px;
+    line-height: 1; margin-left: 4px; transition: transform .18s ease, color .15s; }
+  .skill:hover summary::after, .change:hover summary::after, .occ:hover summary::after { color: var(--lime); }
+  .skill[open] summary::after, .change[open] summary::after, .occ[open] summary::after { transform: rotate(90deg); color: var(--lime); }
+  .skill:focus-within, .change:focus-within, .occ:focus-within { outline: none; }
+  summary:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+  .flash { animation: flash 1.6s ease-out; }
+  @keyframes flash { 0%, 30% { background: var(--lime-soft); border-color: var(--lime); } 100% { background: var(--surface); } }
   .skill.accepted { border-left: 4px solid var(--lime); }
-  .skill summary { list-style: none; cursor: pointer; padding: 8px 10px; display: flex; gap: 8px; align-items: baseline; }
-  .skill summary::-webkit-details-marker { display: none; }
   .num { font-variant-numeric: tabular-nums; color: var(--grey-3); min-width: 22px; }
   .skill .label { font-weight: 600; flex: 1; }
   .tag { font-size: 11.5px; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
@@ -198,15 +202,37 @@
   .skill .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
   .skill .actions a { margin-left: auto; font-size: 13px; }
   details.rejected > summary { cursor: pointer; color: var(--grey-3); font-size: 14px; margin-top: 16px; }
-  .change { border: 1px dashed var(--field-line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 13.5px; }
-  .change .meta { color: var(--grey-3); font-size: 12.5px; }
-  .change .txt { margin-top: 4px; }
-  .change.teach { border-color: var(--lime); }
-  .change ul { margin: 4px 0 2px; padding-left: 18px; }
-  .change .why { color: var(--warn); font-size: 12.5px; margin-top: 4px; }
-  .kind { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
-          background: var(--bg); border-radius: 4px; padding: 1px 6px; color: var(--grey-2); }
-  .change.teach .kind { background: var(--lime); color: var(--black); }
+  .change .st { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
+                background: var(--bg); color: var(--grey-2); border: 1px solid var(--line); }
+  .change.st-accepted .st { background: var(--lime); color: var(--black); border-color: var(--lime); }
+  .change.st-proposed .st { background: var(--lime-soft); color: var(--text); border-color: var(--lime); }
+  .change.st-failed .st { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+  .change.st-rejected { opacity: .75; }
+  .change .label, .occ .label { font-weight: 600; flex: 1; }
+  .change .kind { display: block; font-size: 12px; font-weight: 400; color: var(--grey-3); margin-top: 1px; }
+  .change .body, .occ .body { padding: 0 14px 12px; font-size: 13.5px; color: var(--grey-2); }
+  .change .body .what { color: var(--text); margin: 2px 0 8px; }
+  .change dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0 0 6px; }
+  .change dt { color: var(--grey-3); }
+  .change dd { margin: 0; color: var(--text); }
+  .change .h, .occ .h { margin: 8px 0 2px; font-weight: 600; color: var(--text); }
+  .occ .h2 { margin: 6px 0 0; color: var(--grey-3); }
+  .change .txt { border-left: 3px solid var(--lime); padding: 2px 0 2px 10px; color: var(--text); white-space: pre-wrap; }
+  .change ul, .occ ul { margin: 2px 0 4px; padding-left: 18px; }
+  .change .check { font-size: 12.5px; margin: 8px 0 0; }
+  .change .check.ok::before { content: "✓ "; color: var(--lime); font-weight: 800; }
+  .change .check.bad::before { content: "✕ "; color: var(--warn); font-weight: 800; }
+  .change .why { color: var(--warn); font-size: 12.5px; margin: 4px 0 0; }
+  .occ .num { color: var(--grey-3); }
+  .occ .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+  .occ .actions a { margin-left: auto; font-size: 13px; }
+  .occlead { margin: -4px 0 8px; }
+  /* skill / occupation names in replies: open them in the panel */
+  button.ref { all: unset; cursor: pointer; color: inherit; font-weight: inherit;
+               text-decoration: underline; text-decoration-color: var(--lime); text-decoration-thickness: 2px;
+               text-underline-offset: 3px; border-radius: 3px; transition: background-color .12s; }
+  button.ref:hover { background: var(--lime-soft); }
+  button.ref:focus-visible { outline: 2px solid var(--lime); }
 
   /* --- screen 3 --- */
   .review { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 60px); }
@@ -277,7 +303,7 @@
   body.embed .chat { padding: 28px 28px 8px 0; }
   body.embed .composer { background: transparent; padding: 12px 28px 14px 0; }
   body.embed .work aside { border-right: 1px solid var(--line); }
-  body.embed .msg .bubble, body.embed .skill, body.embed .change, body.embed .dialog { border-radius: var(--radius); }
+  body.embed .msg .bubble, body.embed .skill, body.embed .change, body.embed .occ, body.embed .dialog { border-radius: var(--radius); }
   body.embed aside { background: var(--card); }
   body.embed .btn, body.embed .chip { border-radius: 999px; }
   body.embed #send { border-radius: 50%; }
@@ -297,7 +323,7 @@
   body.embed .chip { font-size: 15px; padding: 6px 14px; }
   body.embed .typing .bubble, body.embed .msg.stepsdone .bubble, body.embed .msg.action .bubble { font-size: 15px; }
   body.embed aside h2 { font-size: 17px; }
-  body.embed .empty, body.embed .skill .body, body.embed .change { font-size: 15px; }
+  body.embed .empty, body.embed .skill .body, body.embed .change .body, body.embed .occ .body { font-size: 15px; }
   body.embed .tag { font-size: 13px; }
   body.embed .btn.small { font-size: 14.5px; padding: 6px 14px; }
   body.embed .dialog h2, body.embed .form h2 { font-size: 21px; }
@@ -309,7 +335,6 @@
     --inverse: #ededed; --on-inverse: #000000; --lime-soft: rgba(184, 211, 49, .14);
     --warn: #f2c35b; --warn-soft: rgba(242, 195, 91, .12); --error: #ff6b7a; color-scheme: dark; }
   body.embed.dark .card { box-shadow: none; border: 1px solid var(--line); }
-  body.embed.dark .skill:hover { box-shadow: 0 2px 10px rgba(0,0,0,.5); }
   body.embed.dark .overlay { background: rgba(0,0,0,.7); }
   body.embed.dark .msg.user.course .more { color: #4d6000; }
   body.embed.dark .likert input:checked + span { border-color: var(--inverse); }
@@ -411,17 +436,17 @@ const T = {
     loginTitle: "Assistente de competências ESCO", loginBtn: "Entrar com a conta da Universidade de Aveiro",
     loginLead: "Para participar, entre com as credenciais da Universidade de Aveiro. O seu email não é guardado: apenas um código derivado dele.",
     logout: "Sair", hello: n => `Olá, ${n}`, backToPof: "Voltar ao POF",
-    s1Lead: "Obrigado por participar. Este é um estudo da Universidade de Aveiro sobre um assistente que ajuda a escolher as competências ESCO (a classificação europeia de competências e profissões) que descrevem uma unidade curricular. Não altera nada no POF.",
+    s1Lead: "Obrigado por participar. Este é um estudo da Universidade de Aveiro sobre um assistente que ajuda a escolher as competências ESCO (a classificação europeia de competências, qualificações e ocupações) que descrevem uma unidade curricular. Não altera nada no POF.",
     s1Steps: [
       "<b>Primeiro:</b> indique o nome da unidade curricular e escreva, pelas suas palavras, as competências que espera que desenvolva.",
       "<b>Depois:</b> cole o texto da página da unidade curricular, em inglês (objetivos e conteúdos).",
-      "<b>Na conversa:</b> o assistente sugere competências ESCO, cada uma com a frase do seu texto que a justifica. Mantenha ou remova as que quiser e pergunte o que precisar: a que profissões a UC dá acesso, o que lhe falta, ou o que mudar no texto para ensinar uma competência.",
+      "<b>Na conversa:</b> o assistente sugere competências ESCO, cada uma com a frase do seu texto que a justifica. Mantenha ou remova as que quiser e pergunte o que precisar: a que ocupações a UC dá acesso, o que lhe falta, ou o que mudar no texto para ensinar uma competência.",
       "<b>No fim:</b> carregue em <b>Terminar</b> e responda a umas perguntas curtas sobre a experiência.",
     ],
     help: "Precisa de ajuda?", helpTitle: "Como funciona", helpNow: "Está aqui",
     helpAsk: "Pode perguntar, por exemplo (clique para usar):", close: "Fechar",
-    helpAsks: ["Que profissões combinam com esta unidade curricular?", "Explique a competência 1",
-               "Mantenha a 1 e a 2, remova a 3", "O que falta para ensinar a competência 2?",
+    helpAsks: ["Que ocupações combinam com esta unidade curricular?", "Explique a competência 1",
+               "Mantenha a 1 e a 2, remova a 3", "O que falta para ensinar a competência 2?", "O que falta para a ocupação 1?",
                "Há alguma competência sobre trabalho em equipa?"],
     email: "O seu email", ucName: "Nome da unidade curricular", ucNamePh: "Ex.: Programação em C",
     expected: "Que competências desenvolve esta unidade curricular?",
@@ -441,6 +466,23 @@ const T = {
     keepAll: "Manter todas", removeAll: "Remover todas", undecided: "Por decidir", cancel: "Voltar", goOn: "Terminar",
     kindShow: "texto da página", kindTeach: "alteração à UC", toAdd: "Acrescentar à unidade curricular:",
     failedBecause: "Porque falhou:",
+    chStatus: { proposed: "Por decidir", accepted: "Aceite", rejected: "Rejeitada", failed: "Falhou a verificação" },
+    chSkill: "Competência", chWhere: "Onde", chWhereText: sec => `acrescentar no fim da secção “${sec}”`,
+    chProposedText: "Texto proposto", chAcceptedText: "Texto aceite", chEdited: "(com as suas palavras)",
+    chCheckOk: "Verificação: com este texto, a competência passa a ser reconhecida no texto da UC.",
+    chCheckFail: "Verificação: mesmo com este texto, a competência não é reconhecida.",
+    chDone: {
+      proposed: "Ainda não decidiu. Diga no chat se aceita, quer editar ou rejeita.",
+      failed: "Não foi aceite. Só pode ser aceite se escrever o texto com as suas palavras (no chat).",
+      accepted: n => n ? `Aceite. A competência ${n} está na sua lista. A página não foi alterada: copie o texto no fim.` : "Aceite. A página não foi alterada: copie o texto no fim.",
+      rejected: "Rejeitada: nada foi alterado.",
+    },
+    modeShow: "Mostrar o que já ensina", modeTeach: "Ensinar algo novo",
+    occupations: "Ocupações", occLead: n => `Ordenadas pelas ${n} competências da sua lista.`,
+    occMatched: "Ligada a", occIsco: "Grupo ISCO", occEsco: "Ver na ESCO ↗",
+    occGap: (on, all) => `${on} de ${all} competências essenciais na lista`,
+    occInText: "No texto, mas fora da lista", occMissing: "Não estão no texto da UC",
+    occNoGap: n => `Para ver o que falta, pergunte: “O que falta para a ocupação ${n}?”`,
     flagged: "⚠ Atenção: esta resposta cita algo que não foi encontrado no texto da unidade curricular nem nos resultados da ESCO. Confirme antes de usar.",
     recapExpected: "O que escreveu antes de começar", recapList: "A lista que construiu", recapLog: "A conversa",
     formTitle: "Perguntas finais", formLead: "Cerca de 3 minutos. Use a coluna da esquerda para se lembrar da sessão.",
@@ -465,7 +507,7 @@ const T = {
     help: "Need help?", helpTitle: "How it works", helpNow: "You are here",
     helpAsk: "You can ask, for example (click to use):", close: "Close",
     helpAsks: ["Which occupations match this course?", "Explain skill 1",
-               "Keep 1 and 2, remove 3", "What is missing to teach skill 2?",
+               "Keep 1 and 2, remove 3", "What is missing to teach skill 2?", "What is missing for occupation 1?",
                "Is there a skill about teamwork?"],
     email: "Your email", ucName: "Course name", ucNamePh: "E.g. C Programming",
     expected: "Which skills does this course develop?",
@@ -485,6 +527,23 @@ const T = {
     keepAll: "Keep all", removeAll: "Remove all", undecided: "Undecided", cancel: "Back", goOn: "Finish",
     kindShow: "page text", kindTeach: "course change", toAdd: "Add to the course:",
     failedBecause: "Why it failed:",
+    chStatus: { proposed: "To decide", accepted: "Accepted", rejected: "Rejected", failed: "Failed the check" },
+    chSkill: "Skill", chWhere: "Where", chWhereText: sec => `add at the end of the “${sec}” section`,
+    chProposedText: "Proposed text", chAcceptedText: "Accepted text", chEdited: "(in your words)",
+    chCheckOk: "Check: with this text, the skill is recognised in the course text.",
+    chCheckFail: "Check: even with this text, the skill is not recognised.",
+    chDone: {
+      proposed: "Not decided yet. Say in the chat whether you accept, want to edit or reject it.",
+      failed: "Not accepted. It can only be accepted if you write the text in your own words (in the chat).",
+      accepted: n => n ? `Accepted. Skill ${n} is on your list. The page was not changed: copy the text at the end.` : "Accepted. The page was not changed: copy the text at the end.",
+      rejected: "Rejected: nothing was changed.",
+    },
+    modeShow: "Show what it already teaches", modeTeach: "Teach something new",
+    occupations: "Occupations", occLead: n => `Ranked by the ${n} skills on your list.`,
+    occMatched: "Linked to", occIsco: "ISCO group", occEsco: "View on ESCO ↗",
+    occGap: (on, all) => `${on} of ${all} essential skills on the list`,
+    occInText: "In the text, not on the list", occMissing: "Not in the course text",
+    occNoGap: n => `To see what is missing, ask: “What is missing for occupation ${n}?”`,
     flagged: "⚠ Note: this reply quotes something that wasn't found in the course text or the ESCO results. Check it before relying on it.",
     recapExpected: "What you wrote before starting", recapList: "The list you built", recapLog: "The conversation",
     formTitle: "Closing questions", formLead: "About 3 minutes. Use the left column to recall the session.",
@@ -502,7 +561,7 @@ const STEPS = {
         checking: d => `A verificar ${d.n} competências contra o texto`,
         thinking: "A pensar",
         find_skills: d => `A pesquisar “${d.topic}” na ESCO e a verificar no texto`,
-        find_occupations: d => d.isco_prefix ? `A procurar profissões (ISCO ${d.isco_prefix})` : "A procurar profissões relacionadas com a lista",
+        find_occupations: d => d.isco_prefix ? `A procurar ocupações (ISCO ${d.isco_prefix})` : "A procurar ocupações relacionadas com a lista",
         check_occupation_gap: d => `A ver o que falta para “${d.occupation}”`,
         drafting: d => `A redigir texto para “${d.skill}”`,
         redrafting: d => `O primeiro texto não passou a verificação; a redigir outro para “${d.skill}”`,
@@ -525,7 +584,7 @@ function stepText(p) {
 }
 
 let me = { login_required: false, logged_in: false, first_name: "" };
-let lang = "pt", session = null, stage = null, chip = null, busy = false, panelState = { skills: [], text_changes: [] };
+let lang = "pt", session = null, stage = null, chip = null, busy = false, panelState = { skills: [], text_changes: [], occupations: [] };
 const $ = id => document.getElementById(id);
 const t = () => T[lang];
 
@@ -671,7 +730,7 @@ function typeInto(el, text) {
     i = Math.min(text.length, i + step);
     el.innerHTML = md(text.slice(0, i));
     $("chat").scrollTop = $("chat").scrollHeight;
-    if (i < text.length) requestAnimationFrame(frame); else el.classList.remove("caret");
+    if (i < text.length) requestAnimationFrame(frame); else { el.classList.remove("caret"); linkifyChat(); }
   })();
 }
 function addMessage(m, animate = false) {
@@ -699,6 +758,7 @@ function addMessage(m, animate = false) {
     div.innerHTML = `<div class="bubble">${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}</div>`;
   }
   $("chat").appendChild(div); $("chat").scrollTop = $("chat").scrollHeight;
+  if (m.role === "assistant" || m.role === "action") linkifyChat();
 }
 // While the assistant works: a bubble listing its steps (spinner on the current one),
 // then the reply, written as the model produces it.
@@ -842,34 +902,133 @@ function skillCard(s, open) {
       <div class="actions">${act}<a href="${esc(s.url)}" target="_blank" rel="noopener">${t().esco}</a></div>
     </div></details>`;
 }
-let lastStatus = {};
+function changeCard(c, open) {
+  const s = t(), skillNo = c.skill_number;
+  const done = c.status === "accepted" ? s.chDone.accepted(skillNo) : s.chDone[c.status] || "";
+  return `<details class="change ${c.mode} st-${c.status}" data-c="${c.number}" ${open ? "open" : ""}>
+    <summary><span class="st">${s.chStatus[c.status] || c.status}</span>
+      <span class="label">${esc(c.label)}<span class="kind">${c.mode === "teach" ? s.modeTeach : s.modeShow}</span></span></summary>
+    <div class="body">
+      <p class="what">${esc(done)}</p>
+      <dl>
+        <dt>${s.chSkill}</dt><dd>${skillNo ? `<button class="ref" data-n="${skillNo}">${skillNo}. ${esc(c.label)}</button>` : esc(c.label)}</dd>
+        <dt>${s.chWhere}</dt><dd>${esc(s.chWhereText(c.section))}</dd>
+      </dl>
+      ${c.add_to_course.length ? `<p class="h">${s.toAdd}</p><ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      <p class="h">${c.status === "accepted" ? s.chAcceptedText : s.chProposedText} ${c.edited ? s.chEdited : ""}</p>
+      <div class="txt">${esc(c.text)}</div>
+      <p class="check ${c.verified ? "ok" : "bad"}">${c.verified ? s.chCheckOk : s.chCheckFail}</p>
+      ${!c.verified && c.reason ? `<p class="why">${s.failedBecause} ${esc(c.reason)}</p>` : ""}
+    </div></details>`;
+}
+function occCard(o, open) {
+  const s = t(), g = o.gap;
+  const gap = g ? `<p class="h">${esc(s.occGap(g.on_list, g.essential))}</p>
+      ${g.in_text.length ? `<p class="h2">${s.occInText}</p><ul>${g.in_text.map(k => `<li><button class="ref" data-n="${k.number}">${k.number}. ${esc(k.label)}</button></li>`).join("")}</ul>` : ""}
+      ${g.not_in_text.length ? `<p class="h2">${s.occMissing}</p><ul>${g.not_in_text.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}`
+    : `<p class="hint">${esc(s.occNoGap(o.rank))}</p>`;
+  return `<details class="occ" data-o="${o.rank}" ${open ? "open" : ""}>
+    <summary><span class="num">${o.rank}.</span><span class="label">${esc(o.label)}</span>
+      ${g ? `<span class="tag ${g.on_list === g.essential ? "" : "warn"}">${g.on_list}/${g.essential}</span>` : ""}</summary>
+    <div class="body">
+      ${o.matched_on.length ? `<p><strong>${s.occMatched}:</strong> ${o.matched_on.map(esc).join(", ")}</p>` : ""}
+      ${gap}
+      <div class="actions"><span class="hint">${s.occIsco} ${esc(o.isco_group)}</span>
+        <a href="${esc(o.url)}" target="_blank" rel="noopener">${s.occEsco}</a></div>
+    </div></details>`;
+}
+// what was on the panel last time, to find what is new
+let lastStatus = {}, lastChanges = {}, lastOcc = "";
 function renderPanel() {
   const p = $("panel"); if (!p) return;
-  const openNow = new Set([...p.querySelectorAll("details.skill[open]")].map(d => d.dataset.n));
+  const openSkills = new Set([...p.querySelectorAll("details.skill[open]")].map(d => d.dataset.n));
+  const openChanges = new Set([...p.querySelectorAll("details.change[open]")].map(d => d.dataset.c));
+  const openOcc = new Set([...p.querySelectorAll("details.occ[open]")].map(d => d.dataset.o));
+  const rejOpen = !!p.querySelector("details.rejected[open]");
   const by = st => panelState.skills.filter(s => s.status === st);
   const acc = by("accepted"), pen = by("pending"), rej = by("rejected");
+  const changes = panelState.text_changes || [], occs = panelState.occupations || [];
+  const first = !Object.keys(lastStatus).length && !Object.keys(lastChanges).length && !lastOcc;
+  // new or changed since the last render
+  const newSkills = first ? [] : panelState.skills.filter(sk => lastStatus[sk.number] !== sk.status).map(sk => String(sk.number));
+  const newChanges = first ? [] : changes.filter(c => lastChanges[c.number] !== c.status).map(c => String(c.number));
+  const occSig = occs.length ? JSON.stringify(occs.map(o => [o.label, !!o.gap])) : "";
+  const occChanged = occSig !== lastOcc && occs.length > 0;
+  const gapNew = occs.filter(o => o.gap && !lastOcc.includes(JSON.stringify([o.label, true]))).map(o => String(o.rank));
+
   let h = `<h2>${t().list} <span class="count">${acc.length}</span></h2>`;
-  h += acc.length ? acc.map(s => skillCard(s, openNow.has(String(s.number)))).join("") : `<p class="empty">${t().listEmpty}</p>`;
-  if (pen.length) h += `<h2>${t().pending}</h2>` + pen.map(s => skillCard(s, openNow.has(String(s.number)))).join("");
-  if (panelState.text_changes.length) {
-    h += `<h2>${t().changes}</h2>` + panelState.text_changes.map(c => `<div class="change ${c.mode}">
-      <div class="meta"><span class="kind">${c.mode === "teach" ? t().kindTeach : t().kindShow}</span>
-        ${c.number}. ${esc(c.label)} · ${t().addTo} <strong>${esc(c.section)}</strong> ·
-        ${c.verified ? t().passed : t().failed} · ${t().status[c.status] || c.status}</div>
-      ${c.add_to_course.length ? `<div>${t().toAdd}<ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
-      <div class="txt">“${esc(c.text)}”</div>
-      ${!c.verified && c.reason ? `<div class="why">${t().failedBecause} ${esc(c.reason)}</div>` : ""}</div>`).join("");
-  }
-  if (rej.length) h += `<details class="rejected"><summary>${t().rejected} (${rej.length})</summary>${rej.map(s => skillCard(s, false)).join("")}</details>`;
+  h += acc.length ? acc.map(s => skillCard(s, openSkills.has(String(s.number)))).join("") : `<p class="empty">${t().listEmpty}</p>`;
+  if (pen.length) h += `<h2>${t().pending}</h2>` + pen.map(s => skillCard(s, openSkills.has(String(s.number)))).join("");
+  if (changes.length) h += `<h2>${t().changes} <span class="count">${changes.length}</span></h2>` +
+    changes.map(c => changeCard(c, openChanges.has(String(c.number)) || newChanges.includes(String(c.number)))).join("");
+  if (occs.length) h += `<h2>${t().occupations} <span class="count">${occs.length}</span></h2>` +
+    `<p class="hint occlead">${esc(t().occLead(acc.length))}</p>` +
+    occs.map(o => occCard(o, openOcc.has(String(o.rank)) || gapNew.includes(String(o.rank)))).join("");
+  if (rej.length) h += `<details class="rejected" ${rejOpen ? "open" : ""}><summary>${t().rejected} (${rej.length})</summary>${rej.map(s => skillCard(s, false)).join("")}</details>`;
   p.innerHTML = h;
-  // briefly highlight skills that are new or changed status
-  for (const sk of panelState.skills) {
-    if (lastStatus[sk.number] !== undefined && lastStatus[sk.number] !== sk.status || lastStatus[sk.number] === undefined && Object.keys(lastStatus).length) {
-      const el = p.querySelector(`details.skill[data-n="${sk.number}"]`); if (el) el.classList.add("flash");
-    }
+
+  // highlight what is new, and bring the first new thing into view
+  const fresh = [
+    ...newSkills.map(n => p.querySelector(`details.skill[data-n="${n}"]`)),
+    ...newChanges.map(n => p.querySelector(`details.change[data-c="${n}"]`)),
+    ...(gapNew.length ? gapNew.map(n => p.querySelector(`details.occ[data-o="${n}"]`))
+                      : occChanged ? [p.querySelector("details.occ")] : []),
+  ].filter(Boolean);
+  fresh.forEach(el => el.classList.add("flash"));
+  if (fresh.length) {
+    const target = fresh.find(el => !el.closest("details.rejected:not([open])")) || fresh[0];
+    setTimeout(() => target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" }), 60);
   }
   lastStatus = Object.fromEntries(panelState.skills.map(sk => [sk.number, sk.status]));
+  lastChanges = Object.fromEntries(changes.map(c => [c.number, c.status]));
+  lastOcc = occSig;
+  linkifyChat();
 }
+// Open a skill or occupation in the panel (from a link in the chat or the panel itself)
+function reveal(sel) {
+  const el = $("panel").querySelector(sel); if (!el) return;
+  const rej = el.closest("details.rejected"); if (rej) rej.open = true;
+  el.open = true; el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+}
+// Skill and occupation names in the assistant's replies become links to the panel.
+function linkifyChat() {
+  const refs = [];
+  for (const sk of panelState.skills || []) if (sk.label.length >= 4) refs.push({ label: sk.label, kind: "n", id: sk.number });
+  for (const o of panelState.occupations || []) if (o.label.length >= 4) refs.push({ label: o.label, kind: "o", id: o.rank });
+  if (!refs.length) return;
+  refs.sort((a, b) => b.label.length - a.label.length);
+  const byLabel = new Map(refs.map(r => [r.label.toLowerCase(), r]));
+  const rx = new RegExp("(?:\\b\\d{1,2}\\.\\s*)?(?<![\\w-])(" +
+    refs.map(r => r.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")(?![\\w-])", "gi");
+  document.querySelectorAll("#chat .msg.assistant:not(.typing):not(.streaming) .bubble, #chat .msg.action .bubble").forEach(b => {
+    if (b.classList.contains("caret")) return;
+    const walker = document.createTreeWalker(b, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.parentElement.closest(".ref, a, code, .flag") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      const text = node.nodeValue; rx.lastIndex = 0;
+      if (!rx.test(text)) continue;
+      rx.lastIndex = 0;
+      const frag = document.createDocumentFragment(); let last = 0, m;
+      while ((m = rx.exec(text))) {
+        const r = byLabel.get(m[1].toLowerCase()); if (!r) continue;
+        frag.append(text.slice(last, m.index));
+        const btn = document.createElement("button");
+        btn.className = "ref"; btn.dataset[r.kind] = r.id; btn.textContent = m[0];
+        frag.append(btn); last = m.index + m[0].length;
+      }
+      frag.append(text.slice(last));
+      node.replaceWith(frag);
+    }
+  });
+}
+document.addEventListener("click", e => {
+  const r = e.target.closest("button.ref"); if (!r) return;
+  e.preventDefault();
+  if (r.dataset.n) reveal(`details.skill[data-n="${r.dataset.n}"]`);
+  else if (r.dataset.o) reveal(`details.occ[data-o="${r.dataset.o}"]`);
+});
 $("panel").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b || busy) return;
   busy = true;

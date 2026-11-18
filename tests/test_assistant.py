@@ -232,6 +232,16 @@ def test_occupations_come_from_the_accepted_list_and_gap_adds_numbered_skills():
         {"section": "Contents", "text": "the Linux command line"}]
     assert gap["not_in_course_text"] == ["debug software"]
     assert s4["known"][2]["origin"] == "required by 'software developer'"
+    # the gap is kept with the occupation, for the page's occupation list
+    assert s4["occupations"][0]["gap"] == {
+        "essential": 4, "on_list": 1,
+        "in_text": [{"number": 2, "label": "perform software unit testing"},
+                    {"number": 3, "label": "operating systems"}],
+        "not_in_text": ["debug software"]}
+    from esco_agent.web.app import panel
+    shown = panel(s4)["occupations"]
+    assert shown[0]["rank"] == 1 and shown[0]["gap"]["on_list"] == 1
+    assert shown[0]["url"].startswith("https://esco.ec.europa.eu/en/classification/occupation?uri=")
 
     assert [(k["label"], k["status"], k["in_text"]) for k in s5["known"]][2:] == [
         ("operating systems", "accepted", True), ("debug software", "accepted", False)]

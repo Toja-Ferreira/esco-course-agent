@@ -57,6 +57,8 @@ MAX_MESSAGE_CHARS = 2000
 MAX_TURNS = 40                  # conversation messages per session, after intake
 DAILY_LIMIT = int(os.environ.get("ESCO_DAILY_LIMIT", "400"))   # model turns per day, all users
 ESCO_PAGE = "https://esco.ec.europa.eu/en/classification/skill?uri="
+OCCUPATION_PAGE = "https://esco.ec.europa.eu/en/classification/occupation?uri="
+OCCUPATION_URI = "http://data.europa.eu/esco/occupation/"
 
 
 class Problem(Exception):
@@ -92,12 +94,20 @@ def panel(state: dict) -> dict:
             "origin": s["origin"],
             "url": ESCO_PAGE + quote(SKILL_URI + s["id"], safe=""),
         })
+    skill_no = {s["id"]: n for n, s in enumerate(state.get("known") or [], 1)}
     changes = [{"number": n, "label": c["label"], "mode": c.get("mode", "show"),
+                "skill_number": skill_no.get(c.get("skill_id")),
+                "edited": bool(c.get("edited_by_teacher")),
                 "add_to_course": c.get("add_to_course") or [], "section": c["section"],
                 "text": c["text"], "verified": c["verified"], "reason": c.get("reason", ""),
                 "status": c["status"]}
                for n, c in enumerate(state.get("text_changes") or [], 1)]
-    return {"skills": skills, "text_changes": changes}
+    occupations = [{"rank": r, "label": o["label"], "isco_group": o.get("isco_group", ""),
+                    "matched_on": [m["label"] for m in o.get("top_matching_skills", [])][:4],
+                    "url": OCCUPATION_PAGE + quote(OCCUPATION_URI + o["id"], safe=""),
+                    "gap": o.get("gap")}
+                   for r, o in enumerate(state.get("occupations") or [], 1)]
+    return {"skills": skills, "text_changes": changes, "occupations": occupations}
 
 
 # --- suggested next messages ----------------------------------------------------
@@ -107,7 +117,7 @@ CHIPS = {
            "why": "Porquê a número {n}?",
            "topic": "Há alguma coisa sobre {topic}?",
            "anything": "Há alguma coisa sobre ",
-           "jobs": "Que profissões estão relacionadas com esta lista?",
+           "jobs": "Que ocupações estão relacionadas com esta lista?",
            "gap": "O que falta para {occupation}?",
            "text": "Sugere texto para cobrir «{skill}»",
            "accept_change": "Aceito a alteração {n}",
