@@ -22,6 +22,8 @@ python-dotenv
 # web page
 fastapi==0.162.5
 uvicorn==0.54.0
+httpx==0.28.1          # university login (server-to-server calls)
+itsdangerous==2.2.0    # signed session cookie
 
 # dev
 pytest

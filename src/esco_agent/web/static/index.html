@@ -18,13 +18,16 @@
     --warn: #8a5a00;
     --warn-soft: #fff4dd;
     --radius: 10px;
+    --bg: var(--paper); --surface: var(--white); --text: var(--grey);
+    --inverse: var(--grey); --on-inverse: var(--white);
+    --field-line: #cfcfcf; --error: #b00020;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
-  body { background: var(--paper); color: var(--grey); font-size: 15px; line-height: 1.5; }
+  body { background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; }
   button, input, textarea { font: inherit; color: inherit; }
-  a { color: var(--grey); }
+  a { color: var(--text); }
 
   header {
     background: var(--black); color: var(--white);
@@ -46,35 +49,43 @@
   .btn:active { transform: translateY(1px) scale(.98); filter: brightness(.88); box-shadow: none; }
   .btn:focus-visible, .chip:focus-visible, summary:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
   .btn.ghost:hover { background: #1a1a1a; border-color: var(--lime); }
-  .btn.outline:hover { border-color: var(--grey); }
+  .btn.outline:hover { border-color: var(--text); }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
-  .btn.dark { background: var(--grey); color: var(--white); }
+  a.btn { display: inline-block; text-decoration: none; }
+  .btn.dark { background: var(--inverse); color: var(--on-inverse); }
   .btn.ghost { background: transparent; color: var(--white); border: 1px solid #555; }
   .btn.small { padding: 4px 10px; font-size: 13px; }
-  .btn.outline { background: var(--white); border: 1px solid var(--line); color: var(--grey); }
+  .btn.outline { background: var(--surface); border: 1px solid var(--line); color: var(--text); }
 
   .screen { display: none; }
   .screen.on { display: block; }
 
   /* --- screen 1 --- */
   .card {
-    background: var(--white); border-radius: var(--radius); border: 1px solid var(--line);
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line);
     max-width: 720px; margin: 40px auto; padding: 32px 36px;
   }
   .card h1 { margin: 0 0 6px; font-size: 24px; }
   .card .lead { color: var(--grey-2); margin: 0 0 24px; }
   label.field { display: block; font-weight: 600; margin: 18px 0 6px; }
   .hint { color: var(--grey-3); font-size: 13px; font-weight: 400; }
-  input[type=email], textarea {
-    width: 100%; border: 1px solid #cfcfcf; border-radius: 8px; padding: 10px 12px;
-    background: var(--white);
+  input[type=email], input[type=text], textarea {
+    width: 100%; border: 1px solid var(--field-line); border-radius: 8px; padding: 10px 12px;
+    background: var(--surface);
   }
   input:focus, textarea:focus { outline: 2px solid var(--lime); border-color: var(--lime); }
   .langs { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .langs button { border: 0; background: var(--white); padding: 6px 14px; cursor: pointer; }
+  .langs button { border: 0; background: var(--surface); padding: 6px 14px; cursor: pointer; }
   .langs button { transition: background .12s; }
   .langs button:hover:not(.on) { background: var(--lime-soft); }
-  .langs button.on { background: var(--grey); color: var(--white); }
+  .langs button.on { background: var(--inverse); color: var(--on-inverse); }
+  .how { margin: -8px 0 8px; padding-left: 22px; color: var(--grey-2); }
+  .how li { margin: 6px 0; padding-left: 4px; }
+  .how li::marker { color: var(--lime); font-weight: 800; }
+  .how li.now { background: var(--lime-soft); border-radius: 8px; padding: 4px 8px; margin-left: -4px; }
+  .dialog .how { margin: 0; padding: 0 22px 0 44px; }
+  .dialog .asks { padding: 4px 22px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .dialog h3 { margin: 14px 22px 2px; font-size: 15px; }
   .row { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 24px; }
   .privacy { color: var(--grey-3); font-size: 12.5px; }
 
@@ -86,9 +97,9 @@
   .chat { flex: 1; min-height: 0; overflow-y: auto; padding: 24px 28px 8px; scroll-behavior: smooth; }
   .msg { max-width: 760px; margin: 0 0 14px; display: flex; }
   .msg .bubble { padding: 11px 15px; border-radius: 12px; white-space: normal; overflow-wrap: anywhere; }
-  .msg.assistant .bubble { background: var(--white); border: 1px solid var(--line); }
+  .msg.assistant .bubble { background: var(--surface); border: 1px solid var(--line); }
   .msg.user { justify-content: flex-end; margin-left: auto; }
-  .msg.user .bubble { background: var(--grey); color: var(--white); }
+  .msg.user .bubble { background: var(--inverse); color: var(--on-inverse); }
   .msg.user.course .bubble { position: relative; }
   .msg.user.course .bubble .clip { max-height: 7.5em; overflow: hidden;
     -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
@@ -96,28 +107,41 @@
   .msg.user.course .more { display: block; margin-top: 6px; background: none; border: 0; padding: 0;
     color: var(--lime); font-size: 13px; font-weight: 600; cursor: pointer; }
   .msg.user.course .more:hover { text-decoration: underline; }
+  /* new messages rise into place: yours from the box, the assistant's a little softer */
+  .msg.enter { animation: rise .24s cubic-bezier(.2, .8, .2, 1); }
+  .msg.user.enter { animation-duration: .28s; transform-origin: bottom right; }
+  .msg.user.enter .bubble { animation: pop .28s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { from { transform: scale(.96); } to { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .msg.enter, .msg.user.enter .bubble { animation: none; } }
   .msg.action { justify-content: center; max-width: none; }
+  .flag { margin-top: 8px; padding: 6px 9px; border-radius: 6px; background: var(--warn-soft);
+          color: var(--warn); font-size: 12.5px; }
   .msg.action .bubble { background: transparent; color: var(--grey-3); font-size: 13px; padding: 2px; }
   .bubble strong { font-weight: 650; }
   .bubble ul { margin: 6px 0; padding-left: 20px; }
   .bubble blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--lime);
                        background: var(--lime-soft); border-radius: 4px; }
   .typing .bubble { color: var(--grey-2); font-size: 14px; min-width: 260px; }
+  .msg.assistant.typing .bubble { border-left: 3px solid var(--lime); }
   .steps { list-style: none; margin: 0; padding: 0; }
+  .msg.stepsdone .bubble { background: transparent; border: 0; padding: 0 4px; font-size: 13px; }
+  .caret::after { content: "▍"; color: var(--lime); animation: blink 1s infinite; margin-left: 1px; }
   .steps li { display: flex; gap: 8px; align-items: baseline; padding: 2px 0; }
   .steps li.done { color: var(--grey-3); }
   .steps li .ic { width: 14px; flex: none; text-align: center; }
-  .steps li.done .ic { color: #6f8a00; }
+  .steps li.done .ic { color: var(--lime); font-weight: 800; }
   .spin { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--line);
-          border-top-color: var(--grey); border-radius: 50%; animation: spin .8s linear infinite; }
+          border-top-color: var(--lime); border-right-color: var(--lime); border-radius: 50%;
+          animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .dots .dot { display: inline-block; animation: blink 1.2s infinite; }
+  .dots .dot { display: inline-block; color: var(--lime); animation: blink 1.2s infinite; }
   .dots .dot:nth-child(2) { animation-delay: .2s; } .dots .dot:nth-child(3) { animation-delay: .4s; }
   @keyframes blink { 0%, 80%, 100% { opacity: .2 } 40% { opacity: 1 } }
 
-  .composer { border-top: 1px solid var(--line); background: var(--white); padding: 12px 20px 14px; }
+  .composer { border-top: 1px solid var(--line); background: var(--surface); padding: 12px 20px 14px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .chip { border: 1px solid var(--line); background: var(--paper); border-radius: 999px;
+  .chip { border: 1px solid var(--line); background: var(--bg); border-radius: 999px;
           padding: 4px 12px; font-size: 13px; cursor: pointer; }
   .chip { transition: background .12s, border-color .12s, transform .06s; }
   .chip:hover { border-color: var(--lime); background: var(--lime-soft); }
@@ -125,23 +149,41 @@
   .send { display: flex; gap: 10px; align-items: flex-end; }
   .send textarea { resize: none; min-height: 44px; max-height: 200px; }
   .keys { color: var(--grey-3); font-size: 12px; margin-top: 6px; }
+  #send { width: 44px; height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  #send svg { width: 20px; height: 20px; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none;
+             align-items: center; justify-content: center; z-index: 20; padding: 16px; }
+  .overlay.on { display: flex; }
+  .dialog { background: var(--surface); border-radius: var(--radius); max-width: 620px; width: 100%;
+            max-height: 85vh; display: flex; flex-direction: column; border-top: 4px solid var(--lime); }
+  .dialog h2 { margin: 0; padding: 18px 22px 4px; font-size: 18px; }
+  .dialog .lead { padding: 0 22px; color: var(--grey-2); margin: 4px 0 10px; }
+  .dialog .items { overflow-y: auto; padding: 0 22px; }
+  .dialog .item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .dialog .item .label { flex: 1; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex: none; }
+  .seg button { border: 0; background: var(--surface); padding: 4px 10px; font-size: 13px; cursor: pointer; transition: background .12s; }
+  .seg button:hover { background: var(--lime-soft); }
+  .seg button.on { background: var(--inverse); color: var(--on-inverse); }
+  .seg button.on.keep { background: var(--lime); color: var(--black); }
+  .dialog .foot { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; padding: 14px 22px 18px; }
 
-  aside { border-left: 1px solid var(--line); background: var(--white); overflow-y: auto; padding: 18px 18px 28px; }
+  aside { border-left: 1px solid var(--line); background: var(--surface); overflow-y: auto; padding: 18px 18px 28px; }
   aside h2 { font-size: 15px; margin: 18px 0 8px; display: flex; align-items: center; gap: 8px; }
   aside h2:first-child { margin-top: 0; }
   .count { background: var(--lime); color: var(--black); border-radius: 999px; padding: 0 9px; font-size: 13px; }
   .empty { color: var(--grey-3); font-size: 14px; }
-  .skill { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; background: var(--white);
+  .skill { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; background: var(--surface);
            transition: border-color .15s, box-shadow .15s, transform .08s; }
-  .skill:hover { border-color: #c9c9c9; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+  .skill:hover { border-color: var(--field-line); box-shadow: 0 2px 8px rgba(0,0,0,.07); }
   .skill[open] { box-shadow: 0 2px 10px rgba(0,0,0,.08); }
   .skill summary { transition: background .12s; border-radius: 8px; }
-  .skill summary:hover { background: var(--paper); }
+  .skill summary:hover { background: var(--bg); }
   .skill summary:active { background: var(--lime-soft); }
-  .skill summary::after { content: "▸"; color: var(--grey-3); transition: transform .15s; margin-left: 4px; }
+  .skill summary::after { content: "▸"; color: var(--lime); transition: transform .15s; margin-left: 4px; }
   .skill[open] summary::after { transform: rotate(90deg); }
   .skill.flash { animation: flash 1.2s ease-out; }
-  @keyframes flash { 0% { background: var(--lime-soft); border-color: var(--lime); } 100% { background: var(--white); } }
+  @keyframes flash { 0% { background: var(--lime-soft); border-color: var(--lime); } 100% { background: var(--surface); } }
   .skill.accepted { border-left: 4px solid var(--lime); }
   .skill summary { list-style: none; cursor: pointer; padding: 8px 10px; display: flex; gap: 8px; align-items: baseline; }
   .skill summary::-webkit-details-marker { display: none; }
@@ -151,20 +193,26 @@
   .tag.warn { background: var(--warn-soft); color: var(--warn); }
   .skill .body { padding: 0 12px 12px 40px; font-size: 13.5px; color: var(--grey-2); }
   .skill .body p { margin: 6px 0; }
-  .skill .quote { border-left: 3px solid var(--lime); padding-left: 8px; margin: 6px 0; color: var(--grey); }
+  .skill .quote { border-left: 3px solid var(--lime); padding-left: 8px; margin: 6px 0; color: var(--text); }
   .skill .quote small { color: var(--grey-3); }
   .skill .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
   .skill .actions a { margin-left: auto; font-size: 13px; }
   details.rejected > summary { cursor: pointer; color: var(--grey-3); font-size: 14px; margin-top: 16px; }
-  .change { border: 1px dashed #bbb; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 13.5px; }
+  .change { border: 1px dashed var(--field-line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 13.5px; }
   .change .meta { color: var(--grey-3); font-size: 12.5px; }
   .change .txt { margin-top: 4px; }
+  .change.teach { border-color: var(--lime); }
+  .change ul { margin: 4px 0 2px; padding-left: 18px; }
+  .change .why { color: var(--warn); font-size: 12.5px; margin-top: 4px; }
+  .kind { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+          background: var(--bg); border-radius: 4px; padding: 1px 6px; color: var(--grey-2); }
+  .change.teach .kind { background: var(--lime); color: var(--black); }
 
   /* --- screen 3 --- */
   .review { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 60px); }
   .review aside { border-left: 0; border-right: 1px solid var(--line); }
   .review aside ol, .review aside ul { padding-left: 20px; margin: 4px 0 12px; }
-  .review .pre { white-space: pre-wrap; background: var(--paper); border-radius: 8px; padding: 8px 10px; font-size: 14px; }
+  .review .pre { white-space: pre-wrap; background: var(--bg); border-radius: 8px; padding: 8px 10px; font-size: 14px; }
   .review .log { max-height: 340px; overflow-y: auto; font-size: 13px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
   .review .log p { margin: 0 0 8px; }
   .form { padding: 24px 32px 60px; max-width: 900px; }
@@ -176,18 +224,95 @@
   .likert label { display: inline-flex; }
   .likert input { display: none; }
   .likert span { display: inline-block; min-width: 38px; text-align: center; padding: 5px 0;
-                 border: 1px solid #cfcfcf; border-radius: 6px; cursor: pointer; }
+                 border: 1px solid var(--field-line); border-radius: 6px; cursor: pointer; }
   .likert span { transition: background .1s, border-color .1s, transform .06s; }
   .likert span:hover { border-color: var(--lime); background: var(--lime-soft); }
   .likert span:active { transform: scale(.94); }
-  .likert input:checked + span { background: var(--grey); color: var(--white); border-color: var(--grey); }
+  .likert input:checked + span { background: var(--inverse); color: var(--on-inverse); border-color: var(--text); }
   .likert .na span { min-width: auto; padding: 5px 10px; font-size: 13px; }
-  .q.missing .text { color: #b00020; }
+  .q.missing .text { color: var(--error); }
 
+  .chat, aside, .review .log { scrollbar-color: var(--lime) transparent; scrollbar-width: thin; }
+  .chat::-webkit-scrollbar, aside::-webkit-scrollbar { width: 8px; }
+  .chat::-webkit-scrollbar-thumb, aside::-webkit-scrollbar-thumb { background: var(--lime); border-radius: 8px; }
   .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
-           background: var(--grey); color: var(--white); padding: 10px 16px; border-radius: 8px;
+           background: var(--inverse); color: var(--on-inverse); padding: 10px 16px; border-radius: 8px;
            border-left: 4px solid var(--lime); max-width: 90vw; display: none; z-index: 10; }
   .done { text-align: center; }
+  .done .result { text-align: left; white-space: pre-wrap; margin: 18px 0; max-height: 50vh; overflow-y: auto;
+                  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; font-size: 14px; }
+
+  /* inside POF's page (?embed=1): POF's font, spacing, page title, light/dark theme and language */
+  .embedbar { display: none; }
+  body.embed { --radius: 16px; --paper: #ffffff; --bg: #ffffff; --bar: 104px;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px; }
+  body.embed header, body.embed .langs { display: none; }
+  /* POF's sidebar widens over the page on hover, so, like POF's pages, the content sits in a
+     centred column with POF's side padding (24 / 48 / 64 px) */
+  body.embed { --gutter: max(64px, calc((100vw - 1280px) / 2)); --gl: var(--gutter); --gr: var(--gutter); }
+  @media (max-width: 1023px) { body.embed { --gutter: 48px; } }
+  @media (max-width: 767px) { body.embed { --gutter: 24px; } }
+  /* --gl / --gr are set from POF's window size (centreInPof), so the column is centred
+     on the whole page, like POF's own tabs, whatever the sidebar takes */
+  body.embed .embedbar { display: flex; align-items: flex-end; gap: 16px; height: var(--bar);
+                         padding: 0 var(--gr) 16px var(--gl); border-bottom: 1px solid var(--line); background: var(--bg); }
+  body.embed .embedbar .titles { flex: 1; min-width: 0; }
+  body.embed .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: var(--grey-2); }
+  body.embed .embedbar h1 { margin: 4px 0 0; font-size: 30px; line-height: 36px; font-weight: 800; letter-spacing: -.02em;
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.embed .embedbar .course { color: var(--grey-2); font-size: 14px; max-width: 34vw; margin-bottom: 4px;
+                                 overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.embed .embedbar #finish { background: var(--lime-soft); color: var(--text); border: 1px solid var(--lime);
+                                 border-radius: 999px; padding: 6px 16px; font-size: 14px; }
+  body.embed .embedbar #help { background: transparent; color: var(--text); border: 1px solid var(--line);
+                               border-radius: 999px; padding: 6px 16px; font-size: 14px; }
+  body.embed .embedbar #help:hover { border-color: var(--lime); background: var(--lime-soft); }
+  body.embed .embedbar #finish:hover { background: var(--lime); color: var(--black); }
+  body.embed .work { height: calc(100vh - var(--bar)); }
+  body.embed .review { min-height: calc(100vh - var(--bar)); }
+  body.embed .card { margin: 40px var(--gr) 40px var(--gl); max-width: none; border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04);
+                     background: var(--card); }
+  body.embed .work, body.embed .review { padding: 0 var(--gr) 0 var(--gl); }
+  body.embed .chat { padding: 28px 28px 8px 0; }
+  body.embed .composer { background: transparent; padding: 12px 28px 14px 0; }
+  body.embed .work aside { border-right: 1px solid var(--line); }
+  body.embed .msg .bubble, body.embed .skill, body.embed .change, body.embed .dialog { border-radius: var(--radius); }
+  body.embed aside { background: var(--card); }
+  body.embed .btn, body.embed .chip { border-radius: 999px; }
+  body.embed #send { border-radius: 50%; }
+  body.embed { --card: #fafafa; }
+  /* larger text, in line with POF's pages */
+  body.embed { font-size: 17px; line-height: 1.55; }
+  body.embed .eyebrow { font-size: 13px; }
+  body.embed .embedbar h1 { font-size: 36px; line-height: 42px; }
+  body.embed { --bar: 116px; }
+  body.embed .card { padding: 36px 40px; }
+  body.embed .card h1 { font-size: 30px; }
+  body.embed #expected { height: 150px; }
+  body.embed .card .lead, body.embed .how { font-size: 17px; }
+  body.embed label.field { font-size: 17px; }
+  body.embed .hint, body.embed .privacy { font-size: 14.5px; }
+  body.embed .keys { font-size: 13.5px; }
+  body.embed .chip { font-size: 15px; padding: 6px 14px; }
+  body.embed .typing .bubble, body.embed .msg.stepsdone .bubble, body.embed .msg.action .bubble { font-size: 15px; }
+  body.embed aside h2 { font-size: 17px; }
+  body.embed .empty, body.embed .skill .body, body.embed .change { font-size: 15px; }
+  body.embed .tag { font-size: 13px; }
+  body.embed .btn.small { font-size: 14.5px; padding: 6px 14px; }
+  body.embed .dialog h2, body.embed .form h2 { font-size: 21px; }
+  body.embed .likert .end, body.embed .review .log { font-size: 14.5px; }
+  body.embed .review .pre { font-size: 15.5px; }
+  /* POF's dark theme */
+  body.embed.dark { --paper: #000000; --bg: #000000; --surface: #1c1c1c; --card: #141414; --text: #f5f5f5;
+    --grey-2: #c2c2c2; --grey-3: #8f8f8f; --line: #2b2b2b; --field-line: #3a3a3a;
+    --inverse: #ededed; --on-inverse: #000000; --lime-soft: rgba(184, 211, 49, .14);
+    --warn: #f2c35b; --warn-soft: rgba(242, 195, 91, .12); --error: #ff6b7a; color-scheme: dark; }
+  body.embed.dark .card { box-shadow: none; border: 1px solid var(--line); }
+  body.embed.dark .skill:hover { box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+  body.embed.dark .overlay { background: rgba(0,0,0,.7); }
+  body.embed.dark .msg.user.course .more { color: #4d6000; }
+  body.embed.dark .likert input:checked + span { border-color: var(--inverse); }
 
   @media (max-width: 900px) {
     .work, .review { grid-template-columns: 1fr; height: auto; }
@@ -204,11 +329,27 @@
   <div class="title">ESCO <span>·</span> <span id="t-title"></span></div>
   <div class="spacer"></div>
   <div class="course" id="course-name"></div>
+  <button class="btn ghost small" id="help" style="display:none"></button>
   <button class="btn ghost small" id="finish" style="display:none"></button>
+  <a class="btn ghost small" id="logout" href="auth/logout" style="display:none"></a>
 </header>
 
+<div class="embedbar" id="embedbar">
+  <div class="titles"><div class="eyebrow" id="t-eyebrow"></div><h1 id="t-embed-title"></h1></div>
+</div>
+
+<!-- 0. login (when the university login is on) -->
+<section class="screen" id="s0">
+  <div class="card" style="text-align:center">
+    <h1 id="t-login-title"></h1>
+    <p class="lead" id="t-login-lead"></p>
+    <p class="hint" id="login-error" style="color:var(--error)"></p>
+    <a class="btn" href="auth/login" id="t-login-btn"></a>
+  </div>
+</section>
+
 <!-- 1. before you start -->
-<section class="screen on" id="s1">
+<section class="screen" id="s1">
   <div class="card">
     <div class="row" style="margin-top:0">
       <h1 id="t-s1-title"></h1>
@@ -217,8 +358,11 @@
       </div>
     </div>
     <p class="lead" id="t-s1-lead"></p>
-    <label class="field" for="email"><span id="t-email"></span></label>
-    <input type="email" id="email" autocomplete="email">
+    <ol class="how" id="t-s1-steps"></ol>
+    <div id="email-block"><label class="field" for="email"><span id="t-email"></span></label>
+    <input type="email" id="email" autocomplete="email"></div>
+    <label class="field" for="uc-name"><span id="t-uc-name"></span></label>
+    <input type="text" id="uc-name" maxlength="150" autocomplete="off">
     <label class="field" for="expected"><span id="t-expected"></span>
       <div class="hint" id="t-expected-hint"></div></label>
     <textarea id="expected" rows="9"></textarea>
@@ -238,7 +382,9 @@
         <div class="chips" id="chips"></div>
         <div class="send">
           <textarea id="box" rows="1"></textarea>
-          <button class="btn" id="send"></button>
+          <button class="btn" id="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
         </div>
         <div class="keys" id="keys"></div>
       </div>
@@ -255,14 +401,30 @@
   </div>
 </section>
 
+<div class="overlay" id="overlay"><div class="dialog" role="dialog" aria-modal="true" id="dialog"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const T = {
   pt: {
-    title: "Assistente de competências", s1Title: "Antes de começar",
-    s1Lead: "Este assistente ajuda a escolher as competências ESCO que descrevem uma unidade curricular. Cada sugestão vem com a frase do seu texto que a justifica.",
-    email: "O seu email", expected: "Que competências desenvolve esta unidade curricular?",
+    title: "Assistente de competências", eyebrow: "Estudo · Competências ESCO", s1Title: "Antes de começar",
+    loginTitle: "Assistente de competências ESCO", loginBtn: "Entrar com a conta da Universidade de Aveiro",
+    loginLead: "Para participar, entre com as credenciais da Universidade de Aveiro. O seu email não é guardado: apenas um código derivado dele.",
+    logout: "Sair", hello: n => `Olá, ${n}`, backToPof: "Voltar ao POF",
+    s1Lead: "Obrigado por participar. Este é um estudo da Universidade de Aveiro sobre um assistente que ajuda a escolher as competências ESCO (a classificação europeia de competências e profissões) que descrevem uma unidade curricular. Não altera nada no POF.",
+    s1Steps: [
+      "<b>Primeiro:</b> indique o nome da unidade curricular e escreva, pelas suas palavras, as competências que espera que desenvolva.",
+      "<b>Depois:</b> cole o texto da página da unidade curricular, em inglês (objetivos e conteúdos).",
+      "<b>Na conversa:</b> o assistente sugere competências ESCO, cada uma com a frase do seu texto que a justifica. Mantenha ou remova as que quiser e pergunte o que precisar: a que profissões a UC dá acesso, o que lhe falta, ou o que mudar no texto para ensinar uma competência.",
+      "<b>No fim:</b> carregue em <b>Terminar</b> e responda a umas perguntas curtas sobre a experiência.",
+    ],
+    help: "Precisa de ajuda?", helpTitle: "Como funciona", helpNow: "Está aqui",
+    helpAsk: "Pode perguntar, por exemplo (clique para usar):", close: "Fechar",
+    helpAsks: ["Que profissões combinam com esta unidade curricular?", "Explique a competência 1",
+               "Mantenha a 1 e a 2, remova a 3", "O que falta para ensinar a competência 2?",
+               "Há alguma competência sobre trabalho em equipa?"],
+    email: "O seu email", ucName: "Nome da unidade curricular", ucNamePh: "Ex.: Programação em C",
+    expected: "Que competências desenvolve esta unidade curricular?",
     expectedHint: "Pelas suas palavras, uma por linha. Escreva antes de ver qualquer sugestão (cerca de 10 minutos). O assistente não vê esta lista.",
     privacy: "O email não é guardado: apenas um código derivado dele, para ligar as suas sessões.",
     start: "Continuar", send: "Enviar", finish: "Terminar",
@@ -273,21 +435,40 @@ const T = {
     definition: "Definição ESCO", evidence: "No seu texto", foundBy: "Encontrada por", esco: "Ver na ESCO ↗",
     noEvidence: "O texto da unidade curricular não mostra esta competência.",
     passed: "verificação passou", failed: "verificação falhou",
-    status: { proposed: "proposta", accepted: "aceite", rejected: "rejeitada" }, addTo: "acrescentar a",
-    chips: [["why", "Porquê a número "], ["anything", "Há alguma coisa sobre "], ["jobs", "Que profissões estão relacionadas com esta lista?"],
-            ["gap", "O que falta para a primeira profissão?"], ["text", "Sugere texto para cobrir uma competência em falta"]],
+    status: { proposed: "proposta", accepted: "aceite", rejected: "rejeitada", failed: "por aceitar" }, addTo: "acrescentar a",
     confirmFinish: "Terminar a sessão e passar às perguntas finais? Já não poderá alterar a lista.",
+    finishTitle: "Antes de terminar", finishLead: n => `Há ${n} competência${n > 1 ? "s" : ""} por decidir. O que quer fazer com cada uma?`,
+    keepAll: "Manter todas", removeAll: "Remover todas", undecided: "Por decidir", cancel: "Voltar", goOn: "Terminar",
+    kindShow: "texto da página", kindTeach: "alteração à UC", toAdd: "Acrescentar à unidade curricular:",
+    failedBecause: "Porque falhou:",
+    flagged: "⚠ Atenção: esta resposta cita algo que não foi encontrado no texto da unidade curricular nem nos resultados da ESCO. Confirme antes de usar.",
     recapExpected: "O que escreveu antes de começar", recapList: "A lista que construiu", recapLog: "A conversa",
     formTitle: "Perguntas finais", formLead: "Cerca de 3 minutos. Use a coluna da esquerda para se lembrar da sessão.",
     susTitle: "Utilização", statementsTitle: "Sobre o assistente", openTitle: "Comentários",
     submit: "Enviar respostas", missing: "Falta responder a algumas perguntas (marcadas a vermelho).",
-    thanks: "Obrigado!", thanksLead: "As suas respostas e a lista foram guardadas.", download: "Descarregar a sessão",
+    thanks: "Obrigado!", thanksLead: "As suas respostas e a lista foram guardadas. Pode copiar o resultado abaixo para usar na página da unidade curricular.",
+    copy: "Copiar o resultado", copied: "Copiado.", resultList: "Competências ESCO", resultChanges: "Alterações ao texto aceites",
     you: "Eu", assistant: "Assistente",
   },
   en: {
-    title: "Skill assistant", s1Title: "Before you start",
-    s1Lead: "This assistant helps you choose the ESCO skills that describe a course. Each suggestion comes with the sentence of your text that supports it.",
-    email: "Your email", expected: "Which skills does this course develop?",
+    title: "Skill assistant", eyebrow: "Study · ESCO skills", s1Title: "Before you start",
+    loginTitle: "ESCO skill assistant", loginBtn: "Sign in with your University of Aveiro account",
+    loginLead: "To take part, sign in with your University of Aveiro credentials. Your email is not stored: only a code derived from it.",
+    logout: "Sign out", hello: n => `Hello, ${n}`, backToPof: "Back to POF",
+    s1Lead: "Thank you for taking part. This is a University of Aveiro study of an assistant that helps you choose the ESCO skills (the European classification of skills and occupations) that describe a course. It does not change anything in POF.",
+    s1Steps: [
+      "<b>First:</b> give the course's name and write, in your own words, the skills you expect it to develop.",
+      "<b>Next:</b> paste the text of the course page, in English (objectives and contents).",
+      "<b>In the conversation:</b> the assistant suggests ESCO skills, each with the sentence of your text that supports it. Keep or remove any of them and ask what you need: which occupations the course leads to, what it is missing, or what to change in the text to teach a skill.",
+      "<b>At the end:</b> press <b>Finish</b> and answer a few short questions about the experience.",
+    ],
+    help: "Need help?", helpTitle: "How it works", helpNow: "You are here",
+    helpAsk: "You can ask, for example (click to use):", close: "Close",
+    helpAsks: ["Which occupations match this course?", "Explain skill 1",
+               "Keep 1 and 2, remove 3", "What is missing to teach skill 2?",
+               "Is there a skill about teamwork?"],
+    email: "Your email", ucName: "Course name", ucNamePh: "E.g. C Programming",
+    expected: "Which skills does this course develop?",
     expectedHint: "In your own words, one per line. Write them before you see any suggestion (about 10 minutes). The assistant does not see this list.",
     privacy: "Your email is not stored: only a code derived from it, to link your sessions.",
     start: "Continue", send: "Send", finish: "Finish",
@@ -298,15 +479,19 @@ const T = {
     definition: "ESCO definition", evidence: "In your text", foundBy: "Found by", esco: "View on ESCO ↗",
     noEvidence: "The course text doesn't show this skill.",
     passed: "check passed", failed: "check failed",
-    status: { proposed: "proposed", accepted: "accepted", rejected: "rejected" }, addTo: "add to",
-    chips: [["why", "Why number "], ["anything", "Is there anything on "], ["jobs", "Which occupations does this list relate to?"],
-            ["gap", "What is missing for the first occupation?"], ["text", "Suggest text to cover a missing skill"]],
+    status: { proposed: "proposed", accepted: "accepted", rejected: "rejected", failed: "not accepted" }, addTo: "add to",
     confirmFinish: "Finish the session and go to the closing questions? You won't be able to change the list afterwards.",
+    finishTitle: "Before you finish", finishLead: n => `${n} skill${n > 1 ? "s are" : " is"} still undecided. What would you like to do with each?`,
+    keepAll: "Keep all", removeAll: "Remove all", undecided: "Undecided", cancel: "Back", goOn: "Finish",
+    kindShow: "page text", kindTeach: "course change", toAdd: "Add to the course:",
+    failedBecause: "Why it failed:",
+    flagged: "⚠ Note: this reply quotes something that wasn't found in the course text or the ESCO results. Check it before relying on it.",
     recapExpected: "What you wrote before starting", recapList: "The list you built", recapLog: "The conversation",
     formTitle: "Closing questions", formLead: "About 3 minutes. Use the left column to recall the session.",
     susTitle: "Usability", statementsTitle: "About the assistant", openTitle: "Comments",
     submit: "Send answers", missing: "Some questions are not answered yet (marked in red).",
-    thanks: "Thank you!", thanksLead: "Your answers and the list have been saved.", download: "Download the session",
+    thanks: "Thank you!", thanksLead: "Your answers and the list have been saved. You can copy the result below to use on the course page.",
+    copy: "Copy the result", copied: "Copied.", resultList: "ESCO skills", resultChanges: "Accepted text changes",
     you: "Me", assistant: "Assistant",
   },
 };
@@ -339,6 +524,7 @@ function stepText(p) {
   const f = STEPS[lang][p.stage]; return f ? (typeof f === "function" ? f(p) : f) : null;
 }
 
+let me = { login_required: false, logged_in: false, first_name: "" };
 let lang = "pt", session = null, stage = null, chip = null, busy = false, panelState = { skills: [], text_changes: [] };
 const $ = id => document.getElementById(id);
 const t = () => T[lang];
@@ -360,8 +546,75 @@ function md(text) {
   return html.replace(/(<br>)+$/, "");
 }
 function toast(msg) { const el = $("toast"); el.textContent = msg; el.style.display = "block"; clearTimeout(el._t); el._t = setTimeout(() => el.style.display = "none", 6000); }
+// Inside POF's page (?embed=1, or any frame): POF's header replaces ours, so the course
+// name and "Finish" move above the chat, and logins open in the whole window.
+const EMBED = new URLSearchParams(location.search).has("embed") || window.self !== window.top;
+if (EMBED) {
+  document.body.classList.add("embed");
+  $("embedbar").append($("course-name"), $("help"), $("finish"));
+}
+// Follow POF's light/dark theme and PT/EN choice, now and whenever the teacher changes them.
+// The conversation keeps the language it started in; only the page's own text switches.
+function followPof() {
+  let root = null;
+  try { root = window.top.document.documentElement; } catch (e) { return; }   // not on POF's address
+  const sync = () => {
+    document.body.classList.toggle("dark", root.classList.contains("dark") || root.dataset.theme === "dark" || root.style.colorScheme === "dark");
+    let l = null;
+    try { l = localStorage.getItem("pof-language"); } catch (e) { /* storage blocked */ }
+    l = l || (root.lang || "").slice(0, 2);
+    if ((l === "pt" || l === "en") && l !== lang) { lang = l; applyLang(); }
+  };
+  sync();
+  new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ["class", "lang", "data-theme"] });
+  window.addEventListener("storage", e => { if (e.key === "pof-language") sync(); });
+}
+// Centre the content on POF's whole window, as POF's own pages are (max 1280px wide, at
+// least POF's side padding), measuring where this frame sits inside POF's page.
+function centreInPof() {
+  try {
+    const frame = window.frameElement, top = window.top;
+    if (!frame) return;
+    const r = frame.getBoundingClientRect(), W = top.innerWidth;
+    const pad = W >= 1024 ? 64 : W >= 768 ? 48 : 24, side = Math.max(0, (W - 1280) / 2);
+    const left = Math.max(pad, side - r.left), right = Math.max(pad, side - (W - r.right));
+    document.body.style.setProperty("--gl", left + "px");
+    document.body.style.setProperty("--gr", right + "px");
+  } catch (e) { /* not on POF's address: keep the CSS defaults */ }
+}
+if (EMBED) {
+  centreInPof();
+  window.addEventListener("resize", centreInPof);
+  try { window.top.addEventListener("resize", centreInPof); } catch (e) { /* other address */ }
+}
+function goTo(url) { (EMBED ? window.top : window).location.href = url; }
+// With POF's login the browser already holds POF's token (same address); send it along.
+function authHeaders() {
+  let token = null;
+  try { token = me.mode === "pof" ? localStorage.getItem("access") : null; } catch (e) { /* storage blocked */ }
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+async function refreshPof() {
+  // POF's own refresh endpoint, as POF's pages do; false if the login has expired
+  try {
+    const refresh = localStorage.getItem("refresh"); if (!refresh) return false;
+    const r = await fetch("/api/token/refresh/", { method: "POST", headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ refresh }) });
+    if (!r.ok) return false;
+    const d = await r.json(); if (!d.access) return false;
+    localStorage.setItem("access", d.access); return true;
+  } catch (e) { return false; }
+}
+async function authFetch(path, opts = {}, retried = false) {
+  const r = await fetch(path, { ...opts, headers: { ...(opts.headers || {}), ...authHeaders() } });
+  if (r.status === 401 && me.mode === "pof" && !retried) {
+    if (await refreshPof()) return authFetch(path, opts, true);
+    goTo(me.login_url); throw new Error("Login expired.");
+  }
+  return r;
+}
 async function api(path, body) {
-  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const r = await authFetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const data = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(data.detail || `Error ${r.status}`);
   return data;
@@ -371,36 +624,63 @@ async function api(path, body) {
 function applyLang() {
   document.documentElement.lang = lang;
   const s = t();
-  $("t-title").textContent = s.title; $("t-s1-title").textContent = s.s1Title; $("t-s1-lead").textContent = s.s1Lead;
-  $("t-email").textContent = s.email; $("t-expected").textContent = s.expected; $("t-expected-hint").textContent = s.expectedHint;
-  $("t-privacy").textContent = s.privacy; $("start").textContent = s.start; $("send").textContent = s.send;
-  $("finish").textContent = s.finish; $("box").placeholder = s.placeholder;
+  $("t-title").textContent = s.title; $("t-eyebrow").textContent = s.eyebrow; $("t-embed-title").textContent = s.title; $("t-s1-title").textContent = s.s1Title; $("t-s1-lead").textContent = s.s1Lead;
+  $("t-s1-steps").innerHTML = s.s1Steps.map(x => `<li>${x}</li>`).join("");   // fixed text, not user input
+  $("t-email").textContent = s.email; $("t-uc-name").textContent = s.ucName; $("uc-name").placeholder = s.ucNamePh; $("t-expected").textContent = s.expected; $("t-expected-hint").textContent = s.expectedHint;
+  $("t-privacy").textContent = s.privacy; $("start").textContent = s.start;
+  $("send").setAttribute("aria-label", s.send); $("send").title = s.send;
+  $("finish").textContent = s.finish; $("help").textContent = s.help; $("box").placeholder = s.placeholder;
+  $("t-login-title").textContent = s.loginTitle; $("t-login-lead").textContent = s.loginLead;
+  $("t-login-btn").textContent = $("t-login-btn").dataset.pof ? s.backToPof : s.loginBtn;
+  $("logout").textContent = s.logout;
+  if (me.logged_in && me.first_name) $("t-s1-title").textContent = s.hello(me.first_name);
   $("keys").textContent = lang === "pt" ? "Enter para enviar · Shift+Enter para mudar de linha"
                                         : "Enter to send · Shift+Enter for a new line";
   document.querySelectorAll("#langs button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
-  renderChips(); renderPanel();
+  renderChips(); renderPanel(); rerenderReview();
 }
 $("langs").addEventListener("click", e => { if (e.target.dataset.lang && !session) { lang = e.target.dataset.lang; applyLang(); } });
 
 // --- 1. before you start ---
-function canStart() { $("start").disabled = !($("email").value.includes("@") && $("expected").value.trim().length >= 5); }
-$("email").addEventListener("input", canStart); $("expected").addEventListener("input", canStart);
+function canStart() {
+  const emailOk = me.logged_in || $("email").value.includes("@");
+  $("start").disabled = !(emailOk && $("uc-name").value.trim() && $("expected").value.trim().length >= 5);
+}
+["email", "uc-name", "expected"].forEach(id => $(id).addEventListener("input", canStart));
 $("start").addEventListener("click", async () => {
   $("start").disabled = true;
   try {
-    const r = await api("/api/session", { email: $("email").value, language: lang, expected: $("expected").value });
+    const r = await api("api/session", { email: $("email").value, language: lang, expected: $("expected").value,
+                                         course_name: $("uc-name").value });
     session = r.session; stage = r.stage;
-    $("s1").classList.remove("on"); $("s2").classList.add("on"); $("finish").style.display = "";
+    if (r.course_name) $("course-name").textContent = r.course_name;
+    $("s1").classList.remove("on"); $("s2").classList.add("on"); $("finish").style.display = ""; $("help").style.display = "";
     document.body.classList.add("chatting");
-    r.chat.forEach(addMessage); renderChips(); $("box").focus();
+    r.chat.forEach(m => addMessage(m, true)); renderChips(); $("box").focus();
   } catch (e) { toast(e.message); canStart(); }
 });
 
 // --- 2. the chat ---
-function addMessage(m) {
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function typeInto(el, text) {
+  // Reveal a message progressively, finishing any message within about 1.5 s.
+  if (reduceMotion || !text) { el.innerHTML = md(text); return; }
+  let i = 0; const step = Math.max(2, Math.ceil(text.length / 90));
+  el.classList.add("caret");
+  (function frame() {
+    i = Math.min(text.length, i + step);
+    el.innerHTML = md(text.slice(0, i));
+    $("chat").scrollTop = $("chat").scrollHeight;
+    if (i < text.length) requestAnimationFrame(frame); else el.classList.remove("caret");
+  })();
+}
+function addMessage(m, animate = false) {
   const div = document.createElement("div");
-  const course = m.role === "user" && m.intake && m.intake !== "name";
-  div.className = `msg ${m.role}` + (course ? " course" : "");
+  div.addEventListener("animationend", () => div.classList.remove("enter"), { once: true });
+  // long pasted sections are shown collapsed; short answers ("none") are not
+  const course = m.role === "user" && m.intake && m.intake !== "name"
+                 && (m.content.length > 280 || m.content.split("\n").length > 4);
+  div.className = `msg ${m.role} enter` + (course ? " course" : "");
   if (course) {
     // a pasted section: shown collapsed, with a toggle, so it doesn't push the chat away
     div.innerHTML = `<div class="bubble"><div class="clip">${esc(m.content).replace(/\n/g, "<br>")}</div>
@@ -409,32 +689,74 @@ function addMessage(m) {
       const open = div.classList.toggle("open");
       e.target.textContent = open ? (lang === "pt" ? "Mostrar menos" : "Show less") : (lang === "pt" ? "Mostrar tudo" : "Show all");
     };
+  } else if (m.role === "assistant" && animate && !m.grounding_issues) {
+    div.innerHTML = '<div class="bubble"></div>';
+    $("chat").appendChild(div); typeInto(div.querySelector(".bubble"), m.content); return;
+  } else if (m.role === "assistant" && m.grounding_issues) {
+    // the reply quotes something not in the course, or a skill that doesn't exist
+    div.innerHTML = `<div class="bubble">${md(m.content)}<div class="flag">${esc(t().flagged)}</div></div>`;
   } else {
     div.innerHTML = `<div class="bubble">${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}</div>`;
   }
   $("chat").appendChild(div); $("chat").scrollTop = $("chat").scrollHeight;
 }
-let steps = [];
+// While the assistant works: a bubble listing its steps (spinner on the current one),
+// then the reply, written as the model produces it.
+let steps = [], streamEl = null, streamText = "", streamed = false;
+function stepsHtml(allDone) {
+  return '<ul class="steps">' + steps.map((s, i) => allDone || i < steps.length - 1
+    ? `<li class="done"><span class="ic">✓</span><span>${esc(s)}</span></li>`
+    : `<li><span class="ic"><span class="spin"></span></span><span>${esc(s)}…</span></li>`).join("") + "</ul>";
+}
 function typing(on) {
-  const old = document.querySelector(".msg.typing"); if (old) old.remove();
-  if (!on) { steps = []; return; }
-  const d = document.createElement("div"); d.className = "msg assistant typing";
-  d.innerHTML = '<div class="bubble"><span class="dots"><span class="dot">●</span> <span class="dot">●</span> <span class="dot">●</span></span></div>';
-  $("chat").appendChild(d); $("chat").scrollTop = $("chat").scrollHeight;
+  if (on) {
+    steps = []; streamEl = null; streamText = ""; streamed = false;
+    const d = document.createElement("div"); d.className = "msg assistant typing enter";
+    d.innerHTML = '<div class="bubble"><span class="dots"><span class="dot">●</span> <span class="dot">●</span> <span class="dot">●</span></span></div>';
+    $("chat").appendChild(d); $("chat").scrollTop = $("chat").scrollHeight;
+    return;
+  }
+  finishSteps();
+  document.querySelectorAll(".msg.typing, .msg.streaming").forEach(el => el.remove());
+  streamEl = null;
+}
+function finishSteps() {
+  // Keep the list of what was done (all ticked) unless it was only "thinking".
+  const el = document.querySelector(".msg.typing"); if (!el) return;
+  const useful = steps.length > 1 || (steps.length === 1 && !/^(A pensar|Thinking)$/.test(steps[0]));
+  if (useful) { el.className = "msg assistant stepsdone"; el.querySelector(".bubble").innerHTML = stepsHtml(true); }
+  else el.remove();
 }
 function showStep(p) {
   const text = stepText(p); if (!text) return;
   if (steps.length && steps[steps.length - 1] === text) return;
+  if (streamEl) {            // the model wrote something, then started a tool: new steps bubble below
+    streamEl.classList.remove("caret"); streamEl = null;
+    if (!document.querySelector(".msg.typing")) {
+      steps = [];
+      const d = document.createElement("div"); d.className = "msg assistant typing";
+      d.innerHTML = '<div class="bubble"></div>'; $("chat").appendChild(d);
+    }
+  }
   steps.push(text);
   const bubble = document.querySelector(".msg.typing .bubble"); if (!bubble) return;
-  bubble.innerHTML = '<ul class="steps">' + steps.map((s, i) => i < steps.length - 1
-    ? `<li class="done"><span class="ic">✓</span><span>${esc(s)}</span></li>`
-    : `<li><span class="ic"><span class="spin"></span></span><span>${esc(s)}…</span></li>`).join("") + "</ul>";
+  bubble.innerHTML = stepsHtml(false);
+  $("chat").scrollTop = $("chat").scrollHeight;
+}
+function showToken(tok) {
+  if (!streamEl) {
+    finishSteps();
+    const d = document.createElement("div"); d.className = "msg assistant streaming enter";
+    d.innerHTML = '<div class="bubble caret"></div>'; $("chat").appendChild(d);
+    streamEl = d.querySelector(".bubble");
+  }
+  streamed = true; streamText += tok;
+  streamEl.innerHTML = md(streamText);
   $("chat").scrollTop = $("chat").scrollHeight;
 }
 async function streamMessage(body) {
   // Reads the newline-delimited progress stream; returns the final result.
-  const r = await fetch("/api/message/stream", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const r = await authFetch("api/message/stream", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.detail || `Error ${r.status}`); }
   const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "", done = null;
   for (;;) {
@@ -446,6 +768,7 @@ async function streamMessage(body) {
       if (!line) continue;
       const ev = JSON.parse(line);
       if (ev.progress) showStep(ev.progress);
+      else if (ev.token) showToken(ev.token);
       else if (ev.done) done = ev.done;
       else if (ev.error) throw new Error(ev.error);
     }
@@ -455,11 +778,17 @@ async function streamMessage(body) {
   return done;
 }
 function renderChips() {
+  // The server suggests next messages from the state of the conversation.
   const box = $("chips"); box.innerHTML = "";
   if (stage !== "chat") return;
-  for (const [key, text] of t().chips) {
-    const b = document.createElement("button"); b.className = "chip"; b.textContent = text.trim().replace(/ $/, "") + (text.endsWith(" ") ? "…" : "");
-    b.onclick = () => { $("box").value = text; chip = { key, text }; $("box").focus(); autosize(); };
+  for (const c of panelState.chips || []) {
+    const b = document.createElement("button"); b.className = "chip";
+    b.textContent = c.send ? c.text : c.text.trimEnd() + "…";
+    b.onclick = () => {
+      chip = { key: c.key, text: c.text };
+      $("box").value = c.text; autosize();
+      if (c.send) send(); else $("box").focus();
+    };
     box.appendChild(b);
   }
 }
@@ -478,8 +807,10 @@ async function send() {
   typing(true);
   try {
     const r = await streamMessage({ session, text, from_button: fromButton });
+    const wasStreamed = streamed;
     typing(false);
-    r.new.filter(m => m.role !== "user").forEach(addMessage);
+    // a reply already written token by token appears at once; fixed messages are typed out
+    r.new.filter(m => m.role !== "user").forEach(m => addMessage(m, !wasStreamed));
     stage = r.stage; panelState = r; renderChips(); renderPanel();
     if (r.course_name) $("course-name").textContent = r.course_name;
   } catch (e) { typing(false); toast(e.message); $("box").value = text; }
@@ -521,10 +852,13 @@ function renderPanel() {
   h += acc.length ? acc.map(s => skillCard(s, openNow.has(String(s.number)))).join("") : `<p class="empty">${t().listEmpty}</p>`;
   if (pen.length) h += `<h2>${t().pending}</h2>` + pen.map(s => skillCard(s, openNow.has(String(s.number)))).join("");
   if (panelState.text_changes.length) {
-    h += `<h2>${t().changes}</h2>` + panelState.text_changes.map(c => `<div class="change">
-      <div class="meta">${c.number}. ${esc(c.label)} · ${t().addTo} <strong>${esc(c.section)}</strong> ·
+    h += `<h2>${t().changes}</h2>` + panelState.text_changes.map(c => `<div class="change ${c.mode}">
+      <div class="meta"><span class="kind">${c.mode === "teach" ? t().kindTeach : t().kindShow}</span>
+        ${c.number}. ${esc(c.label)} · ${t().addTo} <strong>${esc(c.section)}</strong> ·
         ${c.verified ? t().passed : t().failed} · ${t().status[c.status] || c.status}</div>
-      <div class="txt">${esc(c.text)}</div></div>`).join("");
+      ${c.add_to_course.length ? `<div>${t().toAdd}<ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+      <div class="txt">“${esc(c.text)}”</div>
+      ${!c.verified && c.reason ? `<div class="why">${t().failedBecause} ${esc(c.reason)}</div>` : ""}</div>`).join("");
   }
   if (rej.length) h += `<details class="rejected"><summary>${t().rejected} (${rej.length})</summary>${rej.map(s => skillCard(s, false)).join("")}</details>`;
   p.innerHTML = h;
@@ -540,30 +874,93 @@ $("panel").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b || busy) return;
   busy = true;
   try {
-    const r = await api("/api/skill", { session, number: Number(b.dataset.n), action: b.dataset.act });
-    r.new.forEach(addMessage); panelState = r; renderPanel();
+    const r = await api("api/skill", { session, number: Number(b.dataset.n), action: b.dataset.act });
+    r.new.forEach(addMessage); panelState = r; renderPanel(); renderChips();
   } catch (err) { toast(err.message); }
   busy = false;
 });
 
 // --- 3. closing questions ---
-$("finish").addEventListener("click", async () => {
-  if (busy || !confirm(t().confirmFinish)) return;
+function closeDialog() { $("overlay").classList.remove("on"); $("dialog").innerHTML = ""; }
+$("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeDialog(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeDialog(); });
+// "Need help?": the steps, with the current one marked, and example questions
+$("help").addEventListener("click", () => {
+  const s = t(), d = $("dialog");
+  const now = stage === "chat" ? 2 : stage === "finished" ? 3 : 1;
+  d.innerHTML = `<h2>${s.helpTitle}</h2>
+    <ol class="how">${s.s1Steps.map((x, i) => `<li class="${i === now ? "now" : ""}">${x}${i === now ? ` <span class="tag" style="background:var(--lime);color:#000">${s.helpNow}</span>` : ""}</li>`).join("")}</ol>
+    ${stage === "chat" ? `<h3>${s.helpAsk}</h3><div class="asks">${s.helpAsks.map(q => `<button class="chip" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>` : ""}
+    <div class="foot"><button class="btn small" id="d-cancel">${s.close}</button></div>`;
+  d.querySelectorAll("[data-q]").forEach(b => b.onclick = () => {
+    closeDialog(); $("box").value = b.dataset.q; autosize(); $("box").focus(); });
+  $("d-cancel").onclick = closeDialog;
+  $("overlay").classList.add("on");
+});
+$("finish").addEventListener("click", () => {
+  if (busy) return;
+  const pending = panelState.skills.filter(s => s.status === "pending");
+  const choice = Object.fromEntries(pending.map(s => [s.number, null]));
+  const s = t(), d = $("dialog");
+  function draw() {
+    d.innerHTML = `<h2>${pending.length ? s.finishTitle : s.finish}</h2>
+      <p class="lead">${pending.length ? s.finishLead(pending.length) : esc(s.confirmFinish)}</p>
+      <div class="items">${pending.map(k => `<div class="item"><span class="num">${k.number}.</span>
+        <span class="label">${esc(k.label)}</span><span class="seg" data-n="${k.number}">
+        <button data-c="accept" class="keep ${choice[k.number] === "accept" ? "on" : ""}">${s.keep}</button>
+        <button data-c="reject" class="${choice[k.number] === "reject" ? "on" : ""}">${s.remove}</button>
+        <button data-c="" class="${choice[k.number] === null ? "on" : ""}">${s.undecided}</button></span></div>`).join("")}</div>
+      <div class="foot">${pending.length ? `<button class="btn small outline" id="all-keep">${s.keepAll}</button>
+        <button class="btn small outline" id="all-remove">${s.removeAll}</button>` : ""}
+        <span style="flex:1"></span><button class="btn small outline" id="d-cancel">${s.cancel}</button>
+        <button class="btn small" id="d-go">${s.goOn}</button></div>`;
+    d.querySelectorAll(".seg button").forEach(b => b.onclick = () => {
+      choice[b.parentElement.dataset.n] = b.dataset.c || null; draw(); });
+    if (pending.length) {
+      $("all-keep").onclick = () => { pending.forEach(k => choice[k.number] = "accept"); draw(); };
+      $("all-remove").onclick = () => { pending.forEach(k => choice[k.number] = "reject"); draw(); };
+    }
+    $("d-cancel").onclick = closeDialog;
+    $("d-go").onclick = () => finishSession(choice);
+  }
+  draw(); $("overlay").classList.add("on");
+});
+async function finishSession(choice) {
+  busy = true;
   try {
-    const r = await api("/api/finish", { session });
-    $("s2").classList.remove("on"); $("s3").classList.add("on"); $("finish").style.display = "none";
+    for (const [n, action] of Object.entries(choice)) {
+      if (action) await api("api/skill", { session, number: Number(n), action, source: "finish" });
+    }
+    closeDialog();
+    const r = await api("api/finish", { session });
+    $("s2").classList.remove("on"); $("s3").classList.add("on"); $("finish").style.display = "none"; $("help").style.display = "none";
     document.body.classList.remove("chatting");
     renderReview(r);
   } catch (e) { toast(e.message); }
-});
+  busy = false;
+}
 function likert(name, na) {
   let h = `<div class="likert">`;
   for (let i = 1; i <= 5; i++) h += `<label><input type="radio" name="${name}" value="${i}"><span>${i}</span></label>`;
   if (na) h += `<label class="na"><input type="radio" name="${name}" value="na"><span>${esc(na)}</span></label>`;
   return h + "</div>";
 }
+let review = null, submitted = false;
+function formValues() {
+  const v = {};
+  document.querySelectorAll("#form input:checked").forEach(x => v[x.name] = x.value);
+  document.querySelectorAll("#form [data-open]").forEach(x => v["open:" + x.dataset.open] = x.value);
+  return v;
+}
+function restoreValues(v) {
+  Object.entries(v).forEach(([k, val]) => {
+    if (k.startsWith("open:")) { const el = document.querySelector(`#form [data-open="${k.slice(5)}"]`); if (el) el.value = val; }
+    else { const el = document.querySelector(`#form input[name="${k}"][value="${val}"]`); if (el) el.checked = true; }
+  });
+}
 function renderReview(r) {
-  const s = t(); const q = r.questions;
+  review = r;
+  const s = t(); const q = (r.questions_by_language || {})[lang] || r.questions;
   $("recap").innerHTML = `
     <h2>${s.recapExpected}</h2><div class="pre">${esc(r.expected)}</div>
     <h2>${s.recapList} <span class="count">${r.skills.length}</span></h2>
@@ -582,22 +979,67 @@ function renderReview(r) {
     <div class="row"><span></span><button class="btn" id="submit">${s.submit}</button></div>`;
   $("submit").onclick = () => submitAnswers(q);
 }
+// the closing page follows a language switch (POF's), keeping what was already answered
+function rerenderReview() {
+  if (!review || submitted || !$("s3").classList.contains("on")) return;
+  const v = formValues(); renderReview(review); restoreValues(v);
+}
+// What the teacher keeps: the final list with ESCO links and the text changes they accepted
+function resultText() {
+  const s = t(), r = review;
+  let out = `${r.course_name || ""}\n\n${s.resultList}\n` +
+    r.skills.map(k => `- ${k.label}${k.in_text ? "" : ` (${s.notInText})`}: ${k.url}`).join("\n");
+  if ((r.text_changes || []).length)
+    out += `\n\n${s.resultChanges}\n` + r.text_changes.map(c => `- ${c.label} (${c.section}): ${c.text}`).join("\n");
+  return out.trim();
+}
 async function submitAnswers(q) {
   const val = n => { const x = document.querySelector(`input[name="${n}"]:checked`); return x ? (x.value === "na" ? "na" : Number(x.value)) : null; };
   let missing = false;
   document.querySelectorAll(".q[data-q]").forEach(el => { const ok = val(el.dataset.q) !== null; el.classList.toggle("missing", !ok); missing ||= !ok; });
   if (missing) { toast(t().missing); return; }
-  const body = { session, sus: q.sus.map((_, i) => val("sus" + i)),
+  const body = { session, language: lang, sus: q.sus.map((_, i) => val("sus" + i)),
     statements: Object.fromEntries(q.statements.map(st => [st.key, val("st_" + st.key)])),
     open: Object.fromEntries([...document.querySelectorAll("[data-open]")].map(el => [el.dataset.open, el.value])) };
   try {
-    await api("/api/answers", body);
+    await api("api/answers", body);
+    submitted = true;
     $("form").innerHTML = `<div class="done"><h1>${t().thanks}</h1><p class="lead">${t().thanksLead}</p>
-      <a class="btn" href="/api/download/${session}">${t().download}</a></div>`;
+      <div class="pre result" id="result"></div>
+      <button class="btn" id="copy">${t().copy}</button></div>`;
+    $("result").textContent = resultText();
+    $("copy").onclick = async () => {
+      try { await navigator.clipboard.writeText(resultText()); toast(t().copied); }
+      catch (e) { const range = document.createRange(); range.selectNodeContents($("result"));
+                  getSelection().removeAllRanges(); getSelection().addRange(range); }
+    };
   } catch (e) { toast(e.message); }
 }
 
-applyLang();
+// Which first screen: the university login, or "before you start".
+(async () => {
+  try {
+    const mode = (await (await fetch("api/me")).json());        // which login, before sending any token
+    me = mode;
+    if (mode.mode === "pof") {
+      let r = await fetch("api/me", { headers: authHeaders() });
+      me = await r.json();
+      if (!me.logged_in && await refreshPof()) me = await (await fetch("api/me", { headers: authHeaders() })).json();
+      if (!me.logged_in) { goTo(me.login_url); return; }
+    }
+  } catch (e) { /* no login info: assume off */ }
+  $("logout").href = me.logout_url || "auth/logout";
+  if (me.login_required && (!me.logged_in || !me.allowed)) {
+    $("s0").classList.add("on");
+    if (me.error) $("login-error").textContent = me.error;
+    if (me.mode === "pof") { $("t-login-btn").href = "/pof/"; $("t-login-btn").dataset.pof = "1"; }
+    if (EMBED) $("t-login-btn").target = "_top";
+  } else {
+    $("s1").classList.add("on");
+    if (me.logged_in) { $("email-block").style.display = "none"; $("logout").style.display = ""; }
+  }
+  applyLang(); if (EMBED) followPof(); canStart();
+})();
 </script>
 </body>
 </html>

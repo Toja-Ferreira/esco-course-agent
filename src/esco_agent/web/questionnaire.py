@@ -51,6 +51,8 @@ OPEN = {
                     "pt": "O que foi mais útil, e o que atrapalhou?"},
     "distrust": {"en": "Was any suggestion wrong in a way that would make you distrust the tool?",
                  "pt": "Alguma sugestão estava errada de uma forma que o faria desconfiar da ferramenta?"},
+    "comments": {"en": "Anything else you would like to tell us? (optional)",
+                 "pt": "Mais alguma coisa que nos queira dizer? (opcional)"},
 }
 
 SCALE = {"en": ["Strongly disagree", "Strongly agree"], "pt": ["Discordo totalmente", "Concordo totalmente"]}
@@ -77,7 +79,8 @@ def sus_score(answers: list[int]) -> float:
 
 
 def check_answers(raw: dict) -> dict:
-    """Validate a submission; returns the cleaned answers with the SUS score."""
+    """Validate a submission; returns the cleaned answers with the SUS score and the
+    language the questions were shown in (the page follows POF's PT/EN switch)."""
     sus = raw.get("sus")
     score = sus_score(sus)
     statements = raw.get("statements") or {}
@@ -91,5 +94,8 @@ def check_answers(raw: dict) -> dict:
         else:
             raise ValueError(f"missing or invalid answer for '{key}'")
     opens = raw.get("open") or {}
+    lang = raw.get("language") if raw.get("language") in ("en", "pt") else None
     return {"sus": sus, "sus_score": score, "statements": clean,
+            "questions_language": lang,
+            "sus_language": "pt" if (lang == "pt" and SUS_PT) else "en",
             "open": {k: str(opens.get(k, "")).strip()[:3000] for k in OPEN}}

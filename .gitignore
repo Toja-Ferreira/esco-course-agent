@@ -4,3 +4,5 @@ __pycache__/
 data/
 *.egg-info/
 .pytest_cache/
+results/sessions/
+results/.salt

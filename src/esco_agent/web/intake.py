@@ -17,6 +17,9 @@ MESSAGES = {
     "pt": {
         "hello": ("Olá! Vou ajudar a escolher as competências ESCO que descrevem a sua unidade "
                   "curricular. Primeiro, como se chama a unidade curricular?"),
+        "hello_named": ("Olá! Vamos escolher as competências ESCO de **{name}**. Para começar, cole "
+                        "os **resultados de aprendizagem** da página da unidade curricular, **em "
+                        "inglês** (a versão inglesa da página)."),
         "ask_outcomes": ("Obrigado. Agora cole os **resultados de aprendizagem** da página da "
                          "unidade curricular, **em inglês** (a versão inglesa da página)."),
         "ask_contents": ("Agora cole os **conteúdos** (programa), também em inglês. Se a página "
@@ -36,6 +39,8 @@ MESSAGES = {
     "en": {
         "hello": ("Hello! I'll help you choose the ESCO skills that describe your course. First, "
                   "what is the course called?"),
+        "hello_named": ("Hello! Let's choose the ESCO skills for **{name}**. To begin, paste the "
+                        "course's **learning outcomes** from its page, **in English**."),
         "ask_outcomes": ("Thank you. Now paste the course's **learning outcomes** from its page, "
                          "**in English**."),
         "ask_contents": ("Now paste the **contents** (syllabus), also in English. If the page has "
@@ -92,6 +97,12 @@ def check_section(text: str) -> str | None:
     return None
 
 
+def check_name(text: str) -> bool:
+    """A course name: not empty, one line, not a pasted section."""
+    text = (text or "").strip()
+    return bool(text) and len(text) <= 150 and text.count("\n") <= 1
+
+
 def step(stage: str, text: str, language: str) -> dict:
     """One intake answer. Returns {"reply", "stage", and "name"/"outcomes"/"contents"
     when accepted}. "stage" == "ready" means the course is complete."""
@@ -104,7 +115,7 @@ def step(stage: str, text: str, language: str) -> dict:
     if stage == "name":
         if not text:
             return {"reply": say("empty"), "stage": "name"}
-        if len(text) > 150 or text.count("\n") > 1:
+        if not check_name(text):
             return {"reply": say("name_long"), "stage": "name"}
         return {"reply": say("ask_outcomes"), "stage": "outcomes", "name": text}
 
