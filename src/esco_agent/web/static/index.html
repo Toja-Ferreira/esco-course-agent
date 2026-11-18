@@ -201,7 +201,8 @@
   .skill .quote small { color: var(--grey-3); }
   .skill .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
   .skill .actions a { margin-left: auto; font-size: 13px; }
-  details.rejected > summary { cursor: pointer; color: var(--grey-3); font-size: 14px; margin-top: 16px; }
+  .skill.rejected .label { color: var(--grey-2); font-weight: 500; }
+  details.removed-group > summary { cursor: pointer; color: var(--grey-3); font-size: 14px; margin-top: 16px; }
   .change .st { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
                 background: var(--bg); color: var(--grey-2); border: 1px solid var(--line); }
   .change.st-accepted .st { background: var(--lime); color: var(--black); border-color: var(--lime); }
@@ -1000,7 +1001,7 @@ function renderPanel() {
   const openSkills = new Set([...p.querySelectorAll("details.skill[open]")].map(d => d.dataset.n));
   const openChanges = new Set([...p.querySelectorAll("details.change[open]")].map(d => d.dataset.c));
   const openOcc = new Set([...p.querySelectorAll("details.occ[open]")].map(d => d.dataset.o));
-  const rejOpen = !!p.querySelector("details.rejected[open]");
+  const rejOpen = !!p.querySelector("details.removed-group[open]");
   const by = st => panelState.skills.filter(s => s.status === st);
   const acc = by("accepted"), pen = by("pending"), rej = by("rejected");
   const changes = panelState.text_changes || [], occs = panelState.occupations || [];
@@ -1020,7 +1021,7 @@ function renderPanel() {
   if (occs.length) h += `<h2>${t().occupations} <span class="count">${occs.length}</span></h2>` +
     `<p class="hint occlead">${esc(t().occLead(acc.length))}</p>` +
     occs.map(o => occCard(o, openOcc.has(String(o.rank)) || gapNew.includes(String(o.rank)))).join("");
-  if (rej.length) h += `<details class="rejected" ${rejOpen ? "open" : ""}><summary>${t().rejected} (${rej.length})</summary>${rej.map(s => skillCard(s, false)).join("")}</details>`;
+  if (rej.length) h += `<details class="removed-group" ${rejOpen ? "open" : ""}><summary>${t().rejected} (${rej.length})</summary>${rej.map(s => skillCard(s, false)).join("")}</details>`;
   p.innerHTML = h;
 
   // highlight what is new, and bring the first new thing into view
@@ -1032,7 +1033,7 @@ function renderPanel() {
   ].filter(Boolean);
   fresh.forEach(el => el.classList.add("flash"));
   if (fresh.length) {
-    const target = fresh.find(el => !el.closest("details.rejected:not([open])")) || fresh[0];
+    const target = fresh.find(el => !el.closest("details.removed-group:not([open])")) || fresh[0];
     setTimeout(() => target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" }), 60);
   }
   lastStatus = Object.fromEntries(panelState.skills.map(sk => [sk.number, sk.status]));
@@ -1043,7 +1044,7 @@ function renderPanel() {
 // Open a skill or occupation in the panel (from a link in the chat or the panel itself)
 function reveal(sel) {
   const el = $("panel").querySelector(sel); if (!el) return;
-  const rej = el.closest("details.rejected"); if (rej) rej.open = true;
+  const rej = el.closest("details.removed-group"); if (rej) rej.open = true;
   el.open = true; el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
   el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
 }
