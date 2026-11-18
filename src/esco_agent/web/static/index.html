@@ -503,6 +503,7 @@ const T = {
     susTitle: "Utilização", statementsTitle: "Sobre o assistente", openTitle: "Comentários",
     submit: "Enviar respostas", missing: "Falta responder a algumas perguntas (marcadas a vermelho).",
     thanks: "Obrigado!", thanksLead: "As suas respostas e a lista foram guardadas. Pode copiar o resultado abaixo para usar na página da unidade curricular.",
+    resumed: "Sessão retomada onde estava.",
     copy: "Copiar o resultado", copied: "Copiado.", resultList: "Competências ESCO", resultChanges: "Alterações ao texto aceites",
     you: "Eu", assistant: "Assistente",
   },
@@ -566,6 +567,7 @@ const T = {
     susTitle: "Usability", statementsTitle: "About the assistant", openTitle: "Comments",
     submit: "Send answers", missing: "Some questions are not answered yet (marked in red).",
     thanks: "Thank you!", thanksLead: "Your answers and the list have been saved. You can copy the result below to use on the course page.",
+    resumed: "Session picked up where you left it.",
     copy: "Copy the result", copied: "Copied.", resultList: "ESCO skills", resultChanges: "Accepted text changes",
     you: "Me", assistant: "Assistant",
   },
@@ -727,13 +729,47 @@ $("start").addEventListener("click", async () => {
   try {
     const r = await api("api/session", { email: $("email").value, language: lang, expected: $("expected").value,
                                          course_name: $("uc-name").value });
-    session = r.session; stage = r.stage;
+    session = r.session; stage = r.stage; remember(session);
     if (r.course_name) $("course-name").textContent = r.course_name;
-    $("s1").classList.remove("on"); $("s2").classList.add("on"); $("finish").style.display = ""; $("help").style.display = "";
-    document.body.classList.add("chatting");
+    showChat();
     r.chat.forEach(m => addMessage(m, true)); renderChips(); $("box").focus();
   } catch (e) { toast(e.message); canStart(); }
 });
+
+// The session id is kept in the browser, so a reload (POF's session dialog, F5, a
+// dropped connection) picks the session up again instead of starting over.
+const SAVED = "esco-assistant-session";
+function remember(sid) { try { sid ? localStorage.setItem(SAVED, sid) : localStorage.removeItem(SAVED); } catch (e) { /* storage blocked */ } }
+function remembered() { try { return localStorage.getItem(SAVED); } catch (e) { return null; } }
+function showChat() {
+  $("s1").classList.remove("on"); $("s3").classList.remove("on"); $("s2").classList.add("on");
+  $("finish").style.display = ""; $("help").style.display = "";
+  document.body.classList.add("chatting");
+}
+async function showReview() {
+  const r = await api("api/finish", { session });
+  $("s1").classList.remove("on"); $("s2").classList.remove("on"); $("s3").classList.add("on");
+  $("finish").style.display = "none"; $("help").style.display = "none";
+  document.body.classList.remove("chatting");
+  renderReview(r);
+}
+async function tryResume() {
+  const sid = remembered(); if (!sid) return false;
+  try {
+    const r = await api("api/resume", { session: sid });
+    if (r.answered) { remember(null); return false; }        // finished and answered: start anew
+    session = r.session; stage = r.stage;
+    if (r.course_name) $("course-name").textContent = r.course_name;
+    panelState = r;
+    if (stage === "finished") { await showReview(); return true; }
+    showChat();
+    r.chat.forEach(m => addMessage(m));
+    renderPanel(); renderChips();
+    $("chat").scrollTop = $("chat").scrollHeight;
+    toast(t().resumed);
+    return true;
+  } catch (e) { remember(null); return false; }                // gone (server restarted) or not theirs
+}
 
 // --- 2. the chat ---
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1111,10 +1147,7 @@ async function finishSession(choice) {
       if (action) await api("api/skill", { session, number: Number(n), action, source: "finish" });
     }
     closeDialog();
-    const r = await api("api/finish", { session });
-    $("s2").classList.remove("on"); $("s3").classList.add("on"); $("finish").style.display = "none"; $("help").style.display = "none";
-    document.body.classList.remove("chatting");
-    renderReview(r);
+    await showReview();
   } catch (e) { toast(e.message); }
   busy = false;
 }
@@ -1185,7 +1218,7 @@ async function submitAnswers(q) {
     open: Object.fromEntries([...document.querySelectorAll("[data-open]")].map(el => [el.dataset.open, el.value])) };
   try {
     await api("api/answers", body);
-    submitted = true;
+    submitted = true; remember(null);
     $("form").innerHTML = `<div class="done"><h1>${t().thanks}</h1><p class="lead">${t().thanksLead}</p>
       <div class="pre result" id="result"></div>
       <button class="btn" id="copy">${t().copy}</button></div>`;
@@ -1217,8 +1250,8 @@ async function submitAnswers(q) {
     if (me.mode === "pof") { $("t-login-btn").href = "/pof/"; $("t-login-btn").dataset.pof = "1"; }
     if (EMBED) $("t-login-btn").target = "_top";
   } else {
-    $("s1").classList.add("on");
     if (me.logged_in) { $("email-block").style.display = "none"; $("logout").style.display = ""; }
+    if (!(await tryResume())) $("s1").classList.add("on");
   }
   applyLang(); if (EMBED) followPof(); canStart();
 })();

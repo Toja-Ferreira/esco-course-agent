@@ -314,6 +314,7 @@ class Sessions:
             "expected_skills_before": s["expected"],
             "model": served or self.model,
             "chat": s["chat"],            # what the teacher saw, with button use marked
+            "resumed": s.get("resumed", []),   # times the page was reloaded and picked up again
             "answers": s.get("answers"),
             "agent": export(state) if state else None,   # list, events, full transcript
         }
@@ -514,6 +515,24 @@ class Sessions:
             self.save(s, state)
             return {"stage": s["stage"], "new": s["chat"][-1:], **panel(state),
                     "chips": suggestions(state, s["language"], self._asked(s))}
+
+    # --- resume (the page was reloaded, e.g. by POF's session dialog) ---
+
+    async def resume(self, sid: str) -> dict:
+        """Everything the page needs to redraw a session where it was. Waits for a
+        reply still being written, so it comes back with the page."""
+        s = self.get(sid)
+        async with s["lock"]:
+            state = await self._state(s)
+            out = {"session": sid, "language": s["language"], "stage": s["stage"],
+                   "course_name": s["course_name"], "chat": s["chat"],
+                   "answered": bool(s.get("answers")),
+                   "skills": [], "text_changes": [], "occupations": [], "chips": []}
+            if state:
+                out.update(panel(state), chips=suggestions(state, s["language"], self._asked(s)))
+            s.setdefault("resumed", []).append(_now())
+            self.save(s, state or None)
+            return out
 
     # --- 3. finish ---
 
@@ -744,6 +763,11 @@ def create_app(sessions: Sessions | None = None, oauth_config=None, pof_config=N
     async def skill(body: SkillIn, user: dict | None = Depends(require_user)):
         check(body.session, user)
         return await run(sessions.decide(body.session, body.number, body.action, body.source))
+
+    @app.post("/api/resume", dependencies=[Depends(login)])
+    async def resume(body: SessionIn, user: dict | None = Depends(require_user)):
+        check(body.session, user)
+        return await run(sessions.resume(body.session))
 
     @app.post("/api/finish", dependencies=[Depends(login)])
     async def finish(body: SessionIn, user: dict | None = Depends(require_user)):

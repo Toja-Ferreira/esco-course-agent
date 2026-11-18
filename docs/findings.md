@@ -238,3 +238,8 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 - Two false grounding warnings: the check flagged the assistant's suggested question ("Ask 'what does number 1 lack?'") and, next turn, its quote of its own earlier reply. Quoted questions are no longer checked, and the assistant's earlier replies may be quoted, with their own quotations removed so an unsupported quote cannot become supported by repetition. The flagged-reply rate reported in the paper should use the corrected check (both warnings in this session were false).
 - Text changes: a "before and after" view of the section, new text highlighted; the end result includes each changed section in full, ready to paste.
 - The text suggestions in this session (teach: execute software tests, report test findings) both passed the check; the teacher accepted one.
+
+## 2026-11-18 — Reload lost the session
+
+- Clicking POF's "extend session" dialog reloaded the page and the assistant started over: the session lived only in the page's memory. The page now keeps the session id in the browser and, on load, asks the server for it (`/api/resume`, owner-only) and redraws chat, list, suggestions or the closing page. Each pick-up is logged (`resumed`), since a reload mid-session is relevant when reading timings.
+- Limit: sessions and the agent's state are held in the server's memory, so a restart of the container (e.g. `docker compose up -d --build` after an update) still ends open sessions; the saved files are kept. Do not update the VM while teachers are in a session.

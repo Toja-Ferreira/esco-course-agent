@@ -61,6 +61,14 @@ def test_whole_session_from_start_to_answers(tmp_path):
     assert r["new"][-1]["content"] == "Mantive a 2."
     assert [s["status"] for s in r["skills"]] == ["accepted", "accepted"]
 
+    # the page was reloaded (e.g. POF's session dialog): the session comes back as it was
+    back = c.post("/api/resume", json={"session": sid}).json()
+    assert back["stage"] == "chat" and back["course_name"] == "Programação" and not back["answered"]
+    assert back["chat"][-1]["content"] == "Mantive a 2."
+    assert [s["status"] for s in back["skills"]] == ["accepted", "accepted"] and "chips" in back
+    assert len(saved(sessions, sid)["resumed"]) == 1
+    assert c.post("/api/resume", json={"session": "nope"}).status_code == 400
+
     data = saved(sessions, sid)
     assert data["participant"] == hash_email("teacher@ua.pt", sessions.salt)
     assert "teacher@ua.pt" not in json.dumps(data).lower()
@@ -100,6 +108,8 @@ def test_whole_session_from_start_to_answers(tmp_path):
     assert data["answers"]["open"]["most_useful"] == "as frases"
     assert data["answers"]["open"]["comments"] == ""                # optional
     assert data["answers"]["questions_language"] == "en" and data["answers"]["sus_language"] == "en"
+
+    assert c.post("/api/resume", json={"session": sid}).json()["answered"] is True
 
     d = c.get(f"/api/download/{sid}")
     assert d.status_code == 200 and json.loads(d.content)["session"] == sid
