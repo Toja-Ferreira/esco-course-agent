@@ -1,0 +1,28 @@
+# Runs the assistant on the VM, reachable only from nginx (127.0.0.1:8090),
+# which serves it at /esco/ on POF's address. See deploy/DEPLOY.md.
+services:
+  esco-assistant:
+    build: .
+    container_name: esco-assistant
+    restart: unless-stopped
+    env_file: .env                      # DEEPSEEK_API_KEY, HF_TOKEN, ESCO_DAILY_LIMIT, ...
+    environment:                        # these win over .env
+      HOST: 0.0.0.0
+      PORT: "8090"
+      ESCO_AUTH: pof
+      POF_API_URL: http://host.docker.internal:5181   # POF's backend on the host
+      ESCO_DATA_DIR: /app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:8090:8090"
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"          # owner of results/ and hf-cache/
+    volumes:
+      - ./data:/app/data:ro             # ESCO parquet files + skill vectors
+      - ./results:/app/results          # session files and the salt: back these up
+      - ./hf-cache:/hf                  # EmbeddingGemma, downloaded once
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/api/me', timeout=5)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
