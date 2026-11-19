@@ -32,6 +32,7 @@ class SkillRef:
     uri: str
     label: str
     skill_type: str
+    reuse_level: str = ""
 
 
 @dataclass(frozen=True)
@@ -75,6 +76,10 @@ class OccupationIndex:
         self.occ_description = dict(zip(o["conceptUri"], o["description"]))
         self.skill_label = dict(zip(s["conceptUri"], s["preferredLabel"]))
         self.isco_group = dict(zip(occ["conceptUri"], occ["iscoGroup"]))
+        skills_file = data / "skills.parquet"
+        sk = pd.read_parquet(skills_file) if skills_file.exists() else pd.DataFrame()
+        self.skill_reuse = (dict(zip(sk["conceptUri"], sk["reuseLevel"].fillna("")))
+                            if "reuseLevel" in sk else {})
 
         rel = rel[rel["relationType"].isin(RELATION_WEIGHT)
                   & rel["occupationUri"].isin(self.isco_group)]
@@ -118,7 +123,7 @@ class OccupationIndex:
 
         def refs(kind: str) -> list[SkillRef]:
             sub = r[r["relationType"] == kind].sort_values("skillUri")
-            return [SkillRef(u, self.skill_label.get(u, u), t)
+            return [SkillRef(u, self.skill_label.get(u, u), t, self.skill_reuse.get(u, ""))
                     for u, t in zip(sub["skillUri"], sub["skillType"])]
 
         return OccupationSkills(

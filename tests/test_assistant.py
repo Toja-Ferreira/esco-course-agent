@@ -400,3 +400,17 @@ def test_session_is_saved_with_course_list_log_and_conversation(tmp_path):
 
 def test_render_state_empty():
     assert render_state([]) == "No skills yet."
+
+
+def test_generic_skills_come_after_course_specific_ones():
+    # "computer programming" marked transversal here only to test the ordering
+    ESCO["prog"]["reuse"] = "transversal"
+    try:
+        (s,) = run(Agent(), [])
+    finally:
+        ESCO["prog"].pop("reuse")
+    assert [k["label"] for k in s["known"]] == ["perform software unit testing",
+                                                "computer programming"]
+    assert s["known"][1]["reuse"] == "transversal" and s["known"][0]["reuse"] == ""
+    from esco_agent.web.app import panel
+    assert [k["reuse"] for k in panel(s)["skills"]] == ["", "transversal"]

@@ -314,6 +314,7 @@ def _now() -> str:
 
 def _entry(skill: dict, origin: str, in_text: bool, status: str = "pending") -> dict:
     return {"id": skill["id"], "label": skill["label"], "type": skill.get("type", ""),
+            "reuse": skill.get("reuse", ""),       # ESCO reuse level ("transversal" = generic)
             "description": skill.get("description", ""),
             "evidence": skill.get("evidence", []), "in_text": in_text,
             "origin": origin, "status": status}
@@ -388,7 +389,8 @@ def export(state: dict) -> dict:
     """The final list, the log and the whole conversation, for saving."""
     def out(n, s):
         return {"number": n, "uri": SKILL_URI + s["id"], "label": s["label"],
-                "type": s["type"], "in_text": s["in_text"], "evidence": s["evidence"],
+                "type": s["type"], "reuse": s.get("reuse", ""),
+                "in_text": s["in_text"], "evidence": s["evidence"],
                 "origin": s["origin"], "text_change": s.get("text_change")}
     known = list(enumerate(state.get("known") or [], 1))
     return {"language": state.get("language"), "course": state.get("sections", {}),
@@ -415,7 +417,10 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         progress("checking", n=len(candidates))
         result = await suggest_skills(candidates, judge_llm, sections)
         known = []
-        for s in result["suggested"]:
+        # generic (transversal) skills after the course-specific ones; the order sets
+        # the numbers, so the list and the first answer agree
+        suggested = sorted(result["suggested"], key=lambda s: s.get("reuse") == "transversal")
+        for s in suggested:
             via = [q for q in s.get("found_by", []) if q != "whole text"]
             known.append(_entry(s, f"search '{via[0]}'" if via else "the whole course text", True))
         language = state.get("language") or "en"

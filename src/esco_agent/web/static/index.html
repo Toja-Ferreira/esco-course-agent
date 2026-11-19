@@ -240,6 +240,9 @@
   .occ .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
   .occ .actions a { margin-left: auto; font-size: 13px; }
   .occlead { margin: -4px 0 8px; }
+  .subhead { margin: 12px 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+             color: var(--grey-3); }
+  .subhead span { text-transform: none; letter-spacing: 0; font-weight: 400; }
   /* skill / occupation names in replies: open them in the panel */
   button.ref { all: unset; cursor: pointer; color: inherit; font-weight: inherit;
                text-decoration: underline; text-decoration-color: var(--lime); text-decoration-thickness: 2px;
@@ -493,6 +496,7 @@ const T = {
     modeShow: "Mostrar o que já ensina", modeTeach: "Ensinar algo novo",
     baShow: "Ver antes e depois", baBefore: "Antes", baAfter: "Depois (o texto novo está destacado)",
     resultSections: "Secções com as alterações aceites (para colar na página)",
+    transversal: "Transversais", transversalHint: "gerais, comuns a muitas áreas",
     occupations: "Ocupações", occLead: n => `Ordenadas pelas ${n} competências da sua lista.`,
     occMatched: "Ligada a", occIsco: "Grupo ISCO", occEsco: "Ver na ESCO ↗",
     occGap: (on, all) => `${on} de ${all} competências essenciais na lista`,
@@ -557,6 +561,7 @@ const T = {
     modeShow: "Show what it already teaches", modeTeach: "Teach something new",
     baShow: "See before and after", baBefore: "Before", baAfter: "After (the new text is highlighted)",
     resultSections: "Sections with the accepted changes (to paste into the page)",
+    transversal: "Transversal", transversalHint: "general, common to many fields",
     occupations: "Occupations", occLead: n => `Ranked by the ${n} skills on your list.`,
     occMatched: "Linked to", occIsco: "ISCO group", occEsco: "View on ESCO ↗",
     occGap: (on, all) => `${on} of ${all} essential skills on the list`,
@@ -1013,9 +1018,17 @@ function renderPanel() {
   const occChanged = occSig !== lastOcc && occs.length > 0;
   const gapNew = occs.filter(o => o.gap && !lastOcc.includes(JSON.stringify([o.label, true]))).map(o => String(o.rank));
 
+  // course-specific skills first; generic (ESCO "transversal") ones under their own heading
+  const cards = list => {
+    const card = s => skillCard(s, openSkills.has(String(s.number)));
+    const generic = list.filter(s => s.reuse === "transversal"), specific = list.filter(s => s.reuse !== "transversal");
+    return specific.map(card).join("") + (generic.length
+      ? `<p class="subhead" title="${esc(t().transversalHint)}">${t().transversal} <span>· ${esc(t().transversalHint)}</span></p>` + generic.map(card).join("")
+      : "");
+  };
   let h = `<h2>${t().list} <span class="count">${acc.length}</span></h2>`;
-  h += acc.length ? acc.map(s => skillCard(s, openSkills.has(String(s.number)))).join("") : `<p class="empty">${t().listEmpty}</p>`;
-  if (pen.length) h += `<h2>${t().pending}</h2>` + pen.map(s => skillCard(s, openSkills.has(String(s.number)))).join("");
+  h += acc.length ? cards(acc) : `<p class="empty">${t().listEmpty}</p>`;
+  if (pen.length) h += `<h2>${t().pending}</h2>` + cards(pen);
   if (changes.length) h += `<h2>${t().changes} <span class="count">${changes.length}</span></h2>` +
     changes.map(c => changeCard(c, openChanges.has(String(c.number)) || newChanges.includes(String(c.number)))).join("");
   if (occs.length) h += `<h2>${t().occupations} <span class="count">${occs.length}</span></h2>` +

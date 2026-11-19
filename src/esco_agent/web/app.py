@@ -118,6 +118,7 @@ def panel(state: dict) -> dict:
     for n, s in enumerate(state.get("known") or [], 1):
         skills.append({
             "number": n, "label": s["label"], "type": s["type"], "status": s["status"],
+            "reuse": s.get("reuse", ""),
             "in_text": s["in_text"], "definition": s["description"],
             "evidence": [{"section": e["section"], "text": e["text"]} for e in s["evidence"][:3]],
             "origin": s["origin"],

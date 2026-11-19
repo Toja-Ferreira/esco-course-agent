@@ -243,3 +243,8 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 
 - Clicking POF's "extend session" dialog reloaded the page and the assistant started over: the session lived only in the page's memory. The page now keeps the session id in the browser and, on load, asks the server for it (`/api/resume`, owner-only) and redraws chat, list, suggestions or the closing page. Each pick-up is logged (`resumed`), since a reload mid-session is relevant when reading timings.
 - Limit: sessions and the agent's state are held in the server's memory, so a restart of the container (e.g. `docker compose up -d --build` after an update) still ends open sessions; the saved files are kept. Do not update the VM while teachers are in a session.
+
+## 2026-11-19 — Generic skills grouped (ESCO reuse level)
+
+- The plain-chat comparison showed the assistant's list leading with generic skills (think analytically, create solutions to problems), which made it look less sharp than the chat's course-specific topics. ESCO marks each skill's reuse level (transversal, cross-sector, sector-specific, occupation-specific). Transversal skills now come after the course-specific ones in the first answer (so their numbers are higher) and sit under their own "Transversais" heading in the panel. Nothing is removed; the teacher still decides. Reuse level is saved per skill, so the analysis can report acceptance of generic vs specific skills.
+- Not changed: the judge. Its precision (e.g. "organise information, objects and resources" kept on the word "organisation") will be measured on hand-labelled suggestions before any prompt change.

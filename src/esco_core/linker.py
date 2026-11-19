@@ -45,6 +45,7 @@ class SkillHit:
     skill_type: str   # ESCO: "skill/competence" or "knowledge"
     score: float      # fused score, in [0, 1]
     description: str = ""   # ESCO's own definition of the skill
+    reuse_level: str = ""   # ESCO: transversal, cross-sector, sector- or occupation-specific
 
 
 class SkillLinker:
@@ -68,6 +69,8 @@ class SkillLinker:
         self.label = preferred
         self.description = description
         self.skill_type = dict(zip(skills["conceptUri"], skills["skillType"]))
+        self.reuse_level = (dict(zip(skills["conceptUri"], skills["reuseLevel"].fillna("")))
+                            if "reuseLevel" in skills else {})
 
         docs = build_documents(list(self.uris), preferred, alt, description)
         self.stemmer = get_stemmer(LANG)
@@ -95,5 +98,5 @@ class SkillLinker:
     def link(self, text: str, k: int = 10) -> list[SkillHit]:
         ranked = self.first_stage(clean(text))[:k]
         return [SkillHit(u, self.label.get(u, u), self.skill_type.get(u, ""), s,
-                         self.description.get(u) or "")
+                         self.description.get(u) or "", self.reuse_level.get(u, ""))
                 for u, s in ranked]

@@ -94,7 +94,7 @@ def link_text(text: str, k: int = 20, include_descriptions: bool = False) -> dic
     skills = []
     for h in hits:
         skill = {"id": _short(h.uri), "label": h.label,
-                 "type": h.skill_type, "score": round(h.score, 3)}
+                 "type": h.skill_type, "reuse": h.reuse_level, "score": round(h.score, 3)}
         if include_descriptions:
             skill["description"] = h.description
         skills.append(skill)
@@ -170,8 +170,8 @@ def get_occupation_skills(occupation_id: str) -> dict:
         raise ToolError(f"not an ESCO occupation id: {occupation_id!r}") from None
 
     def refs(skills):
-        return [{"id": _short(s.uri), "label": s.label, "type": s.skill_type}
-                for s in skills]
+        return [{"id": _short(s.uri), "label": s.label, "type": s.skill_type,
+                 "reuse": s.reuse_level} for s in skills]
 
     return {"id": _short(o.uri), "label": o.label, "isco_group": o.isco_group,
             "description": o.description,
