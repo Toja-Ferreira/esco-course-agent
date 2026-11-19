@@ -240,6 +240,11 @@
   .occ .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
   .occ .actions a { margin-left: auto; font-size: 13px; }
   .occlead { margin: -4px 0 8px; }
+  .reasons { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .reasons > span { font-weight: 600; font-size: 13px; margin-right: 2px; }
+  .btn.ghostlink { background: none; border: 0; color: var(--grey-3); text-decoration: underline; }
+  .removed-why { color: var(--text); margin: 0 0 8px; }
+  .removed-why span { color: var(--warn); font-size: 13px; }
   .subhead { margin: 12px 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
              color: var(--grey-3); }
   .subhead span { text-transform: none; letter-spacing: 0; font-weight: 400; }
@@ -497,6 +502,10 @@ const T = {
     chMissing: "O que faltaria", chEsco: "O que a ESCO exige", chFailedDraft: "Ver o rascunho que não passou",
     baShow: "Ver antes e depois", baBefore: "Antes", baAfter: "Depois (o texto novo está destacado)",
     resultSections: "Secções com as alterações aceites (para colar na página)",
+    whyRemove: "Porquê?", removedBecause: "Removida:",
+    reasons: { not_in_text: "Não está no texto", not_taught: "A UC não ensina isto", not_wanted: "Não a quero na lista",
+               not_specified: "sem motivo indicado" },
+    updatePage: "A página diz isto (frase abaixo), mas a UC não o ensina: vale a pena atualizar a página.",
     transversal: "Transversais", transversalHint: "gerais, comuns a muitas áreas",
     occupations: "Ocupações", occLead: n => `Ordenadas pelas ${n} competências da sua lista.`,
     occMatched: "Ligada a", occIsco: "Grupo ISCO", occEsco: "Ver na ESCO ↗",
@@ -563,6 +572,10 @@ const T = {
     chMissing: "What would be missing", chEsco: "What ESCO requires", chFailedDraft: "See the draft that did not pass",
     baShow: "See before and after", baBefore: "Before", baAfter: "After (the new text is highlighted)",
     resultSections: "Sections with the accepted changes (to paste into the page)",
+    whyRemove: "Why?", removedBecause: "Removed:",
+    reasons: { not_in_text: "Not in the text", not_taught: "The course doesn't teach it", not_wanted: "I don't want it on the list",
+               not_specified: "no reason given" },
+    updatePage: "The page says this (sentence below), but the course doesn't teach it: worth updating the page.",
     transversal: "Transversal", transversalHint: "general, common to many fields",
     occupations: "Occupations", occLead: n => `Ranked by the ${n} skills on your list.`,
     occMatched: "Linked to", occIsco: "ISCO group", occEsco: "View on ESCO ↗",
@@ -949,15 +962,19 @@ function skillCard(s, open) {
     ? s.evidence.map(e => `<div class="quote">“${esc(e.text)}” <small>(${esc(e.section)})</small></div>`).join("")
     : `<p>${esc(t().noEvidence)}</p>`;
   const act = s.status === "accepted"
-    ? `<button class="btn small outline" data-act="reject" data-n="${s.number}">${t().remove}</button>`
+    ? `<button class="btn small outline" data-act="reject-ask" data-n="${s.number}">${t().remove}</button>`
     : s.status === "rejected"
       ? `<button class="btn small" data-act="accept" data-n="${s.number}">${t().keep}</button>`
       : `<button class="btn small" data-act="accept" data-n="${s.number}">${t().keep}</button>
-         <button class="btn small outline" data-act="reject" data-n="${s.number}">${t().remove}</button>`;
+         <button class="btn small outline" data-act="reject-ask" data-n="${s.number}">${t().remove}</button>`;
+  const why = s.status === "rejected" && s.reject_reason && t().reasons[s.reject_reason]
+    ? `<p class="removed-why">${esc(t().removedBecause)} ${esc(t().reasons[s.reject_reason])}${
+        s.reject_reason === "not_taught" && s.in_text ? `<br><span>${esc(t().updatePage)}</span>` : ""}</p>` : "";
   return `<details class="skill ${s.status}" ${open ? "open" : ""} data-n="${s.number}">
     <summary><span class="num">${s.number}.</span><span class="label">${esc(s.label)}</span>
       ${s.in_text ? "" : `<span class="tag warn">${t().notInText}</span>`}</summary>
     <div class="body">
+      ${why}
       <p><strong>${t().definition}:</strong> ${esc(s.definition) || "—"}</p>
       <p><strong>${t().evidence}:</strong></p>${ev}
       <p><strong>${t().foundBy}:</strong> ${esc(origin(s.origin))}</p>
@@ -1113,9 +1130,20 @@ document.addEventListener("click", e => {
 });
 $("panel").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b || busy) return;
+  if (b.dataset.act === "reject-ask") {           // removing needs a reason: ask in place
+    const box = b.closest(".actions"), n = b.dataset.n, s = t();
+    box.dataset.was = box.innerHTML;
+    box.innerHTML = `<div class="reasons"><span>${s.whyRemove}</span>
+      ${["not_in_text", "not_taught", "not_wanted"].map(r =>
+        `<button class="btn small outline" data-act="reject" data-reason="${r}" data-n="${n}">${s.reasons[r]}</button>`).join("")}
+      <button class="btn small ghostlink" data-act="cancel">${s.cancel}</button></div>`;
+    return;
+  }
+  if (b.dataset.act === "cancel") { const box = b.closest(".actions"); box.innerHTML = box.dataset.was; return; }
   busy = true;
   try {
-    const r = await api("api/skill", { session, number: Number(b.dataset.n), action: b.dataset.act });
+    const r = await api("api/skill", { session, number: Number(b.dataset.n), action: b.dataset.act,
+                                       ...(b.dataset.reason ? { reason: b.dataset.reason } : {}) });
     r.new.forEach(addMessage); panelState = r; renderPanel(); renderChips();
   } catch (err) { toast(err.message); }
   busy = false;

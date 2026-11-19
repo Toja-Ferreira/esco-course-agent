@@ -143,7 +143,8 @@ def test_first_turn_in_portuguese():
 
 def test_accept_reject_search_and_add_a_skill_not_in_the_text():
     agent = Agent(
-        call("update_skill_list", accept=[1], reject=[2]), AIMessage("Kept 1."),
+        call("update_skill_list", accept=[1], reject=[2], reject_reason="not_wanted"),
+        AIMessage("Kept 1."),
         call("find_skills", topic="Linux"), AIMessage("Found 3; Kali Linux is not in the text."),
         call("update_skill_list", accept=[3], add_not_in_text=["kali linux"]), AIMessage("Added."),
         AIMessage("Because sentence X."))
@@ -189,7 +190,8 @@ def test_accept_reject_search_and_add_a_skill_not_in_the_text():
     assert [m["role"] for m in out["transcript"]][:3] == ["human", "ai", "human"]
     assert out["transcript"][2]["content"] == "keep 1, drop 2"
     assert out["transcript"][3]["tool_calls"] == [{"name": "update_skill_list",
-                                                   "args": {"accept": [1], "reject": [2]}}]
+                                                   "args": {"accept": [1], "reject": [2],
+                                                            "reject_reason": "not_wanted"}}]
 
 
 def test_numbers_stay_consecutive_across_searches():
@@ -366,7 +368,8 @@ def test_text_change_needs_a_mode_and_a_skill_missing_from_the_text():
 
 def test_mistakes_are_reported_to_the_llm_and_change_nothing():
     agent = Agent(call("update_skill_list", accept=[1, 9]), AIMessage("."),
-                  call("update_skill_list", accept=[1], reject=[1]), AIMessage("."),
+                  call("update_skill_list", accept=[1], reject=[1], reject_reason="not_wanted"),
+                  AIMessage("."),
                   call("update_skill_list", accept=[1], add_not_in_text=["made up skill"]), AIMessage("."),
                   call("check_occupation_gap", occupation=1), AIMessage("."),
                   call("find_skills", subject="x"), AIMessage("."))
@@ -385,7 +388,8 @@ def test_mistakes_are_reported_to_the_llm_and_change_nothing():
 def test_two_tool_calls_in_one_turn_both_apply():
     both = AIMessage("", tool_calls=[
         {"name": "update_skill_list", "args": {"accept": [1]}, "id": "a", "type": "tool_call"},
-        {"name": "update_skill_list", "args": {"reject": [2]}, "id": "b", "type": "tool_call"}])
+        {"name": "update_skill_list", "args": {"reject": [2], "reject_reason": "not_in_text"},
+         "id": "b", "type": "tool_call"}])
     _, s = run(Agent(both, AIMessage("Done.")), ["keep 1, drop 2"])
     assert [k["status"] for k in s["known"]] == ["accepted", "rejected"]
 
@@ -441,3 +445,20 @@ def test_accepted_text_is_rechecked_for_other_skills_it_shows():
     recheck = [e for e in s5["events"] if e["type"] == "text_change_recheck"][0]
     assert recheck["candidates"] == ["kali"] and recheck["added"] == ["kali"]
     assert s5["sections"] == SECTIONS                       # the course text is unchanged
+
+
+def test_removing_needs_a_reason_and_not_taught_points_to_the_page():
+    agent = Agent(call("update_skill_list", reject=[2]), AIMessage("Why?"),
+                  call("update_skill_list", reject=[2], reject_reason="not_taught"), AIMessage("."))
+    _, s1, s2 = run(agent, ["drop 2", "we don't teach that any more"])
+    assert "reject needs reject_reason" in last_result(s1)["error"]
+    assert s1["known"][1]["status"] == "pending"                     # nothing changed
+    out = last_result(s2)
+    assert out["update_page"] == [{"number": 2, "label": "perform software unit testing",
+                                   "page_sentences": [s2["known"][1]["evidence"][0]["text"]]}]
+    assert s2["known"][1]["reject_reason"] == "not_taught"
+    assert s2["events"][-1]["reason"] == "not_taught"
+    assert export(s2)["rejected"][0]["reject_reason"] == "not_taught"
+    # kept again later: the reason is cleared
+    _, s3 = run(Agent(call("update_skill_list", accept=[2]), AIMessage(".")), ["keep 2"])
+    assert s3["known"][1].get("reject_reason") is None

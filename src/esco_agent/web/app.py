@@ -44,7 +44,7 @@ from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
 
-from esco_agent.assistant import SKILL_URI, _now, course_message, export
+from esco_agent.assistant import REJECT_REASONS, SKILL_URI, _now, course_message, export
 from esco_agent.grounding import check_reply
 from esco_agent.suggest import course_text
 
@@ -94,6 +94,13 @@ def sections_after(state: dict) -> dict:
     return out
 
 
+REASON_WORDS = {
+    "pt": {"not_in_text": "não está no texto", "not_taught": "a UC não ensina isto",
+           "not_wanted": "não a quer na lista"},
+    "en": {"not_in_text": "not in the text", "not_taught": "the course doesn't teach it",
+           "not_wanted": "not wanted on the list"}}
+
+
 def gap_now(gap: dict | None, known: list[dict]) -> dict | None:
     """An occupation's gap against the list as it is now (not as it was when checked)."""
     if not gap or not isinstance(gap.get("essential"), list):
@@ -118,7 +125,7 @@ def panel(state: dict) -> dict:
     for n, s in enumerate(state.get("known") or [], 1):
         skills.append({
             "number": n, "label": s["label"], "type": s["type"], "status": s["status"],
-            "reuse": s.get("reuse", ""),
+            "reuse": s.get("reuse", ""), "reject_reason": s.get("reject_reason"),
             "in_text": s["in_text"], "definition": s["description"],
             "evidence": [{"section": e["section"], "text": e["text"]} for e in s["evidence"][:3]],
             "origin": s["origin"],
@@ -486,9 +493,12 @@ class Sessions:
                     report({"token": text})
         return (await graph.aget_state(self._config(s))).values
 
-    async def decide(self, sid: str, number: int, action: str, source: str = "button") -> dict:
+    async def decide(self, sid: str, number: int, action: str, source: str = "button",
+                     reason: str | None = None) -> dict:
         """Keep or remove a skill from the list panel, without the LLM.
-        source: "button" (the list) or "finish" (the check when finishing)."""
+        source: "button" (the list) or "finish" (the check when finishing).
+        reason: why a skill is removed (REJECT_REASONS); required from the list,
+        "not_specified" from the finish check."""
         s = self.get(sid)
         if s["stage"] != "chat":
             raise Problem("The skill list isn't ready yet. / A lista ainda não está pronta.")
@@ -502,18 +512,29 @@ class Sessions:
                 raise Problem(f"No skill number {number}.")
             skill = known[number - 1]
             status = "accepted" if action == "accept" else "rejected"
+            src = source if source in ("button", "finish") else "button"
+            if status == "rejected":
+                if reason not in REJECT_REASONS:
+                    if src != "finish":
+                        raise Problem("Say why it is removed. / Indique porque a remove.")
+                    reason = "not_specified"
+            else:
+                reason = None
             events = []
-            if skill["status"] != status:
+            if skill["status"] != status or skill.get("reject_reason") != reason:
                 events.append({"t": _now(), "type": status, "skill": skill["id"],
                                "was": skill["status"], "in_text": skill["in_text"],
-                               "source": source if source in ("button", "finish") else "button"})
+                               "source": src, **({"reason": reason} if reason else {})})
                 skill["status"] = status
+            skill["reject_reason"] = reason
             # as_node="first_turn": a node that leads to END, so the next chat
             # message starts a normal turn.
             await graph.aupdate_state(self._config(s), {"known": known, "events": events},
                                       as_node="first_turn")
             word = {("pt", "accepted"): "mantida", ("pt", "rejected"): "removida",
                     ("en", "accepted"): "kept", ("en", "rejected"): "removed"}[(s["language"], status)]
+            if reason in REASON_WORDS[s["language"]]:
+                word += f" ({REASON_WORDS[s['language']][reason]})"
             self._say(s, "action", f"{number}. {skill['label']}: {word}",
                       source=source if source in ("button", "finish") else "button")
             state = (await graph.aget_state(self._config(s))).values
@@ -592,6 +613,7 @@ class SkillIn(BaseModel):
     number: int
     action: str
     source: str = "button"
+    reason: str | None = None
 
 
 class SessionIn(BaseModel):
@@ -767,7 +789,8 @@ def create_app(sessions: Sessions | None = None, oauth_config=None, pof_config=N
     @app.post("/api/skill", dependencies=[Depends(login)])
     async def skill(body: SkillIn, user: dict | None = Depends(require_user)):
         check(body.session, user)
-        return await run(sessions.decide(body.session, body.number, body.action, body.source))
+        return await run(sessions.decide(body.session, body.number, body.action, body.source,
+                                         body.reason))
 
     @app.post("/api/resume", dependencies=[Depends(login)])
     async def resume(body: SessionIn, user: dict | None = Depends(require_user)):

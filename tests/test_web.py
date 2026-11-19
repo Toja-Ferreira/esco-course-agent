@@ -397,3 +397,23 @@ def test_a_whole_page_is_split_by_its_headings():
     assert used.startswith("Usei objetivos, resultados de aprendizagem e conteúdos da página")
     assert "deixei de fora requisitos, avaliação, métodos de ensino e bibliografia" in used
     assert list(sessions.sessions[sid]["sections"]) == ["Objectives", "Learning outcomes", "Contents"]
+
+
+
+def test_removing_from_the_list_needs_a_reason(tmp_path):
+    c, sessions = client(tmp_path)
+    sid = c.post("/api/session", json={"email": "a@b.pt", "language": "pt",
+                                       "expected": "programar em C"}).json()["session"]
+    for text in ("Programação", OUTCOMES, "não tenho"):
+        c.post("/api/message", json={"session": sid, "text": text})
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject"})
+    assert r.status_code == 400 and "porque" in r.json()["detail"]
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject",
+                                   "reason": "not_taught"}).json()
+    assert r["skills"][0]["reject_reason"] == "not_taught"
+    assert r["new"][-1]["content"].endswith("removida (a UC não ensina isto)")
+    r = c.post("/api/skill", json={"session": sid, "number": 2, "action": "reject",
+                                   "source": "finish"}).json()
+    assert r["skills"][1]["reject_reason"] == "not_specified"
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "accept"}).json()
+    assert r["skills"][0]["reject_reason"] is None

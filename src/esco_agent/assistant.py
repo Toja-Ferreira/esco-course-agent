@@ -92,12 +92,21 @@ def _fn(name: str, description: str, properties: dict, required: list[str] | Non
 
 _NUMBERS = {"type": "array", "items": {"type": "integer"}}
 
+REJECT_REASONS = ("not_in_text", "not_taught", "not_wanted")
+
 TOOLS = [
     _fn("update_skill_list",
         "Change the course's skill list. Call this whenever the teacher wants skills "
         "kept, added, removed or rejected; saying it is done is not enough.",
         {"accept": {**_NUMBERS, "description": "Numbers of skills to put on the list."},
          "reject": {**_NUMBERS, "description": "Numbers of skills to reject or take off the list."},
+         "reject_reason": {
+             "type": "string", "enum": list(REJECT_REASONS),
+             "description": "Required with reject. not_in_text: the course text doesn't "
+                            "really say this (a wrong suggestion). not_taught: the text says it "
+                            "but the course doesn't teach it (outdated or a mistake on the page). "
+                            "not_wanted: in the text and taught, but the teacher doesn't want it. "
+                            "If the teacher hasn't said why, ask in one short question first."},
          "add_not_in_text": {
              "type": "array", "items": {"type": "string"},
              "description": "Exact names of skills from a 'not_in_course_text' result that "
@@ -173,7 +182,13 @@ tool result of this conversation. Never invent them or recall them from memory.
 - Never say whether ESCO has or lacks a skill (or what it is called) unless a tool \
 result in this conversation shows it. If you don't know, call find_skills first.
 - Skills the teacher can act on have a number. When the teacher wants skills kept, \
-added, removed or rejected, call update_skill_list.
+added, removed or rejected, call update_skill_list. Removing needs a reason \
+(reject_reason); if it isn't clear from what they said, ask in one short question: \
+the text doesn't really say it, the course doesn't teach it, or they don't want it.
+- The list describes the page, and the page should describe what the course \
+teaches. When they disagree, the fix is the page: if the teacher keeps or adds a \
+skill the text doesn't show but the course teaches, offer a "show" text change; if \
+the text claims something the course doesn't teach, point to the sentence to update.
 - When the teacher asks whether there is anything on a topic, or expects a skill \
 you haven't shown, call find_skills. If it finds nothing suitable, say so; ESCO \
 does not have a skill for everything.
@@ -400,7 +415,8 @@ def export(state: dict) -> dict:
         return {"number": n, "uri": SKILL_URI + s["id"], "label": s["label"],
                 "type": s["type"], "reuse": s.get("reuse", ""),
                 "in_text": s["in_text"], "evidence": s["evidence"],
-                "origin": s["origin"], "text_change": s.get("text_change")}
+                "origin": s["origin"], "text_change": s.get("text_change"),
+                "reject_reason": s.get("reject_reason")}
     known = list(enumerate(state.get("known") or [], 1))
     return {"language": state.get("language"), "course": state.get("sections", {}),
             "skills": [out(n, s) for n, s in known if s["status"] == "accepted"],
@@ -456,8 +472,12 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
     # --- tools. Each takes the working copy `w` of the state, changes it in
     # --- place, and returns (result for the LLM, events for the log).
 
-    def update_skill_list(w, accept=None, reject=None, add_not_in_text=None):
+    def update_skill_list(w, accept=None, reject=None, add_not_in_text=None,
+                          reject_reason=None):
         known, offered = w["known"], w["offered"]
+        if reject and reject_reason not in REJECT_REASONS:
+            raise ToolProblem("reject needs reject_reason (not_in_text, not_taught or "
+                              "not_wanted); if the teacher hasn't said why, ask them")
         accept, reject, names = list(accept or []), list(reject or []), list(add_not_in_text or [])
         bad = [n for n in accept + reject
                if not isinstance(n, int) or not 1 <= n <= len(known)]
@@ -473,13 +493,20 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                 f"{unknown} did not match a skill from a not_in_course_text result; names "
                 "must be exact. To look for a skill, call find_skills.")
         events = []
+        update_page = []
         for numbers, status in ((accept, "accepted"), (reject, "rejected")):
             for n in numbers:
                 skill = known[n - 1]
-                if skill["status"] != status:
+                reason = reject_reason if status == "rejected" else None
+                if skill["status"] != status or skill.get("reject_reason") != reason:
                     events.append({"t": _now(), "type": status, "skill": skill["id"],
-                                   "was": skill["status"], "in_text": skill["in_text"]})
+                                   "was": skill["status"], "in_text": skill["in_text"],
+                                   **({"reason": reason} if reason else {})})
                     skill["status"] = status
+                skill["reject_reason"] = reason
+                if reason == "not_taught" and skill["evidence"]:
+                    update_page.append({"number": n, "label": skill["label"],
+                                        "page_sentences": [e["text"] for e in skill["evidence"]]})
         for name in names:
             skill = offered.pop(by_name[name.strip().casefold()], None)
             if skill is None:      # the same name twice in one call
@@ -490,7 +517,13 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                            "was": "offered", "in_text": False})
         on_list = [f"{n}. {s['label']}" + ("" if s["in_text"] else " (NOT IN TEXT)")
                    for n, s in enumerate(known, 1) if s["status"] == "accepted"]
-        return {"list_now": on_list}, events
+        out = {"list_now": on_list}
+        if update_page:
+            out["update_page"] = update_page
+            out["note"] = ("the page claims these, but the course doesn't teach them: quote the "
+                           "sentences and suggest the teacher updates the page so it matches "
+                           "what the course teaches")
+        return out, events
 
     def _number(w) -> dict:
         return {s["id"]: n for n, s in enumerate(w["known"], 1)}
