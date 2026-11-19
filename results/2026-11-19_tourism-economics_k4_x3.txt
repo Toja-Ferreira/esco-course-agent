@@ -1,0 +1,11 @@
+input: Learning outcomes, Contents | judge sees: label + ESCO definition | per-query k: 4
+
+STABILITY over 3 runs (suggested per run: [4, 3, 3]; candidates per run: [45, 45, 45]; seconds per run: [16.8, 5.3, 4.5])
+  3/3  macroeconomics
+  3/3  tourism market
+  2/3  economics   (a candidate in 3 runs)
+  1/3  microeconomics   (a candidate in 1 runs)
+  1/3  teach economic principles   (a candidate in 3 runs)
+
+suggested in every run: 2   in some runs only: 3   of those, same candidate judged differently: 2
+judge replies valid on first attempt: 3/3 runs

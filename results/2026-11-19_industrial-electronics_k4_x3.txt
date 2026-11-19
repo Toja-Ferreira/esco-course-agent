@@ -1,0 +1,23 @@
+input: Learning outcomes, Contents | judge sees: label + ESCO definition | per-query k: 4
+
+STABILITY over 3 runs (suggested per run: [16, 15, 17]; candidates per run: [74, 71, 72]; seconds per run: [21.6, 5.5, 5.3])
+  3/3  analog electronics theory
+  3/3  assemble electronic units
+  3/3  electric current
+  3/3  electrical testing methods
+  3/3  electricity principles
+  3/3  electronic components
+  3/3  electronic test procedures
+  3/3  electronics principles
+  3/3  energy
+  3/3  measure electrical characteristics
+  3/3  operate electronic measuring instruments
+  3/3  operate signal generator
+  3/3  semiconductors
+  3/3  test circuitry
+  3/3  use measurement instruments
+  2/3  electrical machines   (a candidate in 2 runs)
+  1/3  physics   (a candidate in 2 runs)
+
+suggested in every run: 15   in some runs only: 2   of those, same candidate judged differently: 1
+judge replies valid on first attempt: 3/3 runs

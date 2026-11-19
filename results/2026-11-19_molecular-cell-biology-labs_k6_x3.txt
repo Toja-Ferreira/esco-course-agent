@@ -1,0 +1,31 @@
+input: Learning outcomes, Contents | judge sees: label + ESCO definition | per-query k: 6
+
+STABILITY over 3 runs (suggested per run: [17, 12, 20]; candidates per run: [105, 105, 115]; seconds per run: [17.4, 5.7, 5.5])
+  3/3  analyse experimental laboratory data
+  3/3  apply safety procedures in laboratory
+  3/3  biomedical techniques
+  3/3  develop scientific research protocols
+  3/3  gather experimental data
+  3/3  laboratory techniques
+  3/3  laboratory-based sciences
+  3/3  maintain logbooks
+  3/3  molecular biology
+  3/3  prepare scientific reports
+  3/3  use laboratory equipment
+  2/3  carry out bibliographic work   (a candidate in 3 runs)
+  2/3  spectroscopy   (a candidate in 3 runs)
+  1/3  analytical chemistry   (a candidate in 3 runs)
+  1/3  avoid contamination   (a candidate in 2 runs)
+  1/3  browse, search and filter data, information and digital content   (a candidate in 3 runs)
+  1/3  follow laboratory manuals   (a candidate in 3 runs)
+  1/3  operate centrifuges   (a candidate in 3 runs)
+  1/3  perform chemical experiments   (a candidate in 3 runs)
+  1/3  perform sample testing   (a candidate in 3 runs)
+  1/3  report analysis results   (a candidate in 1 runs)
+  1/3  report the results of treatment   (a candidate in 3 runs)
+  1/3  search databases   (a candidate in 3 runs)
+  1/3  synthesise research publications   (a candidate in 1 runs)
+  1/3  test procedures   (a candidate in 1 runs)
+
+suggested in every run: 11   in some runs only: 14   of those, same candidate judged differently: 11
+judge replies valid on first attempt: 3/3 runs

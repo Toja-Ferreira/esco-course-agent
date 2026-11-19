@@ -1,0 +1,17 @@
+input: Learning outcomes, Contents | judge sees: label + ESCO definition | per-query k: 6
+
+STABILITY over 3 runs (suggested per run: [5, 7, 10]; candidates per run: [60, 60, 54]; seconds per run: [16.5, 4.3, 4.3])
+  3/3  macroeconomics
+  3/3  sustainable development goals
+  3/3  tourism market
+  2/3  economics   (a candidate in 3 runs)
+  2/3  environmental impact of tourism   (a candidate in 3 runs)
+  2/3  market analysis   (a candidate in 3 runs)
+  2/3  promote sustainability   (a candidate in 3 runs)
+  2/3  seek innovation in current practices   (a candidate in 3 runs)
+  1/3  microeconomics   (a candidate in 1 runs)
+  1/3  pricing strategies   (a candidate in 3 runs)
+  1/3  teach economic principles   (a candidate in 3 runs)
+
+suggested in every run: 3   in some runs only: 8   of those, same candidate judged differently: 7
+judge replies valid on first attempt: 3/3 runs

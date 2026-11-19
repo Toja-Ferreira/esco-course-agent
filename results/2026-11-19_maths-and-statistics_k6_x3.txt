@@ -1,0 +1,28 @@
+input: Learning outcomes, Contents | judge sees: label + ESCO definition | per-query k: 6
+
+STABILITY over 3 runs (suggested per run: [21, 22, 22]; candidates per run: [117, 117, 121]; seconds per run: [17.5, 5.9, 5.8])
+  3/3  apply statistical analysis techniques
+  3/3  calculate probabilities
+  3/3  carry out calculations
+  3/3  data visualisation software
+  3/3  deliver visual presentation of data
+  3/3  develop predictive models
+  3/3  execute analytical mathematical calculations
+  3/3  identify statistical patterns
+  3/3  interpret mathematical information
+  3/3  interpret visual literacy
+  3/3  mathematical modelling
+  3/3  mathematics
+  3/3  numerical sequences
+  3/3  perform data analysis
+  3/3  probability theory
+  3/3  quantitative analysis
+  3/3  solve problems
+  3/3  statistics
+  3/3  use data processing techniques
+  3/3  use specific data analysis software
+  3/3  visual presentation techniques
+  2/3  inform on interest rates   (a candidate in 3 runs)
+
+suggested in every run: 21   in some runs only: 1   of those, same candidate judged differently: 1
+judge replies valid on first attempt: 3/3 runs

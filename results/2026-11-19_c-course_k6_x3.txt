@@ -1,0 +1,18 @@
+input: Learning Outcomes, Contents | judge sees: label + ESCO definition | per-query k: 6
+TRACK 'operating systems': suggested, suggested, suggested
+
+STABILITY over 3 runs (suggested per run: [9, 9, 11]; candidates per run: [117, 117, 117]; seconds per run: [16.7, 4.8, 4.9])
+  3/3  computer programming
+  3/3  create solutions to problems
+  3/3  execute software tests
+  3/3  implement ICT coding conventions
+  3/3  operating systems
+  3/3  perform software unit testing
+  3/3  solve problems
+  3/3  systems development life-cycle
+  3/3  think analytically
+  1/3  apply basic programming skills   (a candidate in 3 runs)
+  1/3  organise information, objects and resources   (a candidate in 3 runs)
+
+suggested in every run: 9   in some runs only: 2   of those, same candidate judged differently: 2
+judge replies valid on first attempt: 3/3 runs

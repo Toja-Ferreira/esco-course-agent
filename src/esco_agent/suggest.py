@@ -41,7 +41,7 @@ from pathlib import Path
 from esco_agent.coverage import data_only, judge_coverage, split_sentences
 
 WHOLE_TEXT_K = 15       # candidates from the course as one query
-PER_QUERY_K = 4         # candidates from each sentence or LLM query
+PER_QUERY_K = 6         # candidates from each sentence or LLM query
 MAX_QUERIES = 25        # LLM queries used
 MIN_SENTENCE_WORDS = 5  # skip headings like "Objectives" or "TP component:"
 JUDGE_BATCH = 30        # candidates per judge call (calls run in parallel)
@@ -266,12 +266,20 @@ def _main() -> None:
                          "queries (default), each sentence, or nothing")
     ap.add_argument("--no-descriptions", action="store_true",
                     help="judge from skill labels only (the behaviour before 16 Nov)")
+    ap.add_argument("--per-query-k", type=int, default=PER_QUERY_K,
+                    help=f"candidates kept from each LLM query or sentence (default {PER_QUERY_K}); "
+                         "for comparing settings, the assistant itself uses the default")
+    ap.add_argument("--track", action="append", default=[], metavar="LABEL",
+                    help="report what happened to this ESCO skill in each run: suggested, "
+                         "rejected by the judge, or never a candidate (repeatable)")
     ap.add_argument("--repeat", type=int, default=1,
                     help="run the whole pipeline N times and report how stable the "
                          "suggestions are")
     args = ap.parse_args()
     course = load_sections(args.course)
     use_desc = not args.no_descriptions
+
+    import time
 
     async def run():
         llm = ChatDeepSeek(model=os.environ.get("DEEPSEEK_MODEL", "deepseek-chat"),
@@ -286,6 +294,7 @@ def _main() -> None:
                     {"text": text, "k": k, "include_descriptions": True}))["skills"]
 
             for _ in range(args.repeat):
+                t0 = time.monotonic()
                 if args.candidates == "llm":
                     queries = await propose_queries(llm, course)
                 elif args.candidates == "sentences":
@@ -293,21 +302,35 @@ def _main() -> None:
                 else:
                     queries = []
                 cands = await gather_candidates(
-                    link, course, queries, whole_k=WHOLE_TEXT_K if queries else 30)
+                    link, course, queries, whole_k=WHOLE_TEXT_K if queries else 30,
+                    per_query_k=args.per_query_k)
                 result = await suggest_skills(cands, llm, course, use_desc)
                 result["queries"] = queries if args.candidates == "llm" else []
+                result["seconds"] = round(time.monotonic() - t0, 1)
                 runs.append(result)
         return runs
 
     runs = asyncio.run(run())
     print(f"input: {', '.join(course)} | judge sees: "
-          f"{'label + ESCO definition' if use_desc else 'label only'}")
+          f"{'label + ESCO definition' if use_desc else 'label only'} | "
+          f"per-query k: {args.per_query_k}")
+
+    for label in args.track:
+        def fate(r):
+            if any(x["label"].lower() == label.lower() for x in r["suggested"]):
+                return "suggested"
+            if any(x["label"].lower() == label.lower() for x in r["rejected"]):
+                return "judge said missing"
+            return "not a candidate"
+        print(f"TRACK '{label}': " + ", ".join(fate(r) for r in runs))
 
     if args.repeat > 1:
         st = stability(runs)
         n = st["runs"]
         print(f"\nSTABILITY over {n} runs "
-              f"(suggested per run: {[len(r['suggested']) for r in runs]})")
+              f"(suggested per run: {[len(r['suggested']) for r in runs]}; "
+              f"candidates per run: {[r['n_candidates'] for r in runs]}; "
+              f"seconds per run: {[r['seconds'] for r in runs]})")
         for row in st["rows"]:
             note = "" if row["suggested"] == n else (
                 f"   (a candidate in {row['candidate']} runs)")
@@ -322,7 +345,7 @@ def _main() -> None:
     if r["queries"]:
         print(f"\nLLM QUERIES ({len(r['queries'])}): " + "; ".join(r["queries"]))
     print(f"\nSUGGESTED ({len(r['suggested'])} of {r['n_candidates']} candidates, "
-          f"{r['judge_calls']} judge calls)")
+          f"{r['judge_calls']} judge calls, {r['seconds']} s)")
     multi = len(course) > 1
     for s in r["suggested"]:
         via = [q for q in s.get("found_by", []) if q != "whole text"][:2]

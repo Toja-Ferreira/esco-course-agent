@@ -1,0 +1,19 @@
+input: Learning outcomes, Contents | judge sees: label + ESCO definition | per-query k: 4
+
+STABILITY over 3 runs (suggested per run: [12, 13, 13]; candidates per run: [60, 59, 59]; seconds per run: [18.7, 4.8, 5.2])
+  3/3  apply intercultural teaching strategies
+  3/3  apply teaching strategies
+  3/3  appreciate diverse cultural and artistic expression
+  3/3  build rapport with people from different cultural backgrounds
+  3/3  demonstrate intercultural competence
+  3/3  demonstrate willingness to learn
+  3/3  language teaching methods
+  3/3  respect the diversity of cultural values and norms
+  3/3  show intercultural awareness
+  3/3  use learning strategies
+  3/3  work in teams
+  3/3  work independently
+  2/3  modern languages   (a candidate in 3 runs)
+
+suggested in every run: 12   in some runs only: 1   of those, same candidate judged differently: 1
+judge replies valid on first attempt: 3/3 runs
