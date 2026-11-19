@@ -431,9 +431,12 @@ class Sessions:
             s["sections"]["Learning outcomes"] = r["outcomes"]
         if r.get("contents"):
             s["sections"]["Contents"] = r["contents"]
+        if r.get("sections"):                 # a whole page, split by its headings
+            s["sections"] = dict(r["sections"])
         s["stage"] = r["stage"]
+        if r["stage"] != "ready" or r.get("sections"):
+            self._say(s, "assistant", r["reply"])    # for a page: which sections were used
         if r["stage"] != "ready":
-            self._say(s, "assistant", r["reply"])
             return {}
         s["started"] = True
         state = await self._run(s, {"sections": s["sections"], "language": s["language"],

@@ -130,7 +130,7 @@ def test_intake_checks_each_answer(tmp_path):
                        "para compilação e execução dos programas.")
     assert stage == "outcomes" and "Portuguese" in reply
     stage, reply = say("Learning outcomes\nWrite C.\nAssessment\nTwo tests.\nBibliography\nK&R.")
-    assert stage == "outcomes" and "whole page" in reply and '"Assessment"' in reply
+    assert stage == "outcomes" and reply.startswith("This text is too short")   # a page, too thin
     assert say("Write C.")[1].startswith("This text is too short")
     assert say(OUTCOMES)[0] == "contents"
     stage, _ = say("none")
@@ -360,3 +360,40 @@ def test_sections_after_add_accepted_changes_at_the_end():
                               {"section": "Contents", "text": "Rejected.", "status": "rejected"},
                               {"section": "Contents", "text": "Test reports.", "status": "accepted"}]}
     assert sections_after(state) == {"Contents": "Pointers.\nUnit tests.\nTest reports."}
+
+
+PAGE = """Programming
+Objectives
+The course aims to develop students' ability to understand, design and implement programmes in C language.
+Learning Outcomes
+The course aims to develop students' ability to understand, design and implement programmes in C language.
+Requisites
+Mathematics knowledge at the level of the 12th grade of secondary education.
+Assessment
+TP component:
+- 4 quizzes taken throughout the semester
+Teaching methods
+The theoretical-practical classes are heavily based on practical exercises.
+Contents
+The C Programming course introduces the fundamentals of structured programming, integrating Unix/Linux.
+Recommended bibliography
+Kernighan, Brian W., e Dennis M. Ritchie. 2014. The C Programming Language."""
+
+
+def test_a_whole_page_is_split_by_its_headings():
+    from esco_agent.web.intake import split_page
+    kept, dropped = split_page(PAGE)
+    assert list(kept) == ["Objectives", "Learning outcomes", "Contents"]
+    assert kept["Contents"].startswith("The C Programming course")
+    assert dropped == ["requisites", "assessment", "teaching methods", "bibliography"]
+    assert split_page("Students write C programs.\nThey use make.") is None
+
+    c, sessions = client(tmp_path := __import__("pathlib").Path(__import__("tempfile").mkdtemp()))
+    sid = c.post("/api/session", json={"email": "a@b.pt", "language": "pt", "course_name": "Programação",
+                                       "expected": "programar em C"}).json()["session"]
+    r = c.post("/api/message", json={"session": sid, "text": PAGE}).json()
+    assert r["stage"] == "chat"
+    used = next(m["content"] for m in r["new"] if m["role"] == "assistant")
+    assert used.startswith("Usei objetivos, resultados de aprendizagem e conteúdos da página")
+    assert "deixei de fora requisitos, avaliação, métodos de ensino e bibliografia" in used
+    assert list(sessions.sessions[sid]["sections"]) == ["Objectives", "Learning outcomes", "Contents"]

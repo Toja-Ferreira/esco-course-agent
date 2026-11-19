@@ -3,7 +3,10 @@
 Same principle as the assistant's fixed first turn: this part must not go wrong
 in unpredictable ways, and it costs no API calls. Stages:
     name -> outcomes -> contents -> ready
-Each answer is checked before moving on.
+Each answer is checked before moving on. If the first paste is the whole course
+page (recognised by its section headings), it is split by those headings: the
+objectives, learning outcomes and contents are kept, the rest (assessment,
+teaching methods, requisites, bibliography) is left out, and the intake is done.
 """
 
 from __future__ import annotations
@@ -11,6 +14,7 @@ from __future__ import annotations
 import re
 
 MAX_SECTION_CHARS = 6000
+MAX_PAGE_CHARS = 20000
 MIN_SECTION_WORDS = 8
 
 MESSAGES = {
@@ -18,10 +22,15 @@ MESSAGES = {
         "hello": ("Olá! Vou ajudar a escolher as competências ESCO que descrevem a sua unidade "
                   "curricular. Primeiro, como se chama a unidade curricular?"),
         "hello_named": ("Olá! Vamos escolher as competências ESCO de **{name}**. Para começar, cole "
-                        "os **resultados de aprendizagem** da página da unidade curricular, **em "
-                        "inglês** (a versão inglesa da página)."),
-        "ask_outcomes": ("Obrigado. Agora cole os **resultados de aprendizagem** da página da "
-                         "unidade curricular, **em inglês** (a versão inglesa da página)."),
+                        "o texto da página da unidade curricular **em inglês**: a página inteira, "
+                        "ou só os **resultados de aprendizagem**."),
+        "ask_outcomes": ("Obrigado. Agora cole o texto da página da unidade curricular **em "
+                         "inglês**: a página inteira, ou só os **resultados de aprendizagem**."),
+        "page_used": ("Usei {used} da página{dropped}. A ler a unidade curricular e a procurar "
+                      "competências…"),
+        "page_dropped": " (deixei de fora {dropped}, que não descrevem competências)",
+        "page_none": ("Vejo títulos da página, mas não encontrei objetivos, resultados de "
+                      "aprendizagem nem conteúdos. Pode colar os **resultados de aprendizagem**?"),
         "ask_contents": ("Agora cole os **conteúdos** (programa), também em inglês. Se a página "
                          "não tiver conteúdos, escreva \"não tenho\"."),
         "empty": "Não recebi texto. Pode colar novamente?",
@@ -40,9 +49,14 @@ MESSAGES = {
         "hello": ("Hello! I'll help you choose the ESCO skills that describe your course. First, "
                   "what is the course called?"),
         "hello_named": ("Hello! Let's choose the ESCO skills for **{name}**. To begin, paste the "
-                        "course's **learning outcomes** from its page, **in English**."),
-        "ask_outcomes": ("Thank you. Now paste the course's **learning outcomes** from its page, "
-                         "**in English**."),
+                        "course page's text **in English**: the whole page, or just the "
+                        "**learning outcomes**."),
+        "ask_outcomes": ("Thank you. Now paste the course page's text **in English**: the whole "
+                         "page, or just the **learning outcomes**."),
+        "page_used": "I used {used} from the page{dropped}. Reading the course and looking for skills…",
+        "page_dropped": " (I left out {dropped}, which don't describe skills)",
+        "page_none": ("I can see the page's headings, but no objectives, learning outcomes or "
+                      "contents. Could you paste the **learning outcomes**?"),
         "ask_contents": ("Now paste the **contents** (syllabus), also in English. If the page has "
                          "no contents section, write \"none\"."),
         "empty": "I didn't receive any text. Could you paste it again?",
@@ -68,6 +82,58 @@ _EN = {"the", "and", "of", "to", "students", "will", "be", "with", "for", "is", 
 _OTHER_SECTIONS = ["assessment", "evaluation", "bibliography", "teaching methods",
                    "requisites", "prerequisites", "avaliação", "bibliografia",
                    "métodos de ensino", "metodologias de ensino", "requisitos"]
+
+
+# Section headings of a course page (POF, PT and EN), matched as whole lines.
+KEEP = {"objectives": "Objectives", "objetivos": "Objectives",
+        "learning outcomes": "Learning outcomes", "intended learning outcomes": "Learning outcomes",
+        "resultados de aprendizagem": "Learning outcomes",
+        "contents": "Contents", "syllabus": "Contents", "conteúdos": "Contents",
+        "conteúdos programáticos": "Contents", "programa": "Contents"}
+DROP = {"requisites": "requisites", "prerequisites": "requisites", "requisitos": "requisites",
+        "assessment": "assessment", "evaluation": "assessment", "avaliação": "assessment",
+        "teaching methods": "teaching methods", "teaching methodology": "teaching methods",
+        "métodos de ensino": "teaching methods", "metodologias de ensino": "teaching methods",
+        "bibliography": "bibliography", "recommended bibliography": "bibliography",
+        "bibliografia": "bibliography", "bibliografia recomendada": "bibliography"}
+DROP_PT = {"requisites": "requisitos", "assessment": "avaliação",
+           "teaching methods": "métodos de ensino", "bibliography": "bibliografia"}
+KEEP_PT = {"Objectives": "objetivos", "Learning outcomes": "resultados de aprendizagem",
+           "Contents": "conteúdos"}
+
+
+def _heading(line: str) -> str | None:
+    key = line.strip().rstrip(":").strip().lower()
+    return key if key in KEEP or key in DROP else None
+
+
+def split_page(text: str) -> tuple[dict, list[str]] | None:
+    """A whole course page split by its headings: ({section: text} kept, [dropped
+    kinds]). None if the text doesn't look like a page (fewer than two headings)."""
+    lines = text.splitlines()
+    if sum(_heading(ln) is not None for ln in lines) < 2:
+        return None
+    kept, dropped, current, buf = {}, [], None, []
+
+    def flush():
+        if current is None:
+            return                            # text before the first heading (the title)
+        body = "\n".join(buf).strip()
+        if current in KEEP and body:
+            name = KEEP[current]
+            kept[name] = (kept[name] + "\n" + body) if name in kept else body
+        elif current in DROP and DROP[current] not in dropped:
+            dropped.append(DROP[current])
+
+    for ln in lines:
+        h = _heading(ln)
+        if h is not None:
+            flush(); current, buf = h, []
+        else:
+            buf.append(ln)
+    flush()
+    order = ["Objectives", "Learning outcomes", "Contents"]
+    return {k: kept[k] for k in order if k in kept}, dropped
 
 
 def looks_portuguese(text: str) -> bool:
@@ -118,6 +184,27 @@ def step(stage: str, text: str, language: str) -> dict:
         if not check_name(text):
             return {"reply": say("name_long"), "stage": "name"}
         return {"reply": say("ask_outcomes"), "stage": "outcomes", "name": text}
+
+    if stage == "outcomes":
+        page = split_page(text) if len(text) <= MAX_PAGE_CHARS else None
+        if page is not None:
+            kept, dropped = page
+            if not kept:
+                return {"reply": say("page_none"), "stage": "outcomes"}
+            for body in kept.values():
+                problem = check_section(body)
+                if problem in ("portuguese", "too_long"):
+                    return {"reply": say(problem), "stage": "outcomes"}
+            if len(" ".join(kept.values()).split()) < MIN_SECTION_WORDS:
+                return {"reply": say("too_short"), "stage": "outcomes"}
+            pt = language == "pt"
+            names = [KEEP_PT[k] if pt else k.lower() for k in kept]
+            gone = [DROP_PT[d] if pt else d for d in dropped]
+            join = (lambda xs: ", ".join(xs[:-1]) + (" e " if pt else " and ") + xs[-1]
+                    if len(xs) > 1 else xs[0])
+            return {"reply": say("page_used", used=join(names),
+                                 dropped=say("page_dropped", dropped=join(gone)) if gone else ""),
+                    "stage": "ready", "sections": kept}
 
     if stage in ("outcomes", "contents"):
         if stage == "contents" and text.lower().strip(" .!\"'") in NONE_ANSWERS:
