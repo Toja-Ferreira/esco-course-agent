@@ -489,11 +489,12 @@ const T = {
     chCheckFail: "Verificação: mesmo com este texto, a competência não é reconhecida.",
     chDone: {
       proposed: "Ainda não decidiu. Diga no chat se aceita, quer editar ou rejeita.",
-      failed: "Não foi aceite. Só pode ser aceite se escrever o texto com as suas palavras (no chat).",
+      failed: "Não passou a verificação: com este texto, a competência não fica demonstrada. Veja abaixo o que faltaria. No chat, pode pedir uma nova proposta que o cubra, ou escrever o texto com as suas palavras.",
       accepted: n => n ? `Aceite. A competência ${n} está na sua lista. A página não foi alterada: copie o texto no fim.` : "Aceite. A página não foi alterada: copie o texto no fim.",
       rejected: "Rejeitada: nada foi alterado.",
     },
     modeShow: "Mostrar o que já ensina", modeTeach: "Ensinar algo novo",
+    chMissing: "O que faltaria", chEsco: "O que a ESCO exige", chFailedDraft: "Ver o rascunho que não passou",
     baShow: "Ver antes e depois", baBefore: "Antes", baAfter: "Depois (o texto novo está destacado)",
     resultSections: "Secções com as alterações aceites (para colar na página)",
     transversal: "Transversais", transversalHint: "gerais, comuns a muitas áreas",
@@ -554,11 +555,12 @@ const T = {
     chCheckFail: "Check: even with this text, the skill is not recognised.",
     chDone: {
       proposed: "Not decided yet. Say in the chat whether you accept, want to edit or reject it.",
-      failed: "Not accepted. It can only be accepted if you write the text in your own words (in the chat).",
+      failed: "Did not pass the check: with this text, the skill is not shown. See below what would be missing. In the chat, you can ask for a new proposal that covers it, or write the text in your own words.",
       accepted: n => n ? `Accepted. Skill ${n} is on your list. The page was not changed: copy the text at the end.` : "Accepted. The page was not changed: copy the text at the end.",
       rejected: "Rejected: nothing was changed.",
     },
     modeShow: "Show what it already teaches", modeTeach: "Teach something new",
+    chMissing: "What would be missing", chEsco: "What ESCO requires", chFailedDraft: "See the draft that did not pass",
     baShow: "See before and after", baBefore: "Before", baAfter: "After (the new text is highlighted)",
     resultSections: "Sections with the accepted changes (to paste into the page)",
     transversal: "Transversal", transversalHint: "general, common to many fields",
@@ -589,7 +591,8 @@ const STEPS = {
         check_occupation_gap: d => `A ver o que falta para “${d.occupation}”`,
         drafting: d => `A redigir texto para “${d.skill}”`,
         redrafting: d => `O primeiro texto não passou a verificação; a redigir outro para “${d.skill}”`,
-        verifying: d => `A verificar se o texto mostra “${d.skill}”` },
+        verifying: d => `A verificar se o texto mostra “${d.skill}”`,
+        rechecking: () => "A ver que outras competências o texto aceite mostra" },
   en: { reading: "Reading the course and choosing search terms",
         searching: d => `Searching ESCO (${d.n} searches)`,
         checking: d => `Checking ${d.n} skills against the text`,
@@ -599,7 +602,8 @@ const STEPS = {
         check_occupation_gap: d => `Checking what is missing for “${d.occupation}”`,
         drafting: d => `Drafting text for “${d.skill}”`,
         redrafting: d => `The first draft failed the check; drafting another for “${d.skill}”`,
-        verifying: d => `Checking whether the text shows “${d.skill}”` },
+        verifying: d => `Checking whether the text shows “${d.skill}”`,
+        rechecking: () => "Checking what else the accepted text shows" },
 };
 function stepText(p) {
   // the model is called again after each tool: say so instead of repeating "Thinking"
@@ -963,6 +967,22 @@ function skillCard(s, open) {
 function changeCard(c, open) {
   const s = t(), skillNo = c.skill_number;
   const done = c.status === "accepted" ? s.chDone.accepted(skillNo) : s.chDone[c.status] || "";
+  const draftHtml = `${c.add_to_course.length ? `<p class="h">${s.toAdd}</p><ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      <p class="h">${c.status === "accepted" ? s.chAcceptedText : s.chProposedText} ${c.edited ? s.chEdited : ""}</p>
+      <div class="txt">${esc(c.text)}</div>
+      ${c.section_text ? `<details class="ba"><summary>${s.baShow}</summary>
+        <p class="h2">${s.baBefore} · ${esc(c.section)}</p><div class="sec">${esc(c.section_text)}</div>
+        <p class="h2">${s.baAfter}</p><div class="sec">${esc(c.section_text.trimEnd())}\n<mark>${esc(c.text)}</mark></div>
+      </details>` : ""}`;
+  // a failed draft leads with what is missing; the draft itself only on request
+  const draft = c.status === "failed"
+    ? `${c.reason ? `<p class="h">${s.chMissing}</p><p class="why">${esc(c.reason)}</p>` : ""}
+       ${c.definition ? `<p class="h">${s.chEsco}</p><p>${esc(c.definition)}</p>` : ""}
+       <details class="ba"><summary>${s.chFailedDraft}</summary>${draftHtml}</details>`
+    : `${draftHtml}
+      <p class="check ${c.verified ? "ok" : "bad"}">${c.verified ? s.chCheckOk : s.chCheckFail}</p>
+      ${!c.verified && c.reason ? `<p class="why">${s.failedBecause} ${esc(c.reason)}</p>` : ""}`;
+
   return `<details class="change ${c.mode} st-${c.status}" data-c="${c.number}" ${open ? "open" : ""}>
     <summary><span class="st">${s.chStatus[c.status] || c.status}</span>
       <span class="label">${esc(c.label)}<span class="kind">${c.mode === "teach" ? s.modeTeach : s.modeShow}</span></span></summary>
@@ -972,15 +992,7 @@ function changeCard(c, open) {
         <dt>${s.chSkill}</dt><dd>${skillNo ? `<button class="ref" data-n="${skillNo}">${skillNo}. ${esc(c.label)}</button>` : esc(c.label)}</dd>
         <dt>${s.chWhere}</dt><dd>${esc(s.chWhereText(c.section))}</dd>
       </dl>
-      ${c.add_to_course.length ? `<p class="h">${s.toAdd}</p><ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-      <p class="h">${c.status === "accepted" ? s.chAcceptedText : s.chProposedText} ${c.edited ? s.chEdited : ""}</p>
-      <div class="txt">${esc(c.text)}</div>
-      ${c.section_text ? `<details class="ba"><summary>${s.baShow}</summary>
-        <p class="h2">${s.baBefore} · ${esc(c.section)}</p><div class="sec">${esc(c.section_text)}</div>
-        <p class="h2">${s.baAfter}</p><div class="sec">${esc(c.section_text.trimEnd())}\n<mark>${esc(c.text)}</mark></div>
-      </details>` : ""}
-      <p class="check ${c.verified ? "ok" : "bad"}">${c.verified ? s.chCheckOk : s.chCheckFail}</p>
-      ${!c.verified && c.reason ? `<p class="why">${s.failedBecause} ${esc(c.reason)}</p>` : ""}
+      ${draft}
     </div></details>`;
 }
 function occCard(o, open) {

@@ -255,23 +255,10 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 - In the assistant, all 5 saved C-course sessions had the LLM query "use Unix/Linux environments"; for that query "operating systems" ranks 6th (linker experiment), and the assistant keeps the top 4 per query (PER_QUERY_K). So it was never a candidate, and the judge never saw it.
 - `python -m esco_agent.suggest` gained `--per-query-k N` (comparison only; the assistant keeps the default) and `--track LABEL` (suggested / judge said missing / not a candidate, per run), plus candidates and seconds per run. Plan: C course + 3 others, k = 4, 6, 8, `--repeat 3`; change the default only if more good skills appear without many more wrong ones or a long wait.
 
-## 2026-11-19 — Candidates per search phrase: 4 → 6
+## 2026-11-19 — VM session: invented ESCO fact; failed drafts presented as proposals
 
-Compared k=4 and k=6 on 7 real POF courses (`--repeat 3` each; raw outputs in
-results/2026-11-19_*_k*_x3.txt). k=8 was run on the C course only.
-
-| Course | in every run, k=4 → k=6 | k=6 adds | wrong |
-|---|---|---|---|
-| C programming | 5 → 9 | operating systems (3/3), execute software tests | none |
-| Electronics | 15 → 18 | build electronic prototypes, electricity, test electrical equipment | wind wires 1/3, judge rejected it in the check run |
-| Statistics | 21 → 21 | apply statistical analysis techniques, visual presentation techniques | inform on interest rates 2/3 |
-| Lab biology | 14 → 11 | maintain logbooks, spectroscopy, perform chemical experiments | none; less stable |
-| Languages | 12 → 11 | foster dialogue in society, adapt teaching to target group | borderline |
-| Web programming | 15 → 15 | nothing | none |
-| Tourism economics | 2 → 3 | sustainable development goals, environmental impact of tourism, market analysis, promote sustainability, pricing strategies | none; less stable |
-
-- Time: about 5 s per run for both (the first run of each batch, 16–21 s, includes loading the model).
-- k=8 (C course): adds "work independently" (the "become autonomous" misreading) and more generic problem-solving skills; not adopted.
-- Stability: candidates judged differently between runs rose in lab biology (5 → 11) and tourism (2 → 7). More borderline candidates reach the judge, and it rules on them inconsistently. In statistics, two k=4 skills (gather data, statistical modeling techniques) dropped out at k=6: more candidates can change the judge's rulings on others.
-- Wrong-sense check: "inform on interest rates" is a judge error (ESCO: advising borrowers; course: calculating interest), accepted despite the definition. Second such case after "organise information, objects and resources". Goes to the judge labelling set.
-- Decision: PER_QUERY_K = 6. More supported skills, notably where k=4 was thin (tourism economics), no time cost, one wrong-sense item the teacher can remove. Stability trade-off to report in the paper. Judge consistency (e.g. judge borderline candidates twice, keep agreements) is for after the teacher test.
+- The assistant first said "ESCO has C as a skill", then, after a search, "ESCO has no skill named C". The data has no C entry (checked in labels.parquet): the first claim was invented. The grounding check cannot catch it (no quote, no invalid number). New prompt rule: never say whether ESCO has or lacks a skill unless a tool result in the conversation shows it; search first.
+- A failed text-change draft was still presented as a proposal with its reason underneath, which read like a usable change. Now the tool result for a failed draft omits the draft text and gives the reason and the skill's ESCO definition; the assistant explains what the course would need to cover and asks whether the teacher wants that (then a "teach" draft). In the panel, a failed card leads with "O que faltaria" and "O que a ESCO exige"; the draft is behind "Ver o rascunho que não passou".
+- Found while doing this: skills from an occupation's gap check carry no ESCO definition, so their drafts were written with "definition: n/a" (likely why the first ethical-hacking draft missed). The definition is now looked up before drafting. The gap check itself still judges those skills by label only; to look at after the test.
+- Observation for the paper: asked to "change it so the check passes", the assistant produced a much larger course change (exploitation exercises, penetration-test reports in a C course). Honest, since that is what ESCO's definition requires, and labelled as a course change with the hours/ECTS caveat, but it shows the check becoming the target.
+- Accepting a text change now triggers a re-check of the new text only: it is searched in ESCO (10 candidates, skills already on the list excluded) and judged against its own sentences. Skills it supports are added as suggestions (undecided), marked "accepted text change N", with the new sentence as evidence; the assistant tells the teacher. The whole course is deliberately not re-judged: added text cannot remove support for existing skills, so any "lost" skill would be run-to-run judge noise (cf. lab biology, 11 flips between identical runs). Logged as `text_change_recheck` (candidates, added).

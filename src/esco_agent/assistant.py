@@ -72,6 +72,7 @@ FIND_K = 8          # ESCO skills fetched per "anything on X?" search
 SHOW_NOT_IN_TEXT = 5  # unsupported results reported per search
 OCCUPATIONS_K = 8
 MAX_CHANGE_CHARS = 500
+ALSO_K = 10              # candidates searched in an accepted text change
 
 
 @dataclass
@@ -168,6 +169,8 @@ the course or its page. Politely decline anything else in one sentence and say w
 you can help with.
 - Only mention skills and occupations that appear in CURRENT STATE below or in a \
 tool result of this conversation. Never invent them or recall them from memory.
+- Never say whether ESCO has or lacks a skill (or what it is called) unless a tool \
+result in this conversation shows it. If you don't know, call find_skills first.
 - Skills the teacher can act on have a number. When the teacher wants skills kept, \
 added, removed or rejected, call update_skill_list.
 - When the teacher asks whether there is anything on a topic, or expects a skill \
@@ -193,12 +196,17 @@ skills per reply.
 result as a SUGGESTED CHANGE TO THE COURSE: first what to add to the course \
 (add_to_course), then the page text describing it, and say that you cannot judge \
 whether it fits the course's hours or ECTS; the teacher decides.
-- For every suggestion: quote the proposed text word for word, name the section and \
-the target skill, and say whether the check passed. If the check failed, do NOT ask \
-the teacher to accept it: give the reason from the result in plain words, and offer \
-that they write their own wording, which will be checked. Never present suggested \
-text as part of the current course.
-- When the teacher accepts, rejects or rewords a suggested text, call decide_text_change.
+- For a suggestion whose check passed: quote the proposed text word for word and \
+name the section and the target skill. Never present suggested text as part of the \
+current course.
+- If the check FAILED, do not present or quote the failed draft. Say it did not pass, \
+then explain, from the result's reason and the skill's ESCO definition, what the \
+course (or its page) would need to cover for this skill. Ask whether the teacher \
+wants that: then draft again in mode "teach" covering it. They can also drop the \
+skill, or write their own wording, which will be checked.
+- When the teacher accepts, rejects or rewords a suggested text, call decide_text_change. \
+If its result lists also_supported, say in one line that the accepted text also \
+supports those skills, now suggested with their numbers, for the teacher to decide.
 - Quote the course word for word, in whole sentences.
 - Be brief. After changing the list, say in one line what it now holds.
 
@@ -651,6 +659,15 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                 f"{skill!r} is not a skill that was found missing from the text. Use its "
                 "exact name from a not_in_course_text result (find_skills or "
                 "check_occupation_gap).")
+        if not target.get("description"):
+            # skills from an occupation's gap come without ESCO's definition; look it up,
+            # since the draft and any failure explanation depend on what ESCO requires
+            try:
+                hits = await esco.link(target["label"], 5)
+                target["description"] = next((h.get("description", "") for h in hits
+                                              if h["id"] == target["id"]), "")
+            except Exception:
+                pass
         if mode not in ("show", "teach"):
             raise ToolProblem(
                 "mode must be 'show' (the course already teaches this; the page just doesn't "
@@ -705,6 +722,7 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                   "add_to_course": add, "section": draft[0], "text": draft[1],
                   "verified": verified, "reason": reason, "attempts": attempts,
                   "edited_by_teacher": False,
+                  "definition": target.get("description", ""),   # what ESCO requires
                   "status": "proposed" if verified else "failed"}
         w["text_changes"].append(change)
         n = len(w["text_changes"])
@@ -713,17 +731,45 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         out = {"change": n, "mode": mode, "target_skill": target["label"]}
         if mode == "teach":
             out["add_to_course"] = add
-        out.update({"add_to_section": draft[0], "suggested_text": draft[1],
-                    "check_passed": verified, "status": change["status"]})
+        out.update({"add_to_section": draft[0], "check_passed": verified,
+                    "status": change["status"]})
         if verified:
+            out["suggested_text"] = draft[1]
             out["check"] = ("with this text added, the judge finds the skill in the course "
                             "and cites the new text")
         else:
-            out["check"] = ("FAILED: even with this text added, the judge did not find the "
-                            "skill. Do not ask the teacher to accept it; explain the reason "
-                            "and offer that they write their own wording.")
+            # the failed draft stays in the list (on request), not in the reply
+            out["check"] = ("FAILED: even with the drafted text added, the judge did not find "
+                            "the skill. Do not present or quote the draft. Explain, from the "
+                            "reason and the ESCO definition, what the course would need to "
+                            "cover for this skill, and ask whether the teacher wants that.")
             out["reason"] = reason
+            out["esco_definition"] = target.get("description", "")
         return out, [event]
+
+    async def _also_supported(w, c, change):
+        """After a text change is accepted: which other skills does the new text show?
+        Only the new text is searched and judged, so existing skills are not re-judged
+        (re-judging the whole course would report run-to-run noise as losses)."""
+        progress("rechecking", skill=c["label"])
+        number = _number(w)
+        try:
+            hits = await esco.link(c["text"], ALSO_K)
+        except Exception:
+            return [], []
+        cands = [h for h in hits if h["id"] not in number and h["id"] != c["skill_id"]]
+        if not cands:
+            return [], []
+        where = f"{c['section']} (accepted change {change})"
+        result = await suggest_skills(cands, judge_llm, {where: c["text"]})
+        added = []
+        for s in result["suggested"]:
+            w["offered"].pop(s["id"], None)
+            w["known"].append(_entry(s, f"accepted text change {change}", True))
+            added.append({"number": len(w["known"]), "label": s["label"]})
+        return added, [{"t": _now(), "type": "text_change_recheck", "change": change,
+                        "candidates": [h["id"] for h in cands],
+                        "added": [w["known"][a["number"] - 1]["id"] for a in added]}]
 
     async def decide_text_change(w, change=None, decision=None, edited_text=None):
         changes = w["text_changes"]
@@ -762,8 +808,16 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
             skill["status"] = "accepted"
         if decision == "accept":
             skill["text_change"] = change
+        also, recheck_events = ([], [])
+        if decision == "accept":
+            also, recheck_events = await _also_supported(w, c, change)
+        events += recheck_events
         out = {"change": change, "status": c["status"], "text": c["text"],
                "check_passed": c["verified"], "list_now": _on_list(w)}
+        if also:
+            out["also_supported"] = also
+            out["note"] = ("the accepted text also supports these skills; they are now "
+                           "suggested (undecided). Tell the teacher in one line, with numbers.")
         if not c["verified"] and c.get("reason"):
             out["reason"] = c["reason"]
         return out, events

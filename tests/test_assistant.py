@@ -284,10 +284,11 @@ def test_show_mode_draft_is_verified_and_accepting_it_adds_the_skill():
         "number": 1, "skill_id": "dbg", "label": "debug software", "mode": "show",
         "add_to_course": [], "section": "Contents",
         "text": "Students find and fix faults in their programs with gdb.", "verified": True,
-        "reason": "", "attempts": 1, "edited_by_teacher": False, "status": "accepted"}]
+        "reason": "", "attempts": 1, "edited_by_teacher": False, "definition": "",
+        "status": "accepted"}]
     assert saved["skills"][-1]["label"] == "debug software" and saved["skills"][-1]["text_change"] == 1
-    assert [e["type"] for e in saved["events"]][-3:] == [
-        "text_change_proposed", "text_change_accepted", "accepted"]
+    assert [e["type"] for e in saved["events"]][-4:] == [
+        "text_change_proposed", "text_change_accepted", "accepted", "text_change_recheck"]
 
 
 def test_teach_mode_proposes_what_to_add_and_the_page_text():
@@ -321,7 +322,10 @@ def test_failed_draft_gets_a_reason_one_redraft_and_cannot_be_accepted_as_is():
     out = last_result(s4)
     assert out["check_passed"] is False and out["status"] == "failed"
     assert out["reason"] == "It does not mention a debugger." and "FAILED" in out["check"]
-    assert out["suggested_text"] == "Students correct their code."     # the redraft
+    # the failed draft is not in the reply (the assistant explains what is missing
+    # instead); it stays in the list, on request
+    assert "suggested_text" not in out and "esco_definition" in out
+    assert s4["text_changes"][0]["text"] == "Students correct their code."   # the redraft
     drafts = [p for p in Judge.prompts if '"section": "..."' in p]
     assert len(drafts) == 2 and "Its reason: It does not mention a debugger." in drafts[1]
     assert "fine for the check to fail" in drafts[1]                   # show mode stays honest
@@ -414,3 +418,26 @@ def test_generic_skills_come_after_course_specific_ones():
     assert s["known"][1]["reuse"] == "transversal" and s["known"][0]["reuse"] == ""
     from esco_agent.web.app import panel
     assert [k["reuse"] for k in panel(s)["skills"]] == ["", "transversal"]
+
+
+def test_accepted_text_is_rechecked_for_other_skills_it_shows():
+    # the accepted text mentions Linux: the fake linker then returns operating systems
+    # (already on the list, so not re-judged), Kali Linux and computer programming (known)
+    Judge.drafts[:] = [json.dumps({"section": "contents",
+                                   "text": "Students debug their programs with gdb on Linux."})]
+    Judge.COVERED = {**Judge.COVERED, "Kali Linux": [1]}
+    try:
+        agent = gap_then(call("suggest_text_change", skill="debug software", mode="show"),
+                         AIMessage("Suggestion."),
+                         call("decide_text_change", change=1, decision="accept"), AIMessage("Done."))
+        *_, s5 = run(agent, ["keep 1", "jobs?", "gap?", "it already covers debugging", "ok"])
+    finally:
+        Judge.COVERED = {k: v for k, v in Judge.COVERED.items() if k != "Kali Linux"}
+    out = last_result(s5)
+    assert out["also_supported"] == [{"number": 5, "label": "Kali Linux"}]
+    k = s5["known"][4]
+    assert k["status"] == "pending" and k["origin"] == "accepted text change 1"
+    assert k["evidence"][0]["section"] == "Contents (accepted change 1)"
+    recheck = [e for e in s5["events"] if e["type"] == "text_change_recheck"][0]
+    assert recheck["candidates"] == ["kali"] and recheck["added"] == ["kali"]
+    assert s5["sections"] == SECTIONS                       # the course text is unchanged

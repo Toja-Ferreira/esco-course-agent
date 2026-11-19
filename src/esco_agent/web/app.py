@@ -130,6 +130,7 @@ def panel(state: dict) -> dict:
                 "edited": bool(c.get("edited_by_teacher")),
                 "add_to_course": c.get("add_to_course") or [], "section": c["section"],
                 "section_text": (state.get("sections") or {}).get(c["section"], ""),
+                "definition": c.get("definition", ""),
                 "text": c["text"], "verified": c["verified"], "reason": c.get("reason", ""),
                 "status": c["status"]}
                for n, c in enumerate(state.get("text_changes") or [], 1)]
