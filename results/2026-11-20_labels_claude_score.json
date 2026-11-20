@@ -1,0 +1,101 @@
+{
+  "all": {
+    "labelled": 93,
+    "right": 73,
+    "borderline": 18,
+    "wrong": 2,
+    "strict": 0.7849462365591398,
+    "lenient": 0.978494623655914,
+    "strict_ci95": [
+      0.6777777777777778,
+      0.8640776699029126
+    ],
+    "lenient_ci95": [
+      0.9541258040704419,
+      1.0
+    ]
+  },
+  "course-specific": {
+    "labelled": 81,
+    "right": 64,
+    "borderline": 16,
+    "wrong": 1,
+    "strict": 0.7901234567901234,
+    "lenient": 0.9876543209876543,
+    "strict_ci95": [
+      0.6349130036630036,
+      0.8888888888888888
+    ],
+    "lenient_ci95": [
+      0.9655172413793104,
+      1.0
+    ]
+  },
+  "transversal": {
+    "labelled": 12,
+    "right": 9,
+    "borderline": 2,
+    "wrong": 1,
+    "strict": 0.75,
+    "lenient": 0.9166666666666666,
+    "strict_ci95": [
+      0.5,
+      0.8333333333333334
+    ],
+    "lenient_ci95": [
+      0.8333333333333334,
+      1.0
+    ]
+  },
+  "per_course": {
+    "industrial-electronics": {
+      "labelled": 19,
+      "right": 15,
+      "borderline": 4,
+      "wrong": 0,
+      "strict": 0.7894736842105263,
+      "lenient": 1.0
+    },
+    "maths-and-statistics": {
+      "labelled": 22,
+      "right": 18,
+      "borderline": 3,
+      "wrong": 1,
+      "strict": 0.8181818181818182,
+      "lenient": 0.9545454545454546
+    },
+    "molecular-cell-biology-labs": {
+      "labelled": 16,
+      "right": 14,
+      "borderline": 2,
+      "wrong": 0,
+      "strict": 0.875,
+      "lenient": 1.0
+    },
+    "plurilingual-intercultural-education": {
+      "labelled": 14,
+      "right": 8,
+      "borderline": 5,
+      "wrong": 1,
+      "strict": 0.5714285714285714,
+      "lenient": 0.9285714285714286
+    },
+    "programming-fundamentals": {
+      "labelled": 15,
+      "right": 14,
+      "borderline": 1,
+      "wrong": 0,
+      "strict": 0.9333333333333333,
+      "lenient": 1.0
+    },
+    "tourism-economics": {
+      "labelled": 7,
+      "right": 4,
+      "borderline": 3,
+      "wrong": 0,
+      "strict": 0.5714285714285714,
+      "lenient": 1.0
+    }
+  },
+  "unlabelled": 0
+}

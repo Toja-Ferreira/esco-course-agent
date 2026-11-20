@@ -276,7 +276,7 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 - Prompt: the list describes the page, and the page should describe what the UC teaches; where they disagree the fix is the page (a "show" text change if the UC teaches more than the page says; update the sentence if the page claims more than the UC teaches).
 - Analysis plan change: "suggested, teacher removed" is no longer read as a system error by default. Only `not_in_text` removals count as system errors; `not_taught` counts as a page error; `not_wanted` as teacher preference.
 
-## 2026-11-20 — Pilot by the supervisor (A. J. R. Neves)
+## 2026-11-20 — Pilot by the supervisor
 - Tested with two descriptions of the same UC: the old one and the one he rewrote this year. Feedback: interface "muito prático e intuitivo"; suggested skills "fazem todo o sentido"; closing questionnaire "impecável". No changes requested. Next: invitations and instructions for teachers.
 - Both sessions kept as pilot data (results/test-sessions/), not study data. Old vs new description of the same UC: a possible case for the paper (page quality vs skills found).
 
@@ -296,3 +296,42 @@ raw ranks in results/2026-11-20_smoke_occupations_seed0.{csv,json}.
 - MRR difference, paired: TF-IDF − overlap +0.072 [+0.065, +0.079]; TF-IDF − coverage +0.132 [+0.122, +0.141]. The TF-IDF choice (12 Nov, made on reasoning) is now supported.
 - Seed 1 (a different half) agrees within 0.005 on every number.
 - Limit: exact ESCO skill IDs from the target occupation. In the assistant the skills come from the linker on course text, so this is a check of the ranking, not of the occupations a real course gets.
+
+
+## 2026-11-20 — No-tools baseline (spec item 2, baseline part)
+
+Same model (deepseek-chat), no tools, asked for ESCO skills with exact preferred labels,
+URIs if known, and the supporting sentence (JSON). 6 real POF courses x 3 runs, 248 items.
+`python -m esco_agent.baseline`; items in results/2026-11-20_baseline_notools.{csv,json}.
+95% bootstrap intervals over courses.
+
+| check | baseline | assistant |
+|---|---|---|
+| exact ESCO preferred label | 0.190 [0.088, 0.291] | 1.0 (by construction) |
+| any ESCO label (incl. alt/hidden) | 0.206 [0.091, 0.331] | 1.0 |
+| supporting sentence in the text | 0.948 [0.876, 0.996] | 1.0 (numbered sentences, validated) |
+| URI given | 0.000 | 1.0 |
+
+- Per course, exact labels range 0.00 (tourism economics) to 0.36 (electronics, plurilingual education).
+- Typical misses are plausible-sounding names ("apply probability theory", "calculate confidence intervals", "apply polymerase chain reaction"); some are near misses of real entries (ESCO has "probability theory"). Mapping such names to real entries is what the linker does.
+- Exact match is strict; a lenient match would score the baseline higher, but POF needs real ESCO entries.
+- Consistent with the manual C-course test on 19 Nov (2 of 8).
+
+## 2026-11-20 — Evidence precision of the judge (spec item 3)
+
+All 93 first-turn suggestions for 6 real POF courses (k=6), labelled by Claude (a different
+model family from the judge, DeepSeek) with a fixed rule: knowledge -> right if the cited
+sentence names/covers the topic, borderline if touched/narrower/broader; activity -> right if
+students are shown doing it, borderline if only the topic is named; wrong = different sense.
+Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstrap over courses.
+
+- Strict precision (right) 0.785 [0.678, 0.864]; lenient (right + borderline) 0.978 [0.954, 1.000].
+  Wrong: 2/93 ("inform on interest rates", "demonstrate willingness to learn": shared words).
+- Borderline cases are mostly activity skills where the text shows understanding, not doing
+  ("recognise the importance of innovation" -> "seek innovation in current practices"). Lowest strict
+  precision: plurilingual education and tourism economics (0.57 each).
+- Course-specific 0.790 vs transversal 0.750 (n=12): no clear difference.
+- Human check (19 rows, first 3-4 per course, labelled independently before seeing Claude's
+  labels): agreement 16/19 = 0.84, Cohen's kappa 0.31 (low because nearly all sampled rows are
+  "right"). Disagreements: 2 where Claude was stricter (apply teaching strategies, promote
+  sustainability), 1 more lenient (probability theory).

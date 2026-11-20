@@ -1,0 +1,249 @@
+course,run,label,label_status,uri,uri_given,uri_real,uri_matches_label,quote_found
+industrial-electronics,1,use measurement instruments,preferred,unknown,False,False,False,True
+industrial-electronics,1,perform measurements with appropriate laboratory instruments,none,unknown,False,False,False,True
+industrial-electronics,1,build electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,1,design electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,1,test electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,1,analyse electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,1,electronics,preferred,unknown,False,False,False,True
+industrial-electronics,1,electronic components,preferred,unknown,False,False,False,True
+industrial-electronics,1,electrical engineering,preferred,unknown,False,False,False,True
+industrial-electronics,1,use an oscilloscope,none,unknown,False,False,False,True
+industrial-electronics,1,operate a function generator,none,unknown,False,False,False,True
+industrial-electronics,1,electrical measurement instruments,none,unknown,False,False,False,True
+industrial-electronics,1,electric current,preferred,unknown,False,False,False,True
+industrial-electronics,1,electrical resistance,none,unknown,False,False,False,True
+industrial-electronics,1,semiconductors,preferred,unknown,False,False,False,True
+industrial-electronics,2,use measurement instruments,preferred,unknown,False,False,False,True
+industrial-electronics,2,perform measurements with appropriate laboratory instruments,none,unknown,False,False,False,True
+industrial-electronics,2,build electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,2,design electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,2,test electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,2,analyse electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,2,electronics,preferred,unknown,False,False,False,True
+industrial-electronics,2,electronic components,preferred,unknown,False,False,False,True
+industrial-electronics,2,electrical engineering,preferred,unknown,False,False,False,True
+industrial-electronics,2,use an oscilloscope,none,unknown,False,False,False,True
+industrial-electronics,2,operate a function generator,none,unknown,False,False,False,True
+industrial-electronics,2,use a voltmeter,none,unknown,False,False,False,True
+industrial-electronics,2,use an ammeter,none,unknown,False,False,False,True
+industrial-electronics,2,use an ohmmeter,none,unknown,False,False,False,True
+industrial-electronics,2,semiconductors,preferred,unknown,False,False,False,True
+industrial-electronics,3,use measurement instruments,preferred,unknown,False,False,False,True
+industrial-electronics,3,perform measurements with laboratory instruments,none,unknown,False,False,False,True
+industrial-electronics,3,build electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,3,design electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,3,test electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,3,analyse electronic circuits,none,unknown,False,False,False,True
+industrial-electronics,3,electronics,preferred,unknown,False,False,False,True
+industrial-electronics,3,electronic components,preferred,unknown,False,False,False,True
+industrial-electronics,3,electrical engineering,preferred,unknown,False,False,False,True
+industrial-electronics,3,use oscilloscope,none,unknown,False,False,False,True
+industrial-electronics,3,operate function generator,none,unknown,False,False,False,True
+industrial-electronics,3,electrical measurement,none,unknown,False,False,False,True
+industrial-electronics,3,alternating current,none,unknown,False,False,False,True
+industrial-electronics,3,semiconductors,preferred,unknown,False,False,False,True
+industrial-electronics,3,operational amplifiers,none,unknown,False,False,False,False
+maths-and-statistics,1,apply statistical analysis techniques,preferred,unknown,False,False,False,True
+maths-and-statistics,1,use software for data analysis,none,unknown,False,False,False,True
+maths-and-statistics,1,apply mathematical modelling,none,unknown,False,False,False,True
+maths-and-statistics,1,solve mathematical problems,none,unknown,False,False,False,True
+maths-and-statistics,1,interpret graphs of functions,none,unknown,False,False,False,True
+maths-and-statistics,1,carry out statistical estimation,none,unknown,False,False,False,True
+maths-and-statistics,1,apply probability theory,none,unknown,False,False,False,True
+maths-and-statistics,1,perform data analysis,preferred,unknown,False,False,False,True
+maths-and-statistics,1,apply arithmetic,none,unknown,False,False,False,True
+maths-and-statistics,1,use mathematical tools for problem solving,none,unknown,False,False,False,True
+maths-and-statistics,1,create graphical representations of data,none,unknown,False,False,False,False
+maths-and-statistics,1,apply statistical methods,none,unknown,False,False,False,True
+maths-and-statistics,2,apply statistical analysis techniques,preferred,unknown,False,False,False,True
+maths-and-statistics,2,use software for data analysis,none,unknown,False,False,False,True
+maths-and-statistics,2,apply mathematical modelling,none,unknown,False,False,False,True
+maths-and-statistics,2,solve mathematical problems,none,unknown,False,False,False,True
+maths-and-statistics,2,perform mathematical calculations,none,unknown,False,False,False,True
+maths-and-statistics,2,interpret graphs of functions,none,unknown,False,False,False,True
+maths-and-statistics,2,carry out statistical estimation,none,unknown,False,False,False,True
+maths-and-statistics,2,apply probability theory,none,unknown,False,False,False,True
+maths-and-statistics,2,use arithmetic and geometric progressions,none,unknown,False,False,False,True
+maths-and-statistics,2,calculate percentages and interest,none,unknown,False,False,False,True
+maths-and-statistics,2,organize data,none,unknown,False,False,False,True
+maths-and-statistics,2,create graphical representations of data,none,unknown,False,False,False,False
+maths-and-statistics,2,apply the normal distribution,none,unknown,False,False,False,False
+maths-and-statistics,2,calculate confidence intervals,none,unknown,False,False,False,True
+maths-and-statistics,3,apply statistical analysis techniques,preferred,unknown,False,False,False,True
+maths-and-statistics,3,use software for data analysis,none,unknown,False,False,False,True
+maths-and-statistics,3,apply mathematical modelling,none,unknown,False,False,False,True
+maths-and-statistics,3,solve mathematical problems,none,unknown,False,False,False,True
+maths-and-statistics,3,perform mathematical calculations,none,unknown,False,False,False,True
+maths-and-statistics,3,interpret graphs of functions,none,unknown,False,False,False,True
+maths-and-statistics,3,apply statistical estimation methods,none,unknown,False,False,False,True
+maths-and-statistics,3,use probability distributions,none,unknown,False,False,False,True
+maths-and-statistics,3,apply the central limit theorem,none,unknown,False,False,False,True
+maths-and-statistics,3,calculate confidence intervals,none,unknown,False,False,False,True
+maths-and-statistics,3,apply exploratory data analysis,none,unknown,False,False,False,True
+maths-and-statistics,3,use arithmetic and geometric progressions,none,unknown,False,False,False,True
+maths-and-statistics,3,apply logarithmic and exponential functions,none,unknown,False,False,False,True
+maths-and-statistics,3,calculate percentages and interest,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,apply scientific methods,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,1,perform laboratory techniques,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,use laboratory equipment,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,1,extract nucleic acids,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,perform PCR,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,perform electrophoresis,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,analyse experimental results,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,identify sources of error,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,write scientific reports,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,maintain laboratory notebook,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,search bibliographic information,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,cell and molecular biology,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,biochemistry,none,unknown,False,False,False,True
+molecular-cell-biology-labs,1,cell biology,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,apply scientific methods,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,2,perform laboratory techniques,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,extract nucleic acids,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,extract proteins,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,use electrophoresis,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,apply polymerase chain reaction,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,quantify biomolecules,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,identify sources of error,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,analyse experimental results,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,write scientific reports,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,maintain laboratory notebook,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,search bibliographic information,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,perform cell biology laboratory techniques,none,unknown,False,False,False,True
+molecular-cell-biology-labs,2,apply safety procedures in laboratory,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,3,apply scientific methods,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,3,perform laboratory techniques,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,use laboratory equipment,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,3,extract nucleic acids,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,extract proteins,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,perform PCR,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,perform electrophoresis,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,analyse experimental results,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,identify sources of error,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,write scientific reports,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,maintain laboratory notebook,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,search bibliographic information,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,cell biology,none,unknown,False,False,False,True
+molecular-cell-biology-labs,3,molecular biology,preferred,unknown,False,False,False,True
+molecular-cell-biology-labs,3,centrifugation,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,develop a pedagogical concept,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,1,apply teaching strategies,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,1,work in teams,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,1,work autonomously,alt,unknown,False,False,False,True
+plurilingual-intercultural-education,1,discuss educational issues,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,linguistics,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,1,cultural diversity,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,language teaching methods,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,1,intercultural communication,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,multilingualism,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,language policies,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,lifelong learning,none,unknown,False,False,False,True
+plurilingual-intercultural-education,1,sustainable development,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,develop a pedagogical concept,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,2,apply teaching strategies,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,2,work in teams,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,2,work autonomously,alt,unknown,False,False,False,True
+plurilingual-intercultural-education,2,discuss educational issues,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,intercultural communication,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,linguistics,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,2,cultural diversity,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,language teaching,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,language policies,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,lifelong learning,none,unknown,False,False,False,True
+plurilingual-intercultural-education,2,sustainable development,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,develop a pedagogical concept,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,3,apply teaching strategies,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,3,promote cultural diversity,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,support multilingualism,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,intercultural communication,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,language teaching methods,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,3,language policies,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,debate,alt,unknown,False,False,False,True
+plurilingual-intercultural-education,3,work in teams,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,3,work autonomously,alt,unknown,False,False,False,True
+plurilingual-intercultural-education,3,lifelong learning,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,sustainable development,none,unknown,False,False,False,True
+plurilingual-intercultural-education,3,linguistics,preferred,unknown,False,False,False,True
+plurilingual-intercultural-education,3,learning strategies,none,unknown,False,False,False,True
+programming-fundamentals,1,design algorithms,none,unknown,False,False,False,True
+programming-fundamentals,1,use programming languages,none,unknown,False,False,False,True
+programming-fundamentals,1,use markup languages,preferred,unknown,False,False,False,True
+programming-fundamentals,1,use style sheet languages,none,unknown,False,False,False,True
+programming-fundamentals,1,use scripting programming languages,none,unknown,False,False,False,True
+programming-fundamentals,1,develop web applications,none,unknown,False,False,False,True
+programming-fundamentals,1,work in teams,preferred,unknown,False,False,False,True
+programming-fundamentals,1,analyse programming concepts,none,unknown,False,False,False,True
+programming-fundamentals,1,apply data types,none,unknown,False,False,False,True
+programming-fundamentals,1,use control structures,none,unknown,False,False,False,True
+programming-fundamentals,1,identify web technologies,none,unknown,False,False,False,True
+programming-fundamentals,1,develop responsive web applications,none,unknown,False,False,False,True
+programming-fundamentals,1,represent data structures,none,unknown,False,False,False,True
+programming-fundamentals,1,use web development frameworks,none,unknown,False,False,False,True
+programming-fundamentals,2,design algorithms,none,unknown,False,False,False,True
+programming-fundamentals,2,use programming languages,none,unknown,False,False,False,True
+programming-fundamentals,2,use markup languages,preferred,unknown,False,False,False,True
+programming-fundamentals,2,use stylesheet languages,none,unknown,False,False,False,True
+programming-fundamentals,2,use scripting programming languages,none,unknown,False,False,False,True
+programming-fundamentals,2,develop web applications,none,unknown,False,False,False,True
+programming-fundamentals,2,work in teams,preferred,unknown,False,False,False,True
+programming-fundamentals,2,analyse programming concepts,none,unknown,False,False,False,True
+programming-fundamentals,2,apply data types,none,unknown,False,False,False,True
+programming-fundamentals,2,use control structures,none,unknown,False,False,False,True
+programming-fundamentals,2,identify web technologies,none,unknown,False,False,False,True
+programming-fundamentals,2,develop responsive web applications,none,unknown,False,False,False,True
+programming-fundamentals,2,represent data structures,none,unknown,False,False,False,True
+programming-fundamentals,3,design algorithms,none,unknown,False,False,False,True
+programming-fundamentals,3,use programming languages,none,unknown,False,False,False,True
+programming-fundamentals,3,use markup languages,preferred,unknown,False,False,False,True
+programming-fundamentals,3,use stylesheet languages,none,unknown,False,False,False,True
+programming-fundamentals,3,use scripting programming languages,none,unknown,False,False,False,True
+programming-fundamentals,3,develop web applications,none,unknown,False,False,False,True
+programming-fundamentals,3,work in teams,preferred,unknown,False,False,False,True
+programming-fundamentals,3,analyse programming concepts,none,unknown,False,False,False,True
+programming-fundamentals,3,apply data types,none,unknown,False,False,False,True
+programming-fundamentals,3,use control structures,none,unknown,False,False,False,True
+programming-fundamentals,3,identify web technologies,none,unknown,False,False,False,True
+programming-fundamentals,3,develop responsive web applications,none,unknown,False,False,False,True
+programming-fundamentals,3,represent data structures,none,unknown,False,False,False,True
+tourism-economics,1,apply basic microeconomics and macroeconomics concepts to tourism,none,unknown,False,False,False,True
+tourism-economics,1,analyse the tourism market,none,unknown,False,False,False,True
+tourism-economics,1,interpret economic indicators,none,unknown,False,False,False,True
+tourism-economics,1,"understand tourism as a source of income, jobs and wealth creation",none,unknown,False,False,False,True
+tourism-economics,1,understand how tourism contributes to sustainable development goals,none,unknown,False,False,False,True
+tourism-economics,1,recognise the importance of innovation in tourism,none,unknown,False,False,False,True
+tourism-economics,1,analyse tourism demand and supply,none,unknown,False,False,False,True
+tourism-economics,1,understand the price mechanism,none,unknown,False,False,False,True
+tourism-economics,1,understand market structures,none,unknown,False,False,False,False
+tourism-economics,1,understand governmental intervention in markets,none,unknown,False,False,False,False
+tourism-economics,1,understand the economic impact of tourism,none,unknown,False,False,False,True
+tourism-economics,1,understand tourist motivations,none,unknown,False,False,False,False
+tourism-economics,1,understand the tourism satellite account,none,unknown,False,False,False,True
+tourism-economics,1,understand the evolution of tourism in Portugal and internationally,none,unknown,False,False,False,True
+tourism-economics,2,apply basic microeconomics and macroeconomics concepts to tourism,none,unknown,False,False,False,True
+tourism-economics,2,analyse the tourism market,none,unknown,False,False,False,True
+tourism-economics,2,interpret tourism economic indicators,none,unknown,False,False,False,True
+tourism-economics,2,understand tourism concepts,none,unknown,False,False,False,True
+tourism-economics,2,recognise the economic impact of tourism,none,unknown,False,False,False,True
+tourism-economics,2,understand sustainable development goals,none,unknown,False,False,False,True
+tourism-economics,2,recognise the importance of innovation,none,unknown,False,False,False,True
+tourism-economics,2,analyse tourism demand and supply,none,unknown,False,False,False,True
+tourism-economics,2,understand price mechanisms,none,unknown,False,False,False,True
+tourism-economics,2,understand market structures,none,unknown,False,False,False,False
+tourism-economics,2,understand government intervention,none,unknown,False,False,False,False
+tourism-economics,2,use tourism satellite accounts,none,unknown,False,False,False,True
+tourism-economics,2,understand tourist motivations,none,unknown,False,False,False,False
+tourism-economics,2,understand the evolution of tourism,none,unknown,False,False,False,True
+tourism-economics,3,apply basic microeconomics and macroeconomics concepts to tourism,none,unknown,False,False,False,True
+tourism-economics,3,analyse the tourism market,none,unknown,False,False,False,True
+tourism-economics,3,interpret tourism economic indicators,none,unknown,False,False,False,True
+tourism-economics,3,understand tourism concepts,none,unknown,False,False,False,True
+tourism-economics,3,recognise the economic impact of tourism,none,unknown,False,False,False,True
+tourism-economics,3,understand sustainable development goals,none,unknown,False,False,False,True
+tourism-economics,3,recognise the importance of innovation in tourism,none,unknown,False,False,False,True
+tourism-economics,3,analyse tourism demand and supply,none,unknown,False,False,False,True
+tourism-economics,3,understand the price mechanism,none,unknown,False,False,False,True
+tourism-economics,3,understand market structures,none,unknown,False,False,False,False
+tourism-economics,3,understand governmental intervention in markets,none,unknown,False,False,False,False
+tourism-economics,3,use tourism satellite accounts,none,unknown,False,False,False,True
+tourism-economics,3,understand tourist motivations,none,unknown,False,False,False,False

@@ -1,0 +1,31 @@
+{
+  "model": "deepseek-chat",
+  "runs": 3,
+  "courses": 6,
+  "overall": {
+    "items": 248,
+    "label_preferred": 0.18951612903225806,
+    "label_any": 0.2056451612903226,
+    "quote_found": 0.9475806451612904,
+    "uri_given": 0.0,
+    "uri_correct_of_given": null
+  },
+  "ci95_over_courses": {
+    "label_preferred": [
+      0.08835341365461848,
+      0.2908366533864542
+    ],
+    "label_any": [
+      0.09090909090909091,
+      0.3306122448979592
+    ],
+    "quote_found": [
+      0.8764940239043825,
+      0.996
+    ],
+    "uri_given": [
+      0.0,
+      0.0
+    ]
+  }
+}

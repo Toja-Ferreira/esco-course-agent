@@ -7,3 +7,4 @@ data/
 results/sessions/
 results/.salt
 courses/
+*:Zone.Identifier
