@@ -6,7 +6,7 @@
 - **Stack:** LangGraph agent with function calling (DeepSeek), an MCP server over a hybrid BM25 + EmbeddingGemma skill linker, FastAPI with streamed replies, Docker.
 - **Status:** deployed inside the University of Aveiro's course platform (POF), piloted and approved by the project supervisor; a study with teachers runs on 1 December 2026.
 
-<!-- demo: docs/demo.gif, a 30-second recording of one session -->
+![demo](docs/demo.gif)
 
 ## How it works
 

@@ -1,0 +1,16 @@
+Learning outcomes
+After completing this course, you should be able to:
+- understand basic programming and data analysis concepts
+- recognise open data sources as a public resource
+- use a programming environment to develop programs
+- write simple programs to analyse large bodies of data and produce useful results.
+
+Contents
+Week 1: variables and assignments, expressions, functions, comments, values with units.
+Week 2: loading data with pandas; selecting, sorting and calculating on columns; writing up and sharing the analysis in a notebook.
+Week 3: CSV files, dataframes, getting rows and columns, comparison and bitwise operators.
+Week 4: cleaning data (rogue spaces, extra characters, missing values, column types) and charts.
+Week 5: defining and applying functions in a life expectancy project.
+Week 6: joining datasets, correlation and scatterplots.
+Week 7: grouping data; getting trade data from the Comtrade API.
+Week 8: the split-apply-combine pattern, filtering groups and pivot tables.
