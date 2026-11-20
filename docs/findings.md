@@ -275,3 +275,24 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 - For `not_taught`, the assistant quotes the page sentence(s) and suggests updating the page; the removed card says the same.
 - Prompt: the list describes the page, and the page should describe what the UC teaches; where they disagree the fix is the page (a "show" text change if the UC teaches more than the page says; update the sentence if the page claims more than the UC teaches).
 - Analysis plan change: "suggested, teacher removed" is no longer read as a system error by default. Only `not_in_text` removals count as system errors; `not_taught` counts as a page error; `not_wanted` as teacher preference.
+
+## 2026-11-20 — Pilot by the supervisor (A. J. R. Neves)
+- Tested with two descriptions of the same UC: the old one and the one he rewrote this year. Feedback: interface "muito prático e intuitivo"; suggested skills "fazem todo o sentido"; closing questionnaire "impecável". No changes requested. Next: invitations and instructions for teachers.
+- Both sessions kept as pilot data (results/test-sessions/), not study data. Old vs new description of the same UC: a possible case for the paper (page quality vs skills found).
+
+## 2026-11-20 — Occupation search smoke test (spec item 1)
+
+Query = a random half of an occupation's essential skills (weight 1); rank of the occupation
+itself among 3,039; 3,038 occupations with >= 4 essential skills; ties count half; 95%
+bootstrap intervals over occupations (2,000 resamples). `python -m esco_core.smoke_occupations`,
+raw ranks in results/2026-11-20_smoke_occupations_seed0.{csv,json}.
+
+| scorer | rank 1 | top 3 | top 10 | MRR |
+|---|---|---|---|---|
+| TF-IDF (assistant) | 0.942 [0.933, 0.949] | 0.973 [0.967, 0.978] | 0.987 [0.983, 0.991] | 0.960 [0.954, 0.966] |
+| overlap | 0.780 [0.765, 0.795] | 0.951 [0.942, 0.958] | 0.982 [0.977, 0.987] | 0.888 [0.879, 0.896] |
+| coverage | 0.744 [0.728, 0.760] | 0.885 [0.873, 0.896] | 0.962 [0.955, 0.969] | 0.828 [0.817, 0.839] |
+
+- MRR difference, paired: TF-IDF − overlap +0.072 [+0.065, +0.079]; TF-IDF − coverage +0.132 [+0.122, +0.141]. The TF-IDF choice (12 Nov, made on reasoning) is now supported.
+- Seed 1 (a different half) agrees within 0.005 on every number.
+- Limit: exact ESCO skill IDs from the target occupation. In the assistant the skills come from the linker on course text, so this is a check of the ranking, not of the occupations a real course gets.
