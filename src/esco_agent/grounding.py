@@ -11,8 +11,9 @@ each reply against what the session actually contains:
     assistant's earlier replies (with their own quotations removed, so an
     unsupported quote cannot become supported by being repeated); a quote
     shortened with "…" is checked piece by piece;
-  - a quoted question ("Ask 'what is missing for 1?'") is a suggestion to the
-    teacher, not a citation, and is not checked;
+  - a quoted question ("Ask 'what is missing for 1?'") or command with skill
+    numbers ("say 'keep 1, 2, 6 and 9'") is a suggestion to the teacher, not a
+    citation, and is not checked;
   - every "number N" / "número N" must be a skill that exists.
 
 A reply that fails is still shown, marked, and the issue is logged: the
@@ -28,6 +29,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 QUOTE = re.compile(r'"([^"\n]{12,})"|“([^”\n]{12,})”|«([^»\n]{12,})»')
 NUMBER = re.compile(r"\b(?:n[úu]mero|number|n\.?º)\s*(\d{1,3})\b", re.I)
 MIN_WORDS = 4
+COMMAND = re.compile(r"\s*(?:[^\W\d_]+\s+){1,2}\d[\d\s,;e&-]*(?:and\s+\d+\s*)?[.!]?\s*", re.I)
 
 
 def _norm(text: str) -> str:
@@ -62,6 +64,8 @@ def check_reply(reply: str, state: dict, earlier: int | None = None) -> list[dic
         quote = next(g for g in m.groups() if g)
         if quote.rstrip(" .'\"’”").endswith("?"):
             continue                         # a question the teacher could ask
+        if COMMAND.fullmatch(quote):
+            continue                         # a command to type: "keep 1, 2, 6 and 9"
         pieces = [p for p in re.split(r"…|\.\.\.", quote) if len(p.split()) >= MIN_WORDS]
         missing = [p for p in pieces if _norm(p) not in hay]
         if missing:

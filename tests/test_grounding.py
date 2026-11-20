@@ -32,6 +32,9 @@ def test_real_quotes_pass_and_invented_ones_are_flagged():
 
 def test_suggested_questions_and_earlier_replies_are_not_flagged():
     # the two false alarms of the 18 Nov VM session
+    assert check_reply('For example "keep 1, 2, 6, 9, 10, 14" (20 Nov demo).', STATE) == []
+    assert check_reply('Diga "manter 1, 2 e 4" ou "remove 3 and 5".', STATE) == []
+    assert check_reply('The text says "students write 3 programs".', STATE)[0]["kind"] == "quote_not_found"
     assert check_reply('Ask "what does number 1 lack?" to see the missing skills.', STATE) == []
     earlier = {**STATE, "messages": STATE["messages"] + [
         AIMessage("Ask about gaps to see an occupation's essential skills. The course \"teaches "
