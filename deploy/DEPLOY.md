@@ -4,7 +4,9 @@ The assistant runs in Docker next to POF, listens only on `127.0.0.1:8090`, and
 nginx serves it at `/esco/` on POF's address. POF's tab
 (`/pof/esco-assistant`) shows it in a frame; logins are POF's.
 
-Paths below assume POF at `<base-dir>/Pof` and this repo next to it.
+Placeholders: `<vm-host>` (the VM's address), `<user>` (your login on it), `<base-dir>`
+(the folder holding POF and this repo). Paths below assume POF at `<base-dir>/Pof` and
+this repo next to it.
 Nothing here touches the other projects on the server.
 
 ## 0. POF first
@@ -17,8 +19,8 @@ Nothing here touches the other projects on the server.
    ```
 3. Apply the migration (adds the `esco_test` role; touches no data):
    ```bash
-   docker exec pof-backend python manage.py migrate
-   docker exec pof-backend python manage.py showmigrations api | tail -3   # 0018 has [X]
+   docker exec <pof-backend-container> python manage.py migrate
+   docker exec <pof-backend-container> python manage.py showmigrations api | tail -3   # 0018 has [X]
    ```
 
 ## 1. Get the code and the data
@@ -60,13 +62,14 @@ Checks:
 ```bash
 curl -s 127.0.0.1:8090/api/me; echo                    # {"mode": "pof", ...}
 # POF's backend reachable from the container (expect "HTTP Error 401"):
-docker exec esco-assistant python -c "import urllib.request as u; u.urlopen('http://<pof-backend-host>:<port>/api/auth/user/')"
+docker exec esco-assistant python -c "import os, urllib.request as u; u.urlopen(os.environ['POF_API_URL'] + '/api/auth/user/')"
 # download the embedding model now, not on the first teacher's message:
 docker exec esco-assistant python -c "from esco_core.dense import MODEL_ID, MODEL_REVISION; from sentence_transformers import SentenceTransformer; SentenceTransformer(MODEL_ID, revision=MODEL_REVISION); print('model ok')"
 ```
-The app joins POF's Docker network (`<pof-docker-network>`) to reach POF's backend; the
-VM's firewall blocks containers from reaching ports on the host. If POF's network
-has another name (`docker inspect pof-backend`), set `POF_NETWORK=<name>` in `.env`.
+The app joins POF's Docker network to reach POF's backend container directly (a host
+firewall may block containers from reaching host ports). Set both in `.env`:
+`POF_NETWORK` (`docker inspect <pof-backend-container>` shows it) and `POF_API_URL`
+(`http://<pof-backend-container>:<port>`).
 
 ## 4. nginx
 

@@ -10,7 +10,7 @@ import esco_agent.web.pof_auth as pof_auth
 from esco_agent.assistant import build_assistant
 from esco_agent.web.app import Sessions, create_app, hash_email
 
-POF = pof_auth.PofConfig("http://<pof-backend-host>:<port>")
+POF = pof_auth.PofConfig("http://pof.test:8000")
 USERS = {"tok-teacher": {"email": "Ana@ua.pt", "name": "Ana Silva", "role": "esco_test"},
          "tok-admin": {"email": "boss@ua.pt", "name": "Boss", "role": "administrator"},
          "tok-other": {"email": "x@ua.pt", "name": "X", "role": "teacher"},
@@ -23,7 +23,7 @@ def client(tmp_path, monkeypatch):
 
     def handler(request):
         calls.append(request.url.path)
-        assert str(request.url) == "http://<pof-backend-host>:<port>/api/auth/user/"
+        assert str(request.url) == "http://pof.test:8000/api/auth/user/"
         token = request.headers.get("authorization", "").removeprefix("Bearer ")
         if token not in USERS:
             return httpx.Response(401, json={"detail": "Token is invalid or expired"})
@@ -84,7 +84,7 @@ def test_pof_mode_needs_the_backend_address(monkeypatch):
     monkeypatch.delenv("POF_API_URL", raising=False)
     with pytest.raises(RuntimeError, match="POF_API_URL"):
         pof_auth.PofConfig.from_env()
-    monkeypatch.setenv("POF_API_URL", "http://127.0.0.1:<port>/")
+    monkeypatch.setenv("POF_API_URL", "http://127.0.0.1:9000/")
     monkeypatch.setenv("ESCO_ALLOWED_ROLES", "esco_test")
     cfg = pof_auth.PofConfig.from_env()
-    assert cfg.api_url == "http://127.0.0.1:<port>" and cfg.allowed_roles == ("esco_test",)
+    assert cfg.api_url == "http://127.0.0.1:9000" and cfg.allowed_roles == ("esco_test",)

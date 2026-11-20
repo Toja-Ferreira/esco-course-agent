@@ -10,7 +10,7 @@ Only users whose POF role is in ESCO_ALLOWED_ROLES get in (default
 asked on every click. Settings:
     ESCO_AUTH=pof
     POF_API_URL          POF's backend as seen from this app, e.g.
-                         http://127.0.0.1:<port> (same VM) or http://backend:8000 (same Compose)
+                         e.g. http://127.0.0.1:<port> (same host) or http://<backend-container>:<port> (same Docker network)
     ESCO_ALLOWED_ROLES   comma-separated POF roles
 """
 

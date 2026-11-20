@@ -221,7 +221,7 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 
 ## 2026-11-18 — Deployed on the VM; validated Portuguese SUS
 
-- Deployed on the university VM next to POF: Docker (the VM's Python is 3.8), `127.0.0.1:8090`, nginx `/esco/`. The VM's firewall blocks containers from reaching host ports, so the app joins POF's Docker network and calls `<pof-backend-host>:<port>`. UA login and the POF tab work.
+- Deployed on the university VM next to POF: Docker (the VM's Python is 3.8), `127.0.0.1:8090`, nginx `/esco/`. The VM's firewall blocks containers from reaching host ports, so the app joins POF's Docker network and calls POF's backend container directly. UA login and the POF tab work.
 - SUS in Portuguese: the validated European Portuguese version (Martins et al. 2015, Procedia Computer Science 67, doi:10.1016/j.procs.2015.09.273), wording as published ("produto"). Portuguese pages now show it; `sus_language` records which version each teacher answered.
 
 ## 2026-11-18 — Panel and chat links (after the first VM session)

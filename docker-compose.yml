@@ -10,7 +10,7 @@ services:
       HOST: 0.0.0.0
       PORT: "8090"
       ESCO_AUTH: pof
-      POF_API_URL: http://<pof-backend-host>:<port>   # POF's backend container, on POF's network
+      POF_API_URL: ${POF_API_URL:?set POF_API_URL in .env}   # POF's backend, on POF's network
       ESCO_DATA_DIR: /app/data
     networks: [default, pof]               # the VM's firewall blocks containers -> host ports
     ports:
@@ -29,4 +29,4 @@ services:
 networks:
   pof:
     external: true
-    name: ${POF_NETWORK:-<pof-docker-network>}     # `docker inspect pof-backend` shows it
+    name: ${POF_NETWORK:?set POF_NETWORK in .env}     # POF's Docker network
