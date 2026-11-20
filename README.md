@@ -8,6 +8,10 @@
 
 ![demo](docs/demo.gif)
 
+**Full walkthrough (79 s):** paste a course page → skills with evidence → remove one with a reason → occupations → what the course lacks → text for a missing skill, checked → accepted and re-checked.
+
+https://github.com/user-attachments/assets/dc1ecad3-1e18-44ac-8fa8-61d1009acca3
+
 ## How it works
 
 ```mermaid
