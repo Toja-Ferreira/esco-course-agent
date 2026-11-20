@@ -143,7 +143,8 @@ def test_first_turn_in_portuguese():
 
 def test_accept_reject_search_and_add_a_skill_not_in_the_text():
     agent = Agent(
-        call("update_skill_list", accept=[1], reject=[2], reject_reason="not_wanted"),
+        call("update_skill_list", accept=[1], reject=[2], reject_reason="other",
+             reject_note="too generic"),
         AIMessage("Kept 1."),
         call("find_skills", topic="Linux"), AIMessage("Found 3; Kali Linux is not in the text."),
         call("update_skill_list", accept=[3], add_not_in_text=["kali linux"]), AIMessage("Added."),
@@ -191,7 +192,8 @@ def test_accept_reject_search_and_add_a_skill_not_in_the_text():
     assert out["transcript"][2]["content"] == "keep 1, drop 2"
     assert out["transcript"][3]["tool_calls"] == [{"name": "update_skill_list",
                                                    "args": {"accept": [1], "reject": [2],
-                                                            "reject_reason": "not_wanted"}}]
+                                                            "reject_reason": "other",
+                                                            "reject_note": "too generic"}}]
 
 
 def test_numbers_stay_consecutive_across_searches():
@@ -368,7 +370,7 @@ def test_text_change_needs_a_mode_and_a_skill_missing_from_the_text():
 
 def test_mistakes_are_reported_to_the_llm_and_change_nothing():
     agent = Agent(call("update_skill_list", accept=[1, 9]), AIMessage("."),
-                  call("update_skill_list", accept=[1], reject=[1], reject_reason="not_wanted"),
+                  call("update_skill_list", accept=[1], reject=[1], reject_reason="not_in_text"),
                   AIMessage("."),
                   call("update_skill_list", accept=[1], add_not_in_text=["made up skill"]), AIMessage("."),
                   call("check_occupation_gap", occupation=1), AIMessage("."),
@@ -462,3 +464,15 @@ def test_removing_needs_a_reason_and_not_taught_points_to_the_page():
     # kept again later: the reason is cleared
     _, s3 = run(Agent(call("update_skill_list", accept=[2]), AIMessage(".")), ["keep 2"])
     assert s3["known"][1].get("reject_reason") is None
+
+
+def test_other_reason_needs_the_teachers_words():
+    agent = Agent(call("update_skill_list", reject=[2], reject_reason="other"), AIMessage("Why?"),
+                  call("update_skill_list", reject=[2], reject_reason="other",
+                       reject_note="  duplicates skill 1  "), AIMessage("."))
+    _, s1, s2 = run(agent, ["drop 2, other reason", "it duplicates skill 1"])
+    assert "needs reject_note" in last_result(s1)["error"]
+    assert s1["known"][1]["status"] == "pending"
+    assert s2["known"][1]["reject_note"] == "duplicates skill 1"
+    assert s2["events"][-1]["note"] == "duplicates skill 1"
+    assert export(s2)["rejected"][0]["reject_note"] == "duplicates skill 1"

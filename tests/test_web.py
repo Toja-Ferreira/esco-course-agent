@@ -417,3 +417,17 @@ def test_removing_from_the_list_needs_a_reason(tmp_path):
     assert r["skills"][1]["reject_reason"] == "not_specified"
     r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "accept"}).json()
     assert r["skills"][0]["reject_reason"] is None
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject",
+                                   "reason": "misleading_name"}).json()
+    assert r["skills"][0]["reject_reason"] == "misleading_name"
+    assert r["new"][-1]["content"].endswith("removida (o nome engana)")
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject",
+                                   "reason": "other", "note": " "})
+    assert r.status_code == 400 and "poucas palavras" in r.json()["detail"]
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject",
+                                   "reason": "other", "note": "demasiado genérica"}).json()
+    assert r["skills"][0]["reject_note"] == "demasiado genérica"
+    assert r["new"][-1]["content"].endswith("removida (outro motivo: demasiado genérica)")
+    r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject",
+                                   "reason": "not_in_text", "note": "ignored"}).json()
+    assert r["skills"][0]["reject_note"] is None

@@ -92,7 +92,8 @@ def _fn(name: str, description: str, properties: dict, required: list[str] | Non
 
 _NUMBERS = {"type": "array", "items": {"type": "integer"}}
 
-REJECT_REASONS = ("not_in_text", "not_taught", "not_wanted")
+REJECT_REASONS = ("not_in_text", "not_taught", "misleading_name", "other")
+MAX_NOTE = 300
 
 TOOLS = [
     _fn("update_skill_list",
@@ -105,8 +106,14 @@ TOOLS = [
              "description": "Required with reject. not_in_text: the course text doesn't "
                             "really say this (a wrong suggestion). not_taught: the text says it "
                             "but the course doesn't teach it (outdated or a mistake on the page). "
-                            "not_wanted: in the text and taught, but the teacher doesn't want it. "
+                            "misleading_name: the ESCO definition fits the course, but the skill's name "
+                            "suggests something else, so the teacher doesn't want it. "
+                            "other: any other reason, given in reject_note. "
                             "If the teacher hasn't said why, ask in one short question first."},
+         "reject_note": {
+             "type": "string",
+             "description": "Required with reject_reason other: the teacher's reason, in a "
+                            "few words, as they said it."},
          "add_not_in_text": {
              "type": "array", "items": {"type": "string"},
              "description": "Exact names of skills from a 'not_in_course_text' result that "
@@ -184,7 +191,8 @@ result in this conversation shows it. If you don't know, call find_skills first.
 - Skills the teacher can act on have a number. When the teacher wants skills kept, \
 added, removed or rejected, call update_skill_list. Removing needs a reason \
 (reject_reason); if it isn't clear from what they said, ask in one short question: \
-the text doesn't really say it, the course doesn't teach it, or they don't want it.
+the text doesn't really say it, the course doesn't teach it, the ESCO \
+definition fits but the name is misleading, or another reason (in their words).
 - The list describes the page, and the page should describe what the course \
 teaches. When they disagree, the fix is the page: if the teacher keeps or adds a \
 skill the text doesn't show but the course teaches, offer a "show" text change; if \
@@ -416,7 +424,7 @@ def export(state: dict) -> dict:
                 "type": s["type"], "reuse": s.get("reuse", ""),
                 "in_text": s["in_text"], "evidence": s["evidence"],
                 "origin": s["origin"], "text_change": s.get("text_change"),
-                "reject_reason": s.get("reject_reason")}
+                "reject_reason": s.get("reject_reason"), "reject_note": s.get("reject_note")}
     known = list(enumerate(state.get("known") or [], 1))
     return {"language": state.get("language"), "course": state.get("sections", {}),
             "skills": [out(n, s) for n, s in known if s["status"] == "accepted"],
@@ -473,11 +481,15 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
     # --- place, and returns (result for the LLM, events for the log).
 
     def update_skill_list(w, accept=None, reject=None, add_not_in_text=None,
-                          reject_reason=None):
+                          reject_reason=None, reject_note=None):
         known, offered = w["known"], w["offered"]
         if reject and reject_reason not in REJECT_REASONS:
-            raise ToolProblem("reject needs reject_reason (not_in_text, not_taught or "
-                              "not_wanted); if the teacher hasn't said why, ask them")
+            raise ToolProblem("reject needs reject_reason (not_in_text, not_taught, "
+                              "misleading_name or other); if the teacher hasn't said why, ask them")
+        note = (reject_note or "").strip()[:MAX_NOTE] if reject_reason == "other" else ""
+        if reject and reject_reason == "other" and len(note) < 3:
+            raise ToolProblem("reject_reason other needs reject_note, the teacher's reason in a "
+                              "few words; if they haven't said it, ask them")
         accept, reject, names = list(accept or []), list(reject or []), list(add_not_in_text or [])
         bad = [n for n in accept + reject
                if not isinstance(n, int) or not 1 <= n <= len(known)]
@@ -498,12 +510,16 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
             for n in numbers:
                 skill = known[n - 1]
                 reason = reject_reason if status == "rejected" else None
-                if skill["status"] != status or skill.get("reject_reason") != reason:
+                skill_note = note if reason == "other" else None
+                if (skill["status"] != status or skill.get("reject_reason") != reason
+                        or skill.get("reject_note") != skill_note):
                     events.append({"t": _now(), "type": status, "skill": skill["id"],
                                    "was": skill["status"], "in_text": skill["in_text"],
-                                   **({"reason": reason} if reason else {})})
+                                   **({"reason": reason} if reason else {}),
+                                   **({"note": skill_note} if skill_note else {})})
                     skill["status"] = status
                 skill["reject_reason"] = reason
+                skill["reject_note"] = skill_note
                 if reason == "not_taught" and skill["evidence"]:
                     update_page.append({"number": n, "label": skill["label"],
                                         "page_sentences": [e["text"] for e in skill["evidence"]]})

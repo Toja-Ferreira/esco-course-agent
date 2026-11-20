@@ -240,8 +240,18 @@
   .occ .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
   .occ .actions a { margin-left: auto; font-size: 13px; }
   .occlead { margin: -4px 0 8px; }
-  .reasons { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-  .reasons > span { font-weight: 600; font-size: 13px; margin-right: 2px; }
+  .reasons { display: flex; flex-direction: column; gap: 6px; align-items: stretch; width: 100%; }
+  .reasons > span { font-weight: 600; font-size: 13px; }
+  .reasons .reason { text-align: left; background: var(--surface); color: var(--text); font: inherit;
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .reasons .reason:hover, .reasons .reason:focus-visible { border-color: var(--text); }
+  .reasons .reason b { display: block; font-size: 13px; }
+  .reasons .reason small { display: block; color: var(--grey-3); font-size: 12px; margin-top: 1px; }
+  .reasons .note { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--field-line);
+    border-radius: 6px; background: var(--surface); color: var(--text); }
+  .reasons .row2 { display: flex; gap: 6px; align-items: center; }
+  body.embed .reasons .reason b, body.embed .reasons .note { font-size: 14.5px; }
+  body.embed .reasons .reason small { font-size: 13.5px; }
   .btn.ghostlink { background: none; border: 0; color: var(--grey-3); text-decoration: underline; }
   .removed-why { color: var(--text); margin: 0 0 8px; }
   .removed-why span { color: var(--warn); font-size: 13px; }
@@ -475,7 +485,7 @@ const T = {
     privacy: "O email não é guardado: apenas um código derivado dele, para ligar as suas sessões.",
     start: "Continuar", send: "Enviar", finish: "Terminar",
     placeholder: "Escreva aqui…",
-    list: "Lista de competências", listEmpty: "Ainda vazia. Diga ao assistente quais quer manter, ou use os botões abaixo.",
+    list: "Lista de competências", readDefinition: "Antes de decidir, leia a definição ESCO: o nome da competência, sozinho, pode enganar.", listEmpty: "Ainda vazia. Diga ao assistente quais quer manter, ou use os botões abaixo.",
     pending: "Sugeridas, por decidir", rejected: "Removidas", changes: "Alterações de texto sugeridas",
     keep: "Manter", remove: "Remover", notInText: "não está no texto",
     definition: "Definição ESCO", evidence: "No seu texto", foundBy: "Encontrada por", esco: "Ver na ESCO ↗",
@@ -503,7 +513,12 @@ const T = {
     baShow: "Ver antes e depois", baBefore: "Antes", baAfter: "Depois (o texto novo está destacado)",
     resultSections: "Secções com as alterações aceites (para colar na página)",
     whyRemove: "Porquê?", removedBecause: "Removida:",
-    reasons: { not_in_text: "Não está no texto", not_taught: "A UC não ensina isto", not_wanted: "Não a quero na lista",
+    reasonHelp: { not_in_text: "O texto não diz realmente isto. A sugestão estava errada.",
+                  not_taught: "O texto diz isto, mas está desatualizado ou é um erro da página.",
+                  misleading_name: "Leu a definição ESCO e serve, mas o nome sugere outra coisa.",
+                  other: "Diga porquê em poucas palavras." },
+    notePh: "ex.: demasiado genérica, repete a competência 3",
+    reasons: { not_in_text: "Não está no texto", not_taught: "A UC não ensina isto", misleading_name: "A definição serve, mas o nome engana", other: "Outro motivo", not_wanted: "Não a quero na lista",
                not_specified: "sem motivo indicado" },
     updatePage: "A página diz isto (frase abaixo), mas a UC não o ensina: vale a pena atualizar a página.",
     transversal: "Transversais", transversalHint: "gerais, comuns a muitas áreas",
@@ -545,7 +560,7 @@ const T = {
     privacy: "Your email is not stored: only a code derived from it, to link your sessions.",
     start: "Continue", send: "Send", finish: "Finish",
     placeholder: "Write here…",
-    list: "Skill list", listEmpty: "Empty so far. Tell the assistant which skills to keep, or use the buttons below.",
+    list: "Skill list", readDefinition: "Before deciding, read the ESCO definition: a skill's name alone can mislead.", listEmpty: "Empty so far. Tell the assistant which skills to keep, or use the buttons below.",
     pending: "Suggested, not decided", rejected: "Removed", changes: "Suggested text changes",
     keep: "Keep", remove: "Remove", notInText: "not in the text",
     definition: "ESCO definition", evidence: "In your text", foundBy: "Found by", esco: "View on ESCO ↗",
@@ -573,7 +588,12 @@ const T = {
     baShow: "See before and after", baBefore: "Before", baAfter: "After (the new text is highlighted)",
     resultSections: "Sections with the accepted changes (to paste into the page)",
     whyRemove: "Why?", removedBecause: "Removed:",
-    reasons: { not_in_text: "Not in the text", not_taught: "The course doesn't teach it", not_wanted: "I don't want it on the list",
+    reasonHelp: { not_in_text: "The text doesn't really say this. The suggestion was wrong.",
+                  not_taught: "The text says it, but it's outdated or a mistake on the page.",
+                  misleading_name: "You read the ESCO definition and it fits, but the name suggests something else.",
+                  other: "Say why in a few words." },
+    notePh: "e.g. too generic, repeats skill 3",
+    reasons: { not_in_text: "Not in the text", not_taught: "The course doesn't teach it", misleading_name: "The definition fits, but the name misleads", other: "Other reason", not_wanted: "I don't want it on the list",
                not_specified: "no reason given" },
     updatePage: "The page says this (sentence below), but the course doesn't teach it: worth updating the page.",
     transversal: "Transversal", transversalHint: "general, common to many fields",
@@ -782,6 +802,7 @@ async function tryResume() {
     const r = await api("api/resume", { session: sid });
     if (r.answered) { remember(null); return false; }        // finished and answered: start anew
     session = r.session; stage = r.stage;
+    if (r.language === "pt" || r.language === "en") lang = r.language;   // the session's language, not the default
     if (r.course_name) $("course-name").textContent = r.course_name;
     panelState = r;
     if (stage === "finished") { await showReview(); return true; }
@@ -969,6 +990,7 @@ function skillCard(s, open) {
          <button class="btn small outline" data-act="reject-ask" data-n="${s.number}">${t().remove}</button>`;
   const why = s.status === "rejected" && s.reject_reason && t().reasons[s.reject_reason]
     ? `<p class="removed-why">${esc(t().removedBecause)} ${esc(t().reasons[s.reject_reason])}${
+        s.reject_note ? `: “${esc(s.reject_note)}”` : ""}${
         s.reject_reason === "not_taught" && s.in_text ? `<br><span>${esc(t().updatePage)}</span>` : ""}</p>` : "";
   return `<details class="skill ${s.status}" ${open ? "open" : ""} data-n="${s.number}">
     <summary><span class="num">${s.number}.</span><span class="label">${esc(s.label)}</span>
@@ -1056,6 +1078,7 @@ function renderPanel() {
       : "");
   };
   let h = `<h2>${t().list} <span class="count">${acc.length}</span></h2>`;
+  if (panelState.skills.length) h += `<p class="hint">${esc(t().readDefinition)}</p>`;
   h += acc.length ? cards(acc) : `<p class="empty">${t().listEmpty}</p>`;
   if (pen.length) h += `<h2>${t().pending}</h2>` + cards(pen);
   if (changes.length) h += `<h2>${t().changes} <span class="count">${changes.length}</span></h2>` +
@@ -1133,17 +1156,33 @@ $("panel").addEventListener("click", async e => {
   if (b.dataset.act === "reject-ask") {           // removing needs a reason: ask in place
     const box = b.closest(".actions"), n = b.dataset.n, s = t();
     box.dataset.was = box.innerHTML;
+    // each reason says what it means, so the teacher picks the right one in one click
     box.innerHTML = `<div class="reasons"><span>${s.whyRemove}</span>
-      ${["not_in_text", "not_taught", "not_wanted"].map(r =>
-        `<button class="btn small outline" data-act="reject" data-reason="${r}" data-n="${n}">${s.reasons[r]}</button>`).join("")}
-      <button class="btn small ghostlink" data-act="cancel">${s.cancel}</button></div>`;
+      ${["not_in_text", "not_taught", "misleading_name", "other"].map(r =>
+        `<button class="reason" data-act="${r === "other" ? "other-ask" : "reject"}" data-reason="${r}" data-n="${n}">
+           <b>${esc(s.reasons[r])}</b><small>${esc(s.reasonHelp[r])}</small></button>`).join("")}
+      <div class="row2"><button class="btn small ghostlink" data-act="cancel">${s.cancel}</button></div></div>`;
+    return;
+  }
+  if (b.dataset.act === "other-ask") {            // "other" needs the teacher's words
+    const box = b.closest(".reasons"), n = b.dataset.n, s = t();
+    box.innerHTML = `<span>${esc(s.reasons.other)}</span>
+      <input type="text" class="note" maxlength="300" placeholder="${esc(s.notePh)}">
+      <div class="row2"><button class="btn small" data-act="reject" data-reason="other" data-n="${n}" disabled>${s.remove}</button>
+        <button class="btn small ghostlink" data-act="cancel">${s.cancel}</button></div>`;
+    const inp = box.querySelector(".note"), go = box.querySelector('[data-act="reject"]');
+    inp.addEventListener("input", () => { go.disabled = inp.value.trim().length < 3; });
+    inp.addEventListener("keydown", ev => { if (ev.key === "Enter" && !go.disabled) { ev.preventDefault(); go.click(); } });
+    inp.focus();
     return;
   }
   if (b.dataset.act === "cancel") { const box = b.closest(".actions"); box.innerHTML = box.dataset.was; return; }
   busy = true;
   try {
     const r = await api("api/skill", { session, number: Number(b.dataset.n), action: b.dataset.act,
-                                       ...(b.dataset.reason ? { reason: b.dataset.reason } : {}) });
+                                       ...(b.dataset.reason ? { reason: b.dataset.reason } : {}),
+                                       ...(b.dataset.reason === "other"
+                                           ? { note: b.closest(".actions").querySelector(".note").value } : {}) });
     r.new.forEach(addMessage); panelState = r; renderPanel(); renderChips();
   } catch (err) { toast(err.message); }
   busy = false;
