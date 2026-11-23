@@ -2,7 +2,7 @@
 
 **A chat assistant that helps university teachers describe a course unit with [ESCO](https://esco.ec.europa.eu/) skills, and shows, sentence by sentence, why each skill fits.** The teacher pastes the course page; the assistant suggests ESCO skills, each with the course sentence that supports it; the teacher keeps or removes them in conversation, asks which occupations the course leads to and what it lacks for one, and gets proposed text for the course page, checked before it is shown.
 
-- **Why it needs tools:** asked directly, the same LLM gets the exact ESCO name right for only **19%** of the skills it lists [95% CI 9–29%] and never gives an ESCO identifier. With tools, every suggestion is a real ESCO entry with a sentence from the text, and the judge's suggestions are right or partly right **98%** of the time (strictly right: 79%).
+- **Why it needs tools:** asked directly, the same LLM gets the exact ESCO name right for only **19%** of the skills it lists [95% CI 9–29%] and never gives an ESCO identifier. With tools, every suggestion is a real ESCO entry with a sentence from the text, and, checked by hand, **84%** of the judge's suggestions are fully right and the rest partly right: none of 93 was wrong.
 - **Stack:** LangGraph agent with function calling (DeepSeek), an MCP server over a hybrid BM25 + EmbeddingGemma skill linker, FastAPI with streamed replies, Docker.
 - **Status:** deployed inside the University of Aveiro's course platform (POF), piloted and approved by the project supervisor; a study with teachers runs on 1 December 2026.
 
@@ -41,7 +41,7 @@ All numbers from `docs/findings.md`; raw outputs under `results/`.
 |---|---|---|
 | **Occupation search** (half of an occupation's essential skills as the query) | rank 1: **0.942** [0.933, 0.949]; top 10: 0.987. Simpler scorers: overlap 0.780, coverage 0.744 | 3,038 ESCO occupations, 95% bootstrap CI; `python -m esco_core.smoke_occupations` |
 | **No-tools baseline** (same LLM, asked directly) | exact ESCO label **0.190** [0.088, 0.291]; any ESCO label 0.206; URI given 0.000; sentence really in the text 0.948 | 6 real course pages × 3 runs, 248 items; `python -m esco_agent.baseline` |
-| **Judge evidence precision** | strict **0.785** [0.678, 0.864]; lenient (incl. partly supported) **0.978** [0.954, 1.000]; wrong 2/93 | all 93 first-turn suggestions on 6 courses, labelled with a fixed rule by Claude (a different model family from the judge); human agreement on 19 rows: 0.84, κ = 0.31 |
+| **Judge evidence precision** | strict **0.839** [0.750, 0.903]; lenient (incl. partly supported) **1.000**; wrong 0/93 | all 93 first-turn suggestions on 6 courses, labelled by hand with a fixed rule, blind to the second rater; a second rater (Claude, a different model family from the judge) agrees on 0.92, κ = 0.76, AC1 = 0.91, and is stricter in all 7 disagreements |
 | **Candidates per search phrase** 4 → 6 | e.g. "operating systems" now reaches the judge for a C course; adopted as the default | 7 courses × 3 runs; `python -m esco_agent.suggest --per-query-k` |
 
 The labelling rule: for knowledge items, *right* if the cited sentence names or covers the topic; for activities, *right* only if students are shown doing it, *borderline* if only the topic is named; *wrong* if the words match in a different sense.

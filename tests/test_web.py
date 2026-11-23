@@ -431,3 +431,37 @@ def test_removing_from_the_list_needs_a_reason(tmp_path):
     r = c.post("/api/skill", json={"session": sid, "number": 1, "action": "reject",
                                    "reason": "not_in_text", "note": "ignored"}).json()
     assert r["skills"][0]["reject_note"] is None
+
+
+def test_session_file_records_familiarity_version_usage_and_opened_cards(tmp_path):
+    reply = AIMessage("Mantive a 2.", usage_metadata={
+        "input_tokens": 1000, "output_tokens": 50, "total_tokens": 1050,
+        "input_token_details": {"cache_read": 800}})
+    c, sessions = client(tmp_path, call("update_skill_list", accept=[2]), reply)
+    bad = c.post("/api/session", json={"email": "a@b.pt", "expected": "programar em C",
+                                       "esco_familiarity": "expert"})
+    assert bad.status_code == 400 and "ESCO" in bad.json()["detail"]
+    r = c.post("/api/session", json={"email": "a@b.pt", "language": "pt", "course_name": "Programação",
+                                     "expected": "programar em C", "esco_familiarity": "medium"})
+    sid = r.json()["session"]
+    for text in [OUTCOMES, CONTENTS, "manter a 2"]:
+        assert c.post("/api/message", json={"session": sid, "text": text}).status_code == 200
+
+    assert c.post("/api/ui", json={"session": sid, "event": "open", "kind": "skill",
+                                   "number": 1}).status_code == 200
+    assert c.post("/api/ui", json={"session": sid, "event": "open", "kind": "script"}).status_code == 400
+    data = saved(sessions, sid)
+    assert data["esco_familiarity"] == "medium"
+    assert data["ui"] == [{**data["ui"][0], "event": "open", "kind": "skill", "number": 1}]
+    assert data["agent"]["skills"]            # saving the card event kept the agent's state
+    assert len(data["app_version"]["code"]) == 12
+    u = data["usage"]
+    # first turn: query step + judge (fakes, no usage); chat turn: two agent calls, one with usage
+    assert u["calls"] >= 4 and u["input_tokens"] == 1000 and u["output_tokens"] == 50
+    assert u["cached_input_tokens"] == 800
+
+
+def test_familiarity_is_optional_for_the_api():
+    """The page requires it; the API accepts older clients and stores nothing."""
+    from esco_agent.web.app import FAMILIARITY
+    assert FAMILIARITY == ("none", "low", "medium", "high")

@@ -44,6 +44,7 @@ from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
 
+from esco_agent import usage
 from esco_agent.assistant import MAX_NOTE, REJECT_REASONS, SKILL_URI, _now, course_message, export
 from esco_agent.grounding import check_reply
 from esco_agent.suggest import course_text
@@ -61,8 +62,34 @@ OCCUPATION_PAGE = "https://esco.ec.europa.eu/en/classification/occupation?uri="
 OCCUPATION_URI = "http://data.europa.eu/esco/occupation/"
 
 
+FAMILIARITY = ("none", "low", "medium", "high")    # "Have you used ESCO before?" -> how well
+UI_EVENTS = {"open": ("skill", "text_change", "occupation", "before_after")}
+MAX_UI_EVENTS = 3000
+
+
 class Problem(Exception):
     """Something the visitor should be told; becomes an HTTP 400 with this text."""
+
+
+def app_version() -> dict:
+    """Which code a session ran on: the git commit (passed into the Docker build, or
+    read from a checkout) and a hash of the package's own files, which needs neither."""
+    import subprocess
+    package = Path(__file__).resolve().parents[1]
+    h = hashlib.sha256()
+    for f in sorted(p for p in package.rglob("*") if p.suffix in (".py", ".html") and p.is_file()):
+        h.update(f.relative_to(package).as_posix().encode()); h.update(f.read_bytes())
+    commit = os.environ.get("ESCO_VERSION", "").strip()
+    if not commit or commit == "unknown":
+        try:
+            commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=package,
+                                    capture_output=True, text=True, timeout=5).stdout.strip()
+        except Exception:
+            commit = ""
+    return {"commit": commit or None, "code": h.hexdigest()[:12]}
+
+
+VERSION = app_version()
 
 
 # --- identity -----------------------------------------------------------------
@@ -324,6 +351,10 @@ class Sessions:
             "started": s["created"], "finished": s.get("finished"),
             "expected_skills_before": s["expected"],
             "model": served or self.model,
+            "app_version": VERSION,           # commit + hash of the code that ran
+            "esco_familiarity": s.get("esco_familiarity"),   # none / low / medium / high
+            "usage": s.get("usage"),          # LLM calls and tokens, whole session
+            "ui": s.get("ui", []),            # cards the teacher opened, with times
             "chat": s["chat"],            # what the teacher saw, with button use marked
             "resumed": s.get("resumed", []),   # times the page was reloaded and picked up again
             "answers": s.get("answers"),
@@ -337,7 +368,8 @@ class Sessions:
     # --- 1. start ---
 
     def create(self, email: str, language: str, expected: str, verified: bool = False,
-               login_kind: str = "ua", role: str | None = None, course_name: str = "") -> dict:
+               login_kind: str = "ua", role: str | None = None, course_name: str = "",
+               esco_familiarity: str | None = None) -> dict:
         """email: from a login (verified=True; login_kind "ua" or "pof"), or typed
         (local development). With course_name (asked on the first screen) the chat starts
         at the learning outcomes; without it, the chat asks for the name first."""
@@ -350,13 +382,16 @@ class Sessions:
         if (course_name or "").strip() and not intake.check_name(course_name):
             raise Problem("Please write only the course's name. / "
                           "Escreva apenas o nome da unidade curricular.")
+        if esco_familiarity and esco_familiarity not in FAMILIARITY:
+            raise Problem("Please say whether you have used ESCO before. / "
+                          "Indique se já utilizou a ESCO.")
         course_name = " ".join((course_name or "").split())
         language = language if language in intake.MESSAGES else "pt"
         stage = "outcomes" if course_name else "name"
         sid = uuid.uuid4().hex
         participant = hash_email(email, self.salt)
         s = {"id": sid, "participant": participant, "login": login_kind if verified else "typed",
-             "role": role,
+             "role": role, "esco_familiarity": esco_familiarity or None,
              "language": language,
              "expected": expected[:5000], "stage": stage, "course_name": course_name or None,
              "sections": {}, "started": False, "turns": 0, "chat": [],
@@ -484,6 +519,13 @@ class Sessions:
         (node "agent"); the judge and drafting calls inside tools write JSON."""
         graph = await self.graph()
         report = s.get("progress") or (lambda _: None)
+        turn = usage.start()                # every LLM call of this turn adds to it
+        try:
+            return await self._stream(s, graph, graph_input, report)
+        finally:
+            s["usage"] = usage.add(s.get("usage"), turn)
+
+    async def _stream(self, s: dict, graph, graph_input: dict, report) -> dict:
         async for mode, chunk in graph.astream(graph_input, self._config(s),
                                                stream_mode=["custom", "messages"]):
             if mode == "custom":
@@ -494,6 +536,19 @@ class Sessions:
                 if text and meta.get("langgraph_node") == "agent":
                     report({"token": text})
         return (await graph.aget_state(self._config(s))).values
+
+    async def log_ui(self, sid: str, event: str, kind: str, number: int | None) -> None:
+        """A card opened in the panel (whether the teacher looked at the definition,
+        the evidence or a text change before deciding)."""
+        s = self.get(sid)
+        if kind not in UI_EVENTS.get(event, ()):
+            raise Problem("Unknown event.")
+        ui = s.setdefault("ui", [])
+        if len(ui) >= MAX_UI_EVENTS:
+            return
+        ui.append({"t": _now(), "event": event, "kind": kind, "number": number})
+        async with s["lock"]:              # after a running turn, which saves too
+            self.save(s, await self._state(s))
 
     async def decide(self, sid: str, number: int, action: str, source: str = "button",
                      reason: str | None = None, note: str | None = None) -> dict:
@@ -609,6 +664,14 @@ class StartIn(BaseModel):
     language: str = "pt"
     expected: str
     course_name: str = ""
+    esco_familiarity: str | None = None
+
+
+class UiIn(BaseModel):
+    session: str
+    event: str
+    kind: str
+    number: int | None = None
 
 
 class MessageIn(BaseModel):
@@ -757,9 +820,19 @@ def create_app(sessions: Sessions | None = None, oauth_config=None, pof_config=N
     async def start(body: StartIn, user: dict | None = Depends(require_user)):
         if user:       # the login provides the email; nothing typed is used
             return await sync(sessions.create, user["email"], body.language, body.expected, True,
-                              "pof" if pof else "ua", user.get("role"), body.course_name)
+                              "pof" if pof else "ua", user.get("role"), body.course_name,
+                              body.esco_familiarity)
         return await sync(sessions.create, body.email, body.language, body.expected,
-                          False, "ua", None, body.course_name)
+                          False, "ua", None, body.course_name, body.esco_familiarity)
+
+    @app.post("/api/ui", dependencies=[Depends(login)])
+    async def ui_event(body: UiIn, user: dict | None = Depends(require_user)):
+        check(body.session, user)
+        try:
+            await sessions.log_ui(body.session, body.event, body.kind, body.number)
+        except Problem as e:
+            raise HTTPException(400, str(e)) from None
+        return {"ok": True}
 
     def check(sid: str, user: dict | None) -> None:
         try:

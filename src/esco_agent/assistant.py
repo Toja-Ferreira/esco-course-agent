@@ -62,6 +62,7 @@ from langchain_core.messages import AIMessage, SystemMessage, ToolMessage
 from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, MessagesState, StateGraph
 
+from esco_agent import usage
 from esco_agent.coverage import judge_coverage, split_sentences
 from esco_agent.suggest import (Sections, _shorten, as_sections, course_text,
                                 gather_candidates, numbered_sentences, propose_queries,
@@ -474,8 +475,8 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         system = SYSTEM.format(language=LANGUAGES[state["language"]],
                                state=render_state(state["known"], state.get("occupations"),
                                                   state.get("text_changes")))
-        return {"messages": [await llm_with_tools.ainvoke(
-            [SystemMessage(system), *state["messages"]])]}
+        return {"messages": [usage.count(await llm_with_tools.ainvoke(
+            [SystemMessage(system), *state["messages"]]))]}
 
     # --- tools. Each takes the working copy `w` of the state, changes it in
     # --- place, and returns (result for the LLM, events for the log).
@@ -685,9 +686,9 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         result = await suggest_skills([skill], judge_llm, revised)
         if any(e["text"] in new for s in result["suggested"] for e in s["evidence"]):
             return True, ""
-        reply = await judge_llm.ainvoke([("user", WHY_PROMPT.format(
+        reply = usage.count(await judge_llm.ainvoke([("user", WHY_PROMPT.format(
             course=course_text(revised), skill=skill["label"],
-            definition=skill.get("description") or "n/a"))])
+            definition=skill.get("description") or "n/a"))]))
         try:
             reason = " ".join(str(json.loads(reply.content)["reason"]).split())[:300]
         except (json.JSONDecodeError, KeyError, TypeError):
@@ -734,11 +735,11 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         while attempts < 2 and not verified:
             attempts += 1
             progress("drafting" if attempts == 1 else "redrafting", skill=target["label"])
-            reply = await judge_llm.ainvoke([("user", prompt.format(
+            reply = usage.count(await judge_llm.ainvoke([("user", prompt.format(
                 course=course_text(sections), skill=target["label"],
                 definition=target["description"] or "n/a",
                 sections=", ".join(f'"{n}"' for n in ([wanted] if wanted else sections)),
-                feedback=feedback))])
+                feedback=feedback))]))
             try:
                 data = json.loads(reply.content)
                 sec = _section(sections, data.get("section")) or wanted or list(sections)[-1]

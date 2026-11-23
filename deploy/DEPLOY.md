@@ -53,7 +53,7 @@ chmod 600 .env
 
 ## 3. Start
 
-```bash
+GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build   # first build: several minutes (torch)
 docker compose up -d --build      # first build: several minutes (torch)
 docker compose logs -f            # Ctrl+C to stop following
 ```
@@ -121,7 +121,10 @@ be linked to each other.
 
 ## Later
 
-- Update: `git pull && docker compose up -d --build`.
+- Update: `git pull && GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build`.
+  The commit is saved in every session file (`app_version`), next to a hash of the code,
+  so each result can be tied to the version that produced it. Without `GIT_COMMIT` the
+  commit reads `unknown`, but the code hash still tells versions apart.
 - Stop: `docker compose down` (sessions stay in `results/`).
 - Remove completely: `docker compose down`, delete the nginx block, `sudo systemctl reload nginx`.
 - The daily model-turn cap is `ESCO_DAILY_LIMIT` in `.env` (default 400).

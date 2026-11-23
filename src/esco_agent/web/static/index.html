@@ -68,6 +68,10 @@
   .card h1 { margin: 0 0 6px; font-size: 24px; }
   .card .lead { color: var(--grey-2); margin: 0 0 24px; }
   label.field { display: block; font-weight: 600; margin: 18px 0 6px; }
+  fieldset.choice { border: 0; padding: 0; margin: 18px 0 0; min-width: 0; }
+  fieldset.choice legend { font-weight: 600; margin: 0 0 6px; padding: 0; }
+  fieldset.choice label { display: inline-flex; align-items: center; gap: 6px; margin-right: 20px; cursor: pointer; }
+  fieldset.choice input { accent-color: var(--text); width: 16px; height: 16px; margin: 0; }
   .hint { color: var(--grey-3); font-size: 13px; font-weight: 400; }
   input[type=email], input[type=text], textarea {
     width: 100%; border: 1px solid var(--field-line); border-radius: 8px; padding: 10px 12px;
@@ -348,7 +352,7 @@
   body.embed .card h1 { font-size: 30px; }
   body.embed #expected { height: 150px; }
   body.embed .card .lead, body.embed .how { font-size: 17px; }
-  body.embed label.field { font-size: 17px; }
+  body.embed label.field, body.embed fieldset.choice legend, body.embed fieldset.choice label { font-size: 17px; }
   body.embed .hint, body.embed .privacy { font-size: 14.5px; }
   body.embed .keys { font-size: 13.5px; }
   body.embed .chip { font-size: 15px; padding: 6px 14px; }
@@ -417,6 +421,15 @@
     <ol class="how" id="t-s1-steps"></ol>
     <div id="email-block"><label class="field" for="email"><span id="t-email"></span></label>
     <input type="email" id="email" autocomplete="email"></div>
+    <fieldset class="choice"><legend id="t-esco-used"></legend>
+      <label><input type="radio" name="esco-used" value="no"><span id="t-esco-no"></span></label>
+      <label><input type="radio" name="esco-used" value="yes"><span id="t-esco-yes"></span></label>
+    </fieldset>
+    <fieldset class="choice" id="esco-level-set" hidden><legend id="t-esco-level"></legend>
+      <label><input type="radio" name="esco-level" value="low"><span id="t-esco-low"></span></label>
+      <label><input type="radio" name="esco-level" value="medium"><span id="t-esco-medium"></span></label>
+      <label><input type="radio" name="esco-level" value="high"><span id="t-esco-high"></span></label>
+    </fieldset>
     <label class="field" for="uc-name"><span id="t-uc-name"></span></label>
     <input type="text" id="uc-name" maxlength="150" autocomplete="off">
     <label class="field" for="expected"><span id="t-expected"></span>
@@ -479,10 +492,12 @@ const T = {
     helpAsks: ["Que ocupações combinam com esta unidade curricular?", "Explique a competência 1",
                "Mantenha a 1 e a 2, remova a 3", "O que falta para ensinar a competência 2?", "O que falta para a ocupação 1?",
                "Há alguma competência sobre trabalho em equipa?"],
-    email: "O seu email", ucName: "Nome da unidade curricular", ucNamePh: "Ex.: Programação em C",
+    email: "O seu email", escoUsed: "Já utilizou a ESCO antes?", escoNo: "Não", escoYes: "Sim",
+    escoLevel: "Qual é a sua familiaridade com a ESCO?", escoLow: "Baixa", escoMedium: "Média", escoHigh: "Alta",
+    ucName: "Nome da unidade curricular", ucNamePh: "Ex.: Programação em C",
     expected: "Que competências desenvolve esta unidade curricular?",
     expectedHint: "Pelas suas palavras, uma por linha. Escreva antes de ver qualquer sugestão (cerca de 10 minutos). O assistente não vê esta lista.",
-    privacy: "O email não é guardado: apenas um código derivado dele, para ligar as suas sessões.",
+    privacy: "A conversa e a forma como usa a ferramenta são registadas, para o estudo. O email não é guardado: apenas um código derivado dele, para ligar as suas sessões.",
     start: "Continuar", send: "Enviar", finish: "Terminar",
     placeholder: "Escreva aqui…",
     list: "Lista de competências", readDefinition: "Antes de decidir, leia a definição ESCO: o nome da competência, sozinho, pode enganar.", listEmpty: "Ainda vazia. Diga ao assistente quais quer manter, ou use os botões abaixo.",
@@ -554,10 +569,12 @@ const T = {
     helpAsks: ["Which occupations match this course?", "Explain skill 1",
                "Keep 1 and 2, remove 3", "What is missing to teach skill 2?", "What is missing for occupation 1?",
                "Is there a skill about teamwork?"],
-    email: "Your email", ucName: "Course name", ucNamePh: "E.g. C Programming",
+    email: "Your email", escoUsed: "Have you used ESCO before?", escoNo: "No", escoYes: "Yes",
+    escoLevel: "How familiar are you with ESCO?", escoLow: "Low", escoMedium: "Medium", escoHigh: "High",
+    ucName: "Course name", ucNamePh: "E.g. C Programming",
     expected: "Which skills does this course develop?",
     expectedHint: "In your own words, one per line. Write them before you see any suggestion (about 10 minutes). The assistant does not see this list.",
-    privacy: "Your email is not stored: only a code derived from it, to link your sessions.",
+    privacy: "Your conversation and how you use the tool are recorded, for the study. Your email is not stored: only a code derived from it, to link your sessions.",
     start: "Continue", send: "Send", finish: "Finish",
     placeholder: "Write here…",
     list: "Skill list", readDefinition: "Before deciding, read the ESCO definition: a skill's name alone can mislead.", listEmpty: "Empty so far. Tell the assistant which skills to keep, or use the buttons below.",
@@ -746,7 +763,8 @@ function applyLang() {
   const s = t();
   $("t-title").textContent = s.title; $("t-eyebrow").textContent = s.eyebrow; $("t-embed-title").textContent = s.title; $("t-s1-title").textContent = s.s1Title; $("t-s1-lead").textContent = s.s1Lead;
   $("t-s1-steps").innerHTML = s.s1Steps.map(x => `<li>${x}</li>`).join("");   // fixed text, not user input
-  $("t-email").textContent = s.email; $("t-uc-name").textContent = s.ucName; $("uc-name").placeholder = s.ucNamePh; $("t-expected").textContent = s.expected; $("t-expected-hint").textContent = s.expectedHint;
+  $("t-email").textContent = s.email; $("t-uc-name").textContent = s.ucName;
+  for (const k of ["Used", "No", "Yes", "Level", "Low", "Medium", "High"]) $(`t-esco-${k.toLowerCase()}`).textContent = s[`esco${k}`]; $("uc-name").placeholder = s.ucNamePh; $("t-expected").textContent = s.expected; $("t-expected-hint").textContent = s.expectedHint;
   $("t-privacy").textContent = s.privacy; $("start").textContent = s.start;
   $("send").setAttribute("aria-label", s.send); $("send").title = s.send;
   $("finish").textContent = s.finish; $("help").textContent = s.help; $("box").placeholder = s.placeholder;
@@ -762,22 +780,50 @@ function applyLang() {
 $("langs").addEventListener("click", e => { if (e.target.dataset.lang && !session) { lang = e.target.dataset.lang; applyLang(); } });
 
 // --- 1. before you start ---
+// "Have you used ESCO before?" -> none, or low / medium / high
+function familiarity() {
+  const used = document.querySelector('input[name="esco-used"]:checked')?.value;
+  if (used === "no") return "none";
+  if (used === "yes") return document.querySelector('input[name="esco-level"]:checked')?.value || "";
+  return "";
+}
+document.querySelectorAll('input[name="esco-used"], input[name="esco-level"]').forEach(el =>
+  el.addEventListener("change", () => {
+    $("esco-level-set").hidden = document.querySelector('input[name="esco-used"]:checked')?.value !== "yes";
+    canStart();
+  }));
 function canStart() {
   const emailOk = me.logged_in || $("email").value.includes("@");
-  $("start").disabled = !(emailOk && $("uc-name").value.trim() && $("expected").value.trim().length >= 5);
+  $("start").disabled = !(emailOk && familiarity() && $("uc-name").value.trim() && $("expected").value.trim().length >= 5);
 }
 ["email", "uc-name", "expected"].forEach(id => $(id).addEventListener("input", canStart));
 $("start").addEventListener("click", async () => {
   $("start").disabled = true;
   try {
     const r = await api("api/session", { email: $("email").value, language: lang, expected: $("expected").value,
-                                         course_name: $("uc-name").value });
+                                         course_name: $("uc-name").value, esco_familiarity: familiarity() });
     session = r.session; stage = r.stage; remember(session);
     if (r.course_name) $("course-name").textContent = r.course_name;
     showChat();
     r.chat.forEach(m => addMessage(m, true)); renderChips(); $("box").focus();
   } catch (e) { toast(e.message); canStart(); }
 });
+
+// Which cards the teacher opens (definition, evidence, a text change) before deciding.
+// Recorded in the session file; nothing changes on the page.
+$("panel").addEventListener("click", e => {
+  const summary = e.target.closest("summary");
+  if (!summary || !session) return;
+  const d = summary.parentElement;
+  if (d.open) return;                        // closing, not opening
+  const kind = d.classList.contains("skill") ? ["skill", d.dataset.n]
+    : d.classList.contains("change") ? ["text_change", d.dataset.c]
+    : d.classList.contains("occ") ? ["occupation", d.dataset.o]
+    : d.classList.contains("ba") ? ["before_after", d.closest("details.change")?.dataset.c] : null;
+  if (!kind) return;
+  authFetch("api/ui", { method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+    body: JSON.stringify({ session, event: "open", kind: kind[0], number: kind[1] ? +kind[1] : null }) }).catch(() => {});
+}, true);
 
 // The session id is kept in the browser, so a reload (POF's session dialog, F5, a
 // dropped connection) picks the session up again instead of starting over.

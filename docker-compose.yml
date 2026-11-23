@@ -2,7 +2,10 @@
 # which serves it at /esco/ on POF's address. See deploy/DEPLOY.md.
 services:
   esco-assistant:
-    build: .
+    build:
+      context: .
+      args:                             # GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
     container_name: esco-assistant
     restart: unless-stopped
     env_file: .env                      # DEEPSEEK_API_KEY, HF_TOKEN, ESCO_DAILY_LIMIT, ...

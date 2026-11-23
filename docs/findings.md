@@ -335,3 +335,39 @@ Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstr
   labels): agreement 16/19 = 0.84, Cohen's kappa 0.31 (low because nearly all sampled rows are
   "right"). Disagreements: 2 where Claude was stricter (apply teaching strategies, promote
   sustainability), 1 more lenient (probability theory).
+
+## 23 Nov 2026 — judge precision from full human labels
+
+- All 93 first-turn suggestions (6 courses, 6 candidates per phrase) labelled by hand, blind to the second rater, with
+  the fixed rule (`results/2026-11-20_labels.csv`): right 78, borderline 15, wrong 0.
+  Strict precision **0.839 [0.750, 0.903]**, lenient **1.000** (95% bootstrap over courses).
+  Course-specific 0.852 (n=81), transversal 0.750 (n=12). Lowest course: tourism economics
+  0.571 (n=7, small).
+- Second rater: the Claude labels of 20 Nov. Three verdicts: agreement 0.92 [0.87, 0.97],
+  κ 0.76 [0.58, 0.90], AC1 0.91 [0.84, 0.96]. Strict split (right vs not): κ 0.82, AC1 0.92.
+  Lenient split (wrong vs not): κ 0.00 only because the human label set has no "wrong"
+  (kappa paradox: one category); AC1 0.98. Bootstrap over rows (2000).
+- All 7 disagreements go one way: Claude one step stricter. 5 right → borderline, all
+  activity skills (electronic test procedures, build electronic prototypes, develop
+  scientific research protocols, apply teaching strategies, show intercultural awareness):
+  the rule "right only if students are shown doing it" read more strictly. 2 borderline →
+  wrong: "inform on interest rates", "demonstrate willingness to learn" (shared words).
+- This replaces the 20 Nov agreement figure (19 rows, κ 0.31), which was a small-sample
+  effect. The human labels are the reported precision; the Claude labels (strict 0.785)
+  are a stricter lower bound.
+- Files: `results/2026-11-23_labels_score.json`, `results/2026-11-23_agreement.json`
+  (`python -m esco_agent.labelsheet score` / `agree`).
+
+## 23 Nov 2026 — logging added for the teacher study
+
+- Session files now also hold: `app_version` (git commit passed into the Docker build, and a
+  hash of the package's code, so sessions can be tied to the code that ran); `esco_familiarity`
+  (start screen: "Have you used ESCO before?", then low / medium / high: none, low, medium,
+  high); `usage` (LLM calls, input, output and cached input tokens, whole session); `ui`
+  (cards the teacher opened, with times: skill, text change, occupation, before/after).
+- Planned post-study checks: teacher-judged precision (share of first-turn suggestions kept;
+  removals for "not in the text"), expected skills vs final list (expected skills matched to
+  ESCO by hand), skills added by search (first-turn misses), removal reasons with notes coded,
+  text changes drafted / passed / accepted, tool use and time per turn, grounding flags checked
+  by hand, cost per session, and the position of cited sentences within each page (a U shape
+  would mean lost-in-the-middle in the judge; then split long pages per judge call).

@@ -13,6 +13,11 @@ COPY requirements.txt .
 RUN pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu \
  && pip install -r requirements.txt
 
+# Saved in every session file, so results can be tied to the code that produced them:
+#   GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build
+ARG GIT_COMMIT=unknown
+ENV ESCO_VERSION=$GIT_COMMIT
+
 COPY pyproject.toml README.md ./
 COPY src ./src
 RUN pip install --no-deps .

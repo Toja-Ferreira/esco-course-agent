@@ -38,10 +38,11 @@ import json
 from collections import Counter
 from pathlib import Path
 
+from esco_agent import usage
 from esco_agent.coverage import data_only, judge_coverage, split_sentences
 
 WHOLE_TEXT_K = 15       # candidates from the course as one query
-PER_QUERY_K = 6         # candidates from each sentence or LLM query
+PER_QUERY_K = 4         # candidates from each sentence or LLM query
 MAX_QUERIES = 25        # LLM queries used
 MIN_SENTENCE_WORDS = 5  # skip headings like "Objectives" or "TP component:"
 JUDGE_BATCH = 30        # candidates per judge call (calls run in parallel)
@@ -118,7 +119,7 @@ def sentence_queries(course: str | Sections) -> list[str]:
 async def propose_queries(llm, course: str | Sections) -> list[str]:
     """llm: chat model bound to JSON output. Returns [] if the reply is unusable
     (the caller then falls back to whole-text candidates only)."""
-    reply = await llm.ainvoke([("user", QUERY_PROMPT.format(course=course_text(course)))])
+    reply = usage.count(await llm.ainvoke([("user", QUERY_PROMPT.format(course=course_text(course)))]))
     try:
         items = json.loads(reply.content)["queries"]
     except (json.JSONDecodeError, KeyError, TypeError):
