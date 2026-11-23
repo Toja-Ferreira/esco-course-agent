@@ -50,3 +50,34 @@ def test_label_keys_back_skip_quit_and_resume(tmp_path, monkeypatch):
     monkeypatch.setattr(labelsheet, "_getch", lambda: next(keys))
     labelsheet._label(args)
     assert labelsheet.read_sheet(str(path))[[r["row"] for r in labelsheet.read_sheet(str(path))].index("2")]["verdict"] in ("right",)
+
+
+def test_chance_corrected_matches_hand_computed_values():
+    from esco_agent.labelsheet import chance_corrected
+    # 10 items: both "right" 7 times, both "wrong" once, 2 disagreements
+    a = ["right"] * 8 + ["wrong"] * 2
+    b = ["right"] * 7 + ["wrong"] + ["wrong"] + ["right"]
+    r = chance_corrected(a, b, ("right", "wrong"))
+    assert r["agreement"] == pytest.approx(0.8)
+    # kappa: chance = .8*.8 + .2*.2 = .68 -> (.8-.68)/.32
+    assert r["kappa"] == pytest.approx(0.12 / 0.32)
+    # AC1: pi = .8/.2, chance = 2*.8*.2/(2-1) = .32 -> (.8-.32)/.68
+    assert r["ac1"] == pytest.approx(0.48 / 0.68)
+    assert r["ac1"] > r["kappa"]                 # the kappa paradox: one verdict dominates
+
+
+def test_agree_matches_rows_by_course_and_skill(tmp_path):
+    from esco_agent import labelsheet
+    a, b = rows_for("c1", SUGG, 0), rows_for("c1", SUGG, 1)      # same rows, other order
+    va = {"skill 0": "right", "skill 1": "right", "skill 2": "wrong", "skill 3": ""}
+    vb = {"skill 0": "right", "skill 1": "borderline", "skill 2": "wrong", "skill 3": "right"}
+    for r in a: r["verdict"] = va[r["skill"]]
+    for r in b: r["verdict"] = vb[r["skill"]]
+    pa, pb = tmp_path / "a.csv", tmp_path / "b.csv"
+    labelsheet.write_sheet(str(pa), a); labelsheet.write_sheet(str(pb), b)
+    res = labelsheet.agree(str(pa), str(pb), n_boot=50)
+    assert res["n"] == 3 and res["only_in_b"] == 1
+    assert res["three verdicts"]["agreement"] == pytest.approx(2 / 3)
+    assert res["lenient (wrong vs not)"]["agreement"] == 1.0
+    assert res["confusion"]["right"]["borderline"] == 1
+    assert [d["skill"] for d in res["disagreements"]] == ["skill 1"]

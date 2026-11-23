@@ -15,10 +15,17 @@
     score  reads the filled sheet: precision (strict: right; lenient: right + borderline)
            with 95% bootstrap intervals over courses, also split into generic
            (ESCO "transversal") and course-specific skills.
+    agree  compares two filled sheets of the same suggestions (two labellers), matched
+           by course and skill: raw agreement, Cohen's kappa and Gwet's AC1 (AC1 holds
+           up when one verdict dominates, where kappa drops: the "kappa paradox"), each
+           with a 95% bootstrap interval over rows, for the three verdicts and for the
+           strict and lenient splits; the confusion table; and every disagreement.
 
     python -m esco_agent.labelsheet make courses/*.json --out results/2026-11-20_labels.csv
     python -m esco_agent.labelsheet label results/2026-11-20_labels.csv --per-course 8
     python -m esco_agent.labelsheet score results/2026-11-20_labels.csv
+    python -m esco_agent.labelsheet agree results/2026-11-20_labels.csv \
+        results/2026-11-20_labels_claude.csv --json results/2026-11-23_agreement.json
 """
 from __future__ import annotations
 
@@ -103,6 +110,58 @@ def write_sheet(path: str, rows: list[dict]) -> None:
         w = csv.DictWriter(f, fieldnames=FIELDS, extrasaction="ignore")
         w.writeheader(); w.writerows(rows)
     tmp.replace(path)                         # never leaves a half-written sheet
+
+
+def chance_corrected(a: list[str], b: list[str], cats) -> dict:
+    """Raw agreement, Cohen's kappa and Gwet's AC1 for two raters' labels."""
+    n = len(a)
+    pa = sum(x == y for x, y in zip(a, b)) / n
+    pA = {c: sum(x == c for x in a) / n for c in cats}
+    pB = {c: sum(y == c for y in b) / n for c in cats}
+    pe_k = sum(pA[c] * pB[c] for c in cats)
+    pi = {c: (pA[c] + pB[c]) / 2 for c in cats}
+    pe_g = sum(pi[c] * (1 - pi[c]) for c in cats) / (len(cats) - 1)
+    k = (pa - pe_k) / (1 - pe_k) if pe_k < 1 else float("nan")
+    g = (pa - pe_g) / (1 - pe_g) if pe_g < 1 else float("nan")
+    return {"agreement": pa, "kappa": k, "ac1": g, "chance_kappa": pe_k, "chance_ac1": pe_g}
+
+
+SPLITS = {  # name: (categories, how a verdict maps into them)
+    "three verdicts": (VERDICTS, lambda v: v),
+    "strict (right vs not)": (("right", "not"), lambda v: "right" if v == "right" else "not"),
+    "lenient (wrong vs not)": (("wrong", "not"), lambda v: "wrong" if v == "wrong" else "not"),
+}
+
+
+def agree(path_a: str, path_b: str, n_boot: int = 2000, seed: int = 0) -> dict:
+    key = lambda r: (r["course"], r.get("skill_id") or r["skill"])
+    a = {key(r): r for r in read_sheet(path_a) if r["verdict"] in VERDICTS}
+    b = {key(r): r for r in read_sheet(path_b) if r["verdict"] in VERDICTS}
+    both = sorted(set(a) & set(b))
+    if not both:
+        raise SystemExit("No suggestion has a verdict in both sheets.")
+    va, vb = [a[k]["verdict"] for k in both], [b[k]["verdict"] for k in both]
+    rng = np.random.default_rng(seed)
+    out = {"n": len(both), "only_in_a": len(set(a) - set(b)), "only_in_b": len(set(b) - set(a))}
+    for name, (cats, f) in SPLITS.items():
+        xa, xb = [f(v) for v in va], [f(v) for v in vb]
+        res = chance_corrected(xa, xb, cats)
+        draws = {m: [] for m in ("agreement", "kappa", "ac1")}
+        for _ in range(n_boot):
+            idx = rng.integers(0, len(both), len(both))
+            r = chance_corrected([xa[i] for i in idx], [xb[i] for i in idx], cats)
+            for m in draws:
+                if r[m] == r[m]:                  # skip nan (one category in the draw)
+                    draws[m].append(r[m])
+        for m, d in draws.items():
+            res[f"{m}_ci95"] = [float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))]
+        out[name] = res
+    out["confusion"] = {x: {y: sum(1 for p, q in zip(va, vb) if p == x and q == y)
+                            for y in VERDICTS} for x in VERDICTS}
+    out["disagreements"] = [{"course": k[0], "skill": a[k]["skill"], "a": a[k]["verdict"],
+                             "b": b[k]["verdict"], "evidence": a[k]["evidence"]}
+                            for k, x, y in zip(both, va, vb) if x != y]
+    return out
 
 
 def _getch() -> str:
@@ -215,6 +274,28 @@ def _score(args) -> None:
         Path(args.json).write_text(json.dumps(res, indent=2), encoding="utf-8")
 
 
+def _agree(args) -> None:
+    res = agree(args.a, args.b)
+    print(f"{res['n']} suggestions labelled in both sheets"
+          + (f" ({res['only_in_a']} only in the first, {res['only_in_b']} only in the second)"
+             if res["only_in_a"] or res["only_in_b"] else ""))
+    for name in SPLITS:
+        r = res[name]
+        ci = lambda m: f"[{r[m + '_ci95'][0]:.2f}, {r[m + '_ci95'][1]:.2f}]"
+        print(f"\n{name}\n  agreement {r['agreement']:.2f} {ci('agreement')}"
+              f"   kappa {r['kappa']:.2f} {ci('kappa')} (chance {r['chance_kappa']:.2f})"
+              f"   AC1 {r['ac1']:.2f} {ci('ac1')}")
+    print("\nconfusion (rows: first sheet, columns: second)")
+    print(" " * 12 + "".join(f"{v:>12}" for v in VERDICTS))
+    for x in VERDICTS:
+        print(f"{x:<12}" + "".join(f"{res['confusion'][x][y]:>12}" for y in VERDICTS))
+    print(f"\n{len(res['disagreements'])} disagreements:")
+    for d in res["disagreements"]:
+        print(f"  {d['course']}: {d['skill']}  ({d['a']} / {d['b']})")
+    if args.json:
+        Path(args.json).write_text(json.dumps(res, indent=2), encoding="utf-8")
+
+
 def _main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -223,8 +304,10 @@ def _main() -> None:
     lb = sub.add_parser("label"); lb.add_argument("sheet")
     lb.add_argument("--per-course", type=int, default=None)
     s = sub.add_parser("score"); s.add_argument("sheet"); s.add_argument("--json", default=None)
+    g = sub.add_parser("agree"); g.add_argument("a"); g.add_argument("b")
+    g.add_argument("--json", default=None)
     args = ap.parse_args()
-    {"make": _make, "label": _label, "score": _score}[args.cmd](args)
+    {"make": _make, "label": _label, "score": _score, "agree": _agree}[args.cmd](args)
 
 
 if __name__ == "__main__":
