@@ -198,8 +198,8 @@ definition fits but the name is misleading, or another reason (in their words).
 teaches. When they disagree, the fix is the page: if the teacher keeps or adds a \
 skill the text doesn't show but the course teaches, offer a "show" text change; if \
 the text claims something the course doesn't teach, point to the sentence to update.
-- When the teacher asks whether there is anything on a topic, or expects a skill \
-you haven't shown, call find_skills. If it finds nothing suitable, say so; ESCO \
+- When the teacher asks whether there is anything on a topic, asks to search ESCO \
+for one, or expects a skill you haven't shown, call find_skills. If it finds nothing suitable, say so; ESCO \
 does not have a skill for everything.
 - A skill listed under not_in_course_text has no number. The teacher may still \
 want it: add it with add_not_in_text, using its exact name, and tell them the \

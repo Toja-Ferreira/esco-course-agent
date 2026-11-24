@@ -204,10 +204,18 @@ def test_suggested_messages_follow_the_conversation():
     def k(i, status, origin="search 'x'"):
         return {"id": i, "label": i, "status": status, "origin": origin}
 
-    state = {"queries": ["use pointers", "x"], "known": [k("a", "pending"), k("b", "pending")]}
+    state = {"queries": ["identify sources of information on genetics advances",
+                         "use pointers", "manipulate DNA", "x"],
+             "known": [k("a", "pending"), k("b", "pending")]}
     texts = [c["text"] for c in suggestions(state, "pt")]
+    # a missed search phrase, as a search: short and specific first; long ones never
     assert texts == ["Porquê a número 1?", "Manter todas as sugeridas",
-                     "Procurar outro tema na ESCO: "]   # the model's own search phrases: not offered
+                     "Procurar na ESCO: «manipulate DNA»", "Procurar outro tema na ESCO: "]
+    asked = {"procurar na esco: «manipulate dna»"}
+    assert "Procurar na ESCO: «use pointers»" in [c["text"] for c in suggestions(state, "pt", asked)]
+    state["events"] = [{"type": "search", "topic": "Manipulate DNA"}]      # searched since
+    assert not any("manipulate" in c["text"] for c in suggestions(state, "pt"))
+    state["events"] = []
 
     state["known"] = [k("a", "accepted"), k("b", "rejected")]
     assert [c["key"] for c in suggestions(state, "pt")][0] == "jobs"

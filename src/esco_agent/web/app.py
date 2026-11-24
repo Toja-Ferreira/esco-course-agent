@@ -185,6 +185,7 @@ def panel(state: dict) -> dict:
 CHIPS = {
     "pt": {"keep_all": "Manter todas as sugeridas",
            "why": "Porquê a número {n}?",
+           "topic": "Procurar na ESCO: «{topic}»",
            "anything": "Procurar outro tema na ESCO: ",
            "jobs": "Que ocupações estão relacionadas com esta lista?",
            "gap": "O que falta para {occupation}?",
@@ -194,6 +195,7 @@ CHIPS = {
            "reword_change": "Quero reescrever a alteração {n}: "},
     "en": {"keep_all": "Keep all the suggested ones",
            "why": "Why number {n}?",
+           "topic": "Search ESCO for \"{topic}\"",
            "anything": "Search ESCO for another topic: ",
            "jobs": "Which occupations does this list relate to?",
            "gap": "What is missing for {occupation}?",
@@ -203,6 +205,9 @@ CHIPS = {
            "reword_change": "I want to reword text change {n}: "},
 }
 MAX_CHIPS = 5
+MAX_TOPIC_WORDS = 4         # longer search phrases read as the model's, not the teacher's
+GENERIC_START = ("understand ", "implement ", "design ", "apply ", "analyse ", "analyze ",
+                 "develop ", "use ", "learn ", "identify ")
 
 
 
@@ -260,8 +265,19 @@ def suggestions(state: dict, language: str, asked: set[str] | None = None) -> li
         if skill["origin"].startswith("required by") and skill["id"] not in changed:
             add("text", c["text"].format(skill=skill["label"]))
             break
-    # an open search, finished by the teacher. (The first turn's own search phrases are
-    # not offered: they are the model's wording, and read as odd questions.)
+    # a topic from the first turn's search phrases that led to no suggestion and hasn't
+    # been searched since: often a real miss ("manipulate DNA"). Offered as a search, not
+    # a question, and short specific phrases first (long ones read as the model's wording)
+    found_by = {k["origin"] for k in known}
+    searched = {e["topic"].lower() for e in state.get("events") or [] if e.get("type") == "search"}
+    topics = [q for q in state.get("queries") or []
+              if f"search '{q}'" not in found_by and q.lower() not in searched
+              and len(q.split()) <= MAX_TOPIC_WORDS]
+    topics.sort(key=lambda q: (q.lower().startswith(GENERIC_START), len(q.split())))
+    for q in topics:
+        if c["topic"].format(topic=q).lower() not in asked:
+            add("topic", c["topic"].format(topic=q))
+            break
     add("anything", c["anything"], send=False)
     return out
 
