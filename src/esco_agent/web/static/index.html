@@ -526,6 +526,9 @@ const T = {
     modeShow: "Mostrar o que já ensina", modeTeach: "Ensinar algo novo",
     chMissing: "O que faltaria", chEsco: "O que a ESCO exige", chFailedDraft: "Ver o rascunho que não passou",
     inSection: sec => `Na secção «${sec}», com o texto novo destacado:`,
+    chAcceptBtn: "Aceitar", chRejectBtn: "Rejeitar", chRewordBtn: "Escrever com as minhas palavras",
+    chAcceptMsg: n => `Aceito a alteração ${n}`, chRejectMsg: n => `Rejeito a alteração ${n}`,
+    chRewordMsg: n => `Quero reescrever a alteração ${n}: `,
     resultSections: "Secções com as alterações aceites (para colar na página)",
     whyRemove: "Porquê?", removedBecause: "Removida:",
     reasonHelp: { not_in_text: "O texto não diz realmente isto. A sugestão estava errada.",
@@ -603,6 +606,9 @@ const T = {
     modeShow: "Show what it already teaches", modeTeach: "Teach something new",
     chMissing: "What would be missing", chEsco: "What ESCO requires", chFailedDraft: "See the draft that did not pass",
     inSection: sec => `In the “${sec}” section, with the new text highlighted:`,
+    chAcceptBtn: "Accept", chRejectBtn: "Reject", chRewordBtn: "Use my own words",
+    chAcceptMsg: n => `I accept text change ${n}`, chRejectMsg: n => `I reject text change ${n}`,
+    chRewordMsg: n => `I want to reword text change ${n}: `,
     resultSections: "Sections with the accepted changes (to paste into the page)",
     whyRemove: "Why?", removedBecause: "Removed:",
     reasonHelp: { not_in_text: "The text doesn't really say this. The suggestion was wrong.",
@@ -1079,7 +1085,23 @@ function changeCard(c, open) {
         <dt>${s.chWhere}</dt><dd>${esc(s.chWhereText(c.section, c.around && c.around[1] ? c.around[0].split("\n").pop() : ""))}</dd>
       </dl>
       ${draft}
+      ${changeActions(c)}
     </div></details>`;
+}
+// Deciding on a text change from its card: the same message the teacher could type,
+// sent through the conversation (so the check, the re-check and the log are the same).
+function changeActions(c) {
+  const s = t(), n = c.number;
+  const btn = (cls, label, key, msg, send) =>
+    `<button class="btn small ${cls}" data-act="change-msg" data-key="${key}" data-send="${send ? 1 : ""}" data-msg="${esc(msg)}">${label}</button>`;
+  if (c.status === "proposed")
+    return `<div class="actions">${btn("", s.chAcceptBtn, "accept_change", s.chAcceptMsg(n), true)}
+      ${btn("outline", s.chRejectBtn, "reject_change", s.chRejectMsg(n), true)}
+      ${btn("ghostlink", s.chRewordBtn, "reword_change", s.chRewordMsg(n), false)}</div>`;
+  if (c.status === "failed")
+    return `<div class="actions">${btn("", s.chRewordBtn, "reword_change", s.chRewordMsg(n), false)}
+      ${btn("outline", s.chRejectBtn, "reject_change", s.chRejectMsg(n), true)}</div>`;
+  return "";
 }
 function occCard(o, open) {
   const s = t(), g = o.gap;
@@ -1166,6 +1188,10 @@ function reveal(sel) {
   el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
 }
 // Skill and occupation names in the assistant's replies become links to the panel.
+// words after which a skill name still stands on its own ("and genetics", "a genetics")
+const LINK_AFTER = new Set(["e", "and", "ou", "or", "de", "do", "da", "dos", "das", "of", "a", "o",
+  "as", "os", "the", "com", "with", "em", "no", "na", "in", "para", "for", "to", "sobre", "on",
+  "about", "como", "é", "is", "nº", "number", "número", "competência", "skill", "ocupação", "occupation"]);
 function linkifyChat() {
   const refs = [];
   for (const sk of panelState.skills || []) if (sk.label.length >= 4) refs.push({ label: sk.label, kind: "n", id: sk.number });
@@ -1177,6 +1203,9 @@ function linkifyChat() {
     refs.map(r => r.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")(?![\\w-])", "gi");
   document.querySelectorAll("#chat .msg.assistant:not(.typing):not(.streaming) .bubble, #chat .msg.action .bubble").forEach(b => {
     if (b.classList.contains("caret")) return;
+    // links made before the list grew may cover part of a longer name: start again
+    b.querySelectorAll("button.ref").forEach(x => x.replaceWith(x.textContent));
+    b.normalize();
     const walker = document.createTreeWalker(b, NodeFilter.SHOW_TEXT, {
       acceptNode: n => n.parentElement.closest(".ref, a, code, .flag") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
     const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
@@ -1187,6 +1216,9 @@ function linkifyChat() {
       const frag = document.createDocumentFragment(); let last = 0, m;
       while ((m = rx.exec(text))) {
         const r = byLabel.get(m[1].toLowerCase()); if (!r) continue;
+        // "genetics" in "medical genetics" is part of another name, not skill "genetics"
+        const prev = /([A-Za-zÀ-ÿ]+)\s+$/.exec(text.slice(0, m.index));
+        if (!/^\d/.test(m[0]) && prev && !LINK_AFTER.has(prev[1].toLowerCase())) continue;
         frag.append(text.slice(last, m.index));
         const btn = document.createElement("button");
         btn.className = "ref"; btn.dataset[r.kind] = r.id; btn.textContent = m[0];
@@ -1205,6 +1237,12 @@ document.addEventListener("click", e => {
 });
 $("panel").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b || busy) return;
+  if (b.dataset.act === "change-msg") {
+    chip = { key: b.dataset.key, text: b.dataset.msg };
+    $("box").value = b.dataset.msg; autosize();
+    if (b.dataset.send) send(); else $("box").focus();
+    return;
+  }
   if (b.dataset.act === "reject-ask") {           // removing needs a reason: ask in place
     const box = b.closest(".actions"), n = b.dataset.n, s = t();
     box.dataset.was = box.innerHTML;

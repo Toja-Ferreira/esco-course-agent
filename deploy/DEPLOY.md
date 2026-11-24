@@ -122,6 +122,9 @@ be linked to each other.
 ## Later
 
 - Update: `git pull && GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build`.
+  If docker runs through sudo, put the variable after it, since sudo drops the
+  environment: `sudo GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build`.
+  Check: `docker exec esco-assistant printenv ESCO_VERSION` prints the commit.
   The commit is saved in every session file (`app_version`), next to a hash of the code,
   so each result can be tied to the version that produced it. Without `GIT_COMMIT` the
   commit reads `unknown`, but the code hash still tells versions apart.
