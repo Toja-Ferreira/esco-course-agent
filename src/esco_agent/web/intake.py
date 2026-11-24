@@ -103,8 +103,17 @@ KEEP_PT = {"Objectives": "objetivos", "Learning outcomes": "resultados de aprend
 
 
 def _heading(line: str) -> str | None:
-    key = line.strip().rstrip(":").strip().lower()
-    return key if key in KEEP or key in DROP else None
+    key = " ".join(line.strip().rstrip(":").strip().lower().split())
+    if key in KEEP or key in DROP:
+        return key
+    # a qualified heading of a section that is left out ("Abbreviated bibliography",
+    # "Main bibliography"), so it doesn't end up inside the section above it
+    words = key.split()
+    if 1 < len(words) <= 4:
+        for term in DROP:
+            if len(term.split()) == 1 and words[-1] == term:
+                return term
+    return None
 
 
 def split_page(text: str) -> tuple[dict, list[str]] | None:

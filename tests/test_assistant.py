@@ -274,7 +274,7 @@ def test_show_mode_draft_is_verified_and_accepting_it_adds_the_skill():
 
     out = last_result(s4)
     assert out == {"change": 1, "mode": "show", "target_skill": "debug software",
-                   "add_to_section": "Contents",
+                   "add_to_section": "Contents", "placed": "at the end",
                    "suggested_text": "Students find and fix faults in their programs with gdb.",
                    "check_passed": True, "status": "proposed", "check": out["check"]}
     assert "already develops" in Judge.prompts[0] and "Skill: debug software" in Judge.prompts[0]
@@ -289,6 +289,7 @@ def test_show_mode_draft_is_verified_and_accepting_it_adds_the_skill():
         "add_to_course": [], "section": "Contents",
         "text": "Students find and fix faults in their programs with gdb.", "verified": True,
         "reason": "", "attempts": 1, "edited_by_teacher": False, "definition": "",
+        "after": "", "tried_description": False, "description_reason": "",
         "status": "accepted"}]
     assert saved["skills"][-1]["label"] == "debug software" and saved["skills"][-1]["text_change"] == 1
     assert [e["type"] for e in saved["events"]][-4:] == [
@@ -312,11 +313,12 @@ def test_teach_mode_proposes_what_to_add_and_the_page_text():
 
 
 def test_failed_draft_gets_a_reason_one_redraft_and_cannot_be_accepted_as_is():
-    Judge.drafts[:] = [json.dumps({"section": "Contents", "text": "Students debug software."}),
-                       json.dumps({"section": "Contents", "text": "Students correct their code."})]
+    teach = lambda text: json.dumps({"add_to_course": ["debugging"], "section": "Contents",
+                                     "text": text})
+    Judge.drafts[:] = [teach("Students debug software."), teach("Students correct their code.")]
     Judge.prompts.clear()
     agent = gap_then(
-        call("suggest_text_change", skill="debug software", mode="show", section="Contents"),
+        call("suggest_text_change", skill="debug software", mode="teach", section="Contents"),
         AIMessage("It failed because..."),
         call("decide_text_change", change=1, decision="accept"), AIMessage("."),
         call("decide_text_change", change=1, decision="accept",
@@ -332,7 +334,7 @@ def test_failed_draft_gets_a_reason_one_redraft_and_cannot_be_accepted_as_is():
     assert s4["text_changes"][0]["text"] == "Students correct their code."   # the redraft
     drafts = [p for p in Judge.prompts if '"section": "..."' in p]
     assert len(drafts) == 2 and "Its reason: It does not mention a debugger." in drafts[1]
-    assert "fine for the check to fail" in drafts[1]                   # show mode stays honest
+    assert "Address that reason" in drafts[1]
     assert "can only be accepted in the teacher's own wording" in last_result(s5)["error"]
 
     c = s6["text_changes"][0]
@@ -476,3 +478,47 @@ def test_other_reason_needs_the_teachers_words():
     assert s2["known"][1]["reject_note"] == "duplicates skill 1"
     assert s2["events"][-1]["note"] == "duplicates skill 1"
     assert export(s2)["rejected"][0]["reject_note"] == "duplicates skill 1"
+
+
+def test_a_description_that_cannot_pass_becomes_a_teaching_change_marked_as_such():
+    """The teacher wants the skill: if describing the course can't show it, the course
+    doesn't teach it yet, so the change to teach it follows in the same call (20 Nov
+    genetics session). The log says the assistant switched, not the teacher."""
+    Judge.drafts[:] = [json.dumps({"section": "Contents", "text": "Students debug software."}),
+                       json.dumps({"section": "Contents", "text": "Students correct their code."}),
+                       json.dumps({"add_to_course": ["a lab on the gdb debugger"],
+                                   "section": "Contents", "text": "Students fix faults using gdb."})]
+    Judge.prompts.clear()
+    agent = gap_then(call("suggest_text_change", skill="debug software", mode="show"),
+                     AIMessage("Since describing it wasn't enough, here is a change."))
+    *_, s = run(agent, ["keep 1", "jobs?", "gap?", "add debugging"])
+    out = last_result(s)
+    assert out["mode"] == "teach" and out["check_passed"] is True
+    assert out["add_to_course"] == ["a lab on the gdb debugger"]
+    assert "could not show this skill" in out["note"] and "debugger" in out["note"]
+    drafts = [p for p in Judge.prompts if '"section": "..."' in p]
+    assert len(drafts) == 3 and "START developing" in drafts[2]
+    assert "was not enough" in drafts[2] and "It does not mention a debugger." in drafts[2]
+    c = s["text_changes"][0]
+    assert (c["mode"], c["tried_description"], c["attempts"]) == ("teach", True, 3)
+    assert c["description_reason"] == "It does not mention a debugger."
+    assert s["events"][-1]["type"] == "text_change_proposed" and s["events"][-1]["tried_description"]
+
+
+def test_new_text_is_placed_after_the_line_it_belongs_to():
+    from esco_agent.assistant import insert_text, split_at
+    sec = "THEME I. PCR\nTOPIC V. Ames Test\nPractical notes"
+    assert insert_text(sec, "TOPIC VI. Cloning", "topic v.  ames test") == \
+        "THEME I. PCR\nTOPIC V. Ames Test\nTOPIC VI. Cloning\nPractical notes"
+    assert insert_text(sec, "X", "no such line").endswith("Practical notes\nX")   # else: the end
+    assert split_at(sec, "") == (sec, "")
+
+    Judge.drafts[:] = [json.dumps({"section": "Contents", "after": "- pointers and dynamic memory",
+                                   "text": "- debugging with gdb"})]
+    Judge.prompts.clear()
+    agent = gap_then(call("suggest_text_change", skill="debug software", mode="show"), AIMessage("."))
+    *_, s = run(agent, ["keep 1", "jobs?", "gap?", "it already covers debugging"])
+    out = last_result(s)
+    assert out["placed"] == 'after the line "- pointers and dynamic memory"'
+    assert s["text_changes"][0]["after"] == "- pointers and dynamic memory"
+    assert s["sections"] == SECTIONS                      # the course text itself is unchanged

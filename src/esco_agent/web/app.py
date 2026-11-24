@@ -45,7 +45,7 @@ from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
 
 from esco_agent import usage
-from esco_agent.assistant import MAX_NOTE, REJECT_REASONS, SKILL_URI, _now, course_message, export
+from esco_agent.assistant import MAX_NOTE, insert_text, split_at, REJECT_REASONS, SKILL_URI, _now, course_message, export
 from esco_agent.grounding import check_reply
 from esco_agent.suggest import course_text
 
@@ -111,13 +111,13 @@ def hash_email(email: str, salt: bytes) -> str:
 # --- what the page shows ------------------------------------------------------
 
 def sections_after(state: dict) -> dict:
-    """The sections that have accepted text changes, with the new text at the end
-    (the same place the check put it). The course page itself is never changed."""
+    """The sections that have accepted text changes, with the new text where the check
+    put it (after its line, or at the end). The course page itself is never changed."""
     out = {}
     for c in state.get("text_changes") or []:
         if c["status"] == "accepted":
             base = out.get(c["section"], (state.get("sections") or {}).get(c["section"], ""))
-            out[c["section"]] = base.rstrip() + "\n" + c["text"]
+            out[c["section"]] = insert_text(base, c["text"], c.get("after"))
     return out
 
 
@@ -166,6 +166,8 @@ def panel(state: dict) -> dict:
                 "edited": bool(c.get("edited_by_teacher")),
                 "add_to_course": c.get("add_to_course") or [], "section": c["section"],
                 "section_text": (state.get("sections") or {}).get(c["section"], ""),
+                # the section around the new text, to show it in place
+                "around": split_at((state.get("sections") or {}).get(c["section"], ""), c.get("after")),
                 "definition": c.get("definition", ""),
                 "text": c["text"], "verified": c["verified"], "reason": c.get("reason", ""),
                 "status": c["status"]}
@@ -183,28 +185,25 @@ def panel(state: dict) -> dict:
 CHIPS = {
     "pt": {"keep_all": "Manter todas as sugeridas",
            "why": "Porquê a número {n}?",
-           "topic": "Há alguma coisa sobre {topic}?",
-           "anything": "Há alguma coisa sobre ",
+           "anything": "Procurar outro tema na ESCO: ",
            "jobs": "Que ocupações estão relacionadas com esta lista?",
            "gap": "O que falta para {occupation}?",
            "text": "Sugere texto para cobrir «{skill}»",
+           "teach": "Sugere uma alteração para a UC passar a ensinar «{skill}»",
            "accept_change": "Aceito a alteração {n}",
            "reword_change": "Quero reescrever a alteração {n}: "},
     "en": {"keep_all": "Keep all the suggested ones",
            "why": "Why number {n}?",
-           "topic": "Is there anything on {topic}?",
-           "anything": "Is there anything on ",
+           "anything": "Search ESCO for another topic: ",
            "jobs": "Which occupations does this list relate to?",
            "gap": "What is missing for {occupation}?",
            "text": "Suggest text to cover \"{skill}\"",
+           "teach": "Suggest a change so the course starts teaching \"{skill}\"",
            "accept_change": "I accept text change {n}",
            "reword_change": "I want to reword text change {n}: "},
 }
 MAX_CHIPS = 5
 
-
-GENERIC_START = ("understand ", "implement ", "design ", "apply ", "analyse ", "analyze ",
-                 "develop ", "use ", "learn ")
 
 
 def suggestions(state: dict, language: str, asked: set[str] | None = None) -> list[dict]:
@@ -224,13 +223,25 @@ def suggestions(state: dict, language: str, asked: set[str] | None = None) -> li
                 and all(x["text"] != text for x in out)):
             out.append({"key": key, "text": text, "send": send})
 
-    # a text change waiting for a decision comes first (a failed one can't be accepted as is)
+    changed = {ch["skill_id"] for ch in state.get("text_changes") or []}
+    # a text change waiting for a decision comes first (a failed one can't be accepted as is;
+    # if it only described what the course already does, the way on is to teach the skill)
     for n, ch in enumerate(state.get("text_changes") or [], 1):
         if ch["status"] in ("proposed", "failed"):
             if ch["status"] == "proposed":
                 add("accept_change", c["accept_change"].format(n=n))
+            elif ch.get("mode", "show") == "show" and ch.get("label"):
+                add("teach", c["teach"].format(skill=ch["label"]))
             add("reword_change", c["reword_change"].format(n=n), send=False)
             break
+    # the latest search found ESCO skills the text doesn't show: offer text for the first
+    searches = [e["topic"] for e in state.get("events") or [] if e.get("type") == "search"]
+    if searches:
+        origin = f"search '{searches[-1]}'"
+        for skill in (state.get("offered") or {}).values():
+            if skill.get("origin") == origin and skill["id"] not in changed:
+                add("text", c["text"].format(skill=skill["label"]))
+                break
     pending = [n for n, k in enumerate(known, 1) if k["status"] == "pending"]
     accepted = [k for k in known if k["status"] == "accepted"]
     for n in pending:                          # the first undecided one not asked about yet
@@ -245,22 +256,12 @@ def suggestions(state: dict, language: str, asked: set[str] | None = None) -> li
     if occupations:
         add("gap", c["gap"].format(occupation=occupations[0]["label"]))
     # a skill an occupation needs that the text doesn't show: offer a text change
-    changed = {ch["skill_id"] for ch in state.get("text_changes") or []}
     for skill in (state.get("offered") or {}).values():
         if skill["origin"].startswith("required by") and skill["id"] not in changed:
             add("text", c["text"].format(skill=skill["label"]))
             break
-    # first-turn search phrases that led to no suggestion and haven't been searched
-    # since; specific ones ("manage dynamic memory") before generic ones
-    found_by = {k["origin"] for k in known}
-    searched = {e["topic"].lower() for e in state.get("events") or [] if e.get("type") == "search"}
-    topics = [q for q in state.get("queries") or []
-              if f"search '{q}'" not in found_by and q.lower() not in searched]
-    topics.sort(key=lambda q: q.lower().startswith(GENERIC_START))
-    for q in topics:
-        if c["topic"].format(topic=q).lower() not in asked:
-            add("topic", c["topic"].format(topic=q))
-            break
+    # an open search, finished by the teacher. (The first turn's own search phrases are
+    # not offered: they are the model's wording, and read as odd questions.)
     add("anything", c["anything"], send=False)
     return out
 

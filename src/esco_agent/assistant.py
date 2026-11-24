@@ -226,9 +226,15 @@ name the section and the target skill. Never present suggested text as part of t
 current course.
 - If the check FAILED, do not present or quote the failed draft. Say it did not pass, \
 then explain, from the result's reason and the skill's ESCO definition, what the \
-course (or its page) would need to cover for this skill. Ask whether the teacher \
-wants that: then draft again in mode "teach" covering it. They can also drop the \
-skill, or write their own wording, which will be checked.
+course (or its page) would need to cover for this skill. If the draft only described \
+what the course already does, say plainly that the course does not teach that yet, so \
+describing it better cannot be enough, and ask whether they want a change to the \
+course that teaches it: if yes, draft again in mode "teach", covering what was missing. \
+They can also drop the skill, or write their own wording, which will be checked.
+- "show", "teach" and "mode" are internal words: never use them with the teacher. Say \
+"text that describes what the course already does" or "a change so the course starts \
+teaching it".
+- If a suggest_text_change result has a note, do what it says.
 - When the teacher accepts, rejects or rewords a suggested text, call decide_text_change. \
 If its result lists also_supported, say in one line that the accepted text also \
 supports those skills, now suggested with their numbers, for the teacher to decide.
@@ -256,6 +262,25 @@ TEXT = {
 }
 
 
+def split_at(section_text: str, after: str | None) -> tuple[str, str]:
+    """Where new text goes in a section: (lines up to and including the line `after`,
+    the rest). `after` is matched as a whole line, ignoring case and spacing; when it
+    is missing or not found, the new text goes at the end. The course text itself is
+    never changed: this only places a suggested addition, for the check and the view."""
+    lines = section_text.rstrip().split("\n")
+    key = " ".join((after or "").split()).casefold()
+    if key:
+        for i, line in enumerate(lines):
+            if " ".join(line.split()).casefold() == key:
+                return "\n".join(lines[:i + 1]), "\n".join(lines[i + 1:])
+    return "\n".join(lines), ""
+
+
+def insert_text(section_text: str, text: str, after: str | None = None) -> str:
+    head, tail = split_at(section_text, after)
+    return "\n".join(x for x in (head, text, tail) if x)
+
+
 SHOW_PROMPT = """A teacher's course already develops a particular skill, but the \
 course page does not show it.
 
@@ -274,9 +299,16 @@ invent content, and do not promise more than the course does: if the course does
 really do what the definition requires, say less, even if the skill is then not shown.
 - Match the page's style and language, and be concrete about what students do or \
 learn. Do not simply restate the skill's name.
-- Choose the section to add to from: {sections}.{feedback}
+- Match the form of the section you add to: if it is a list of numbered topics or \
+items (e.g. "THEME III. ..."), write the addition as the next item in the same form \
+and numbering, with a short description after its title; otherwise one or two \
+sentences.
+- Choose the section to add to from: {sections}. In "after", copy word for word the \
+line of that section after which your text fits best (e.g. the last item of the list \
+it belongs to, not a bibliography or a heading that starts another part); "" for the \
+end of the section.{feedback}
 
-Reply with JSON only: {{"section": "...", "text": "..."}}"""
+Reply with JSON only: {{"section": "...", "after": "...", "text": "..."}}"""
 
 TEACH_PROMPT = """A teacher wants their course to START developing a skill that it \
 does not develop at present.
@@ -295,10 +327,14 @@ would need to add so that students develop this skill as defined above. Stay clo
 the course's subject and level, and build on what it already teaches where you can.
 - "text": one or two sentences for the page describing that new content, in the \
 page's style and language. Be concrete about what students learn or do; do not simply \
-restate the skill's name.
-- "section": where the sentences go, from: {sections}.{feedback}
+restate the skill's name. If the section is a list of numbered topics or items (e.g. \
+"THEME III. ..."), write it as the next item in the same form and numbering, with a \
+short description after its title.
+- "section": where the sentences go, from: {sections}.
+- "after": copy word for word the line of that section after which the text fits best \
+(e.g. the last item of the list it belongs to); "" for the end of the section.{feedback}
 
-Reply with JSON only: {{"add_to_course": ["...", "..."], "section": "...", "text": "..."}}"""
+Reply with JSON only: {{"add_to_course": ["...", "..."], "section": "...", "after": "...", "text": "..."}}"""
 
 WHY_PROMPT = """A checker read this course text and decided that it does not show the \
 skill below.
@@ -676,12 +712,12 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         by_name = {k.casefold(): k for k in sections}
         return by_name.get(name.strip().casefold()) if isinstance(name, str) else None
 
-    async def _verify(sections: Sections, skill: dict, section: str, text: str
-                      ) -> tuple[bool, str]:
+    async def _verify(sections: Sections, skill: dict, section: str, text: str,
+                      after: str | None = None) -> tuple[bool, str]:
         """Add the text to its section and ask the judge about the skill again.
         Passes only if the skill is found and the new text is among the evidence.
         On failure, also asks the judge for the reason, in one sentence."""
-        revised = {**sections, section: sections[section].rstrip() + "\n" + text}
+        revised = {**sections, section: insert_text(sections[section], text, after)}
         new = set(split_sentences(text))
         result = await suggest_skills([skill], judge_llm, revised)
         if any(e["text"] in new for s in result["suggested"] for e in s["evidence"]):
@@ -730,47 +766,75 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
             if wanted is None:
                 raise ToolProblem(f"no section {section!r}; the sections are {list(sections)}")
 
-        prompt = SHOW_PROMPT if mode == "show" else TEACH_PROMPT
-        attempts, draft, add, verified, reason, feedback = 0, None, [], False, "", ""
-        while attempts < 2 and not verified:
-            attempts += 1
-            progress("drafting" if attempts == 1 else "redrafting", skill=target["label"])
-            reply = usage.count(await judge_llm.ainvoke([("user", prompt.format(
-                course=course_text(sections), skill=target["label"],
-                definition=target["description"] or "n/a",
-                sections=", ".join(f'"{n}"' for n in ([wanted] if wanted else sections)),
-                feedback=feedback))]))
-            try:
-                data = json.loads(reply.content)
-                sec = _section(sections, data.get("section")) or wanted or list(sections)[-1]
-                text = " ".join(str(data["text"]).split())
-                items = (data.get("add_to_course") or []) if mode == "teach" else []
-                items = [" ".join(str(x).split()) for x in items if str(x).strip()][:6]
-            except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
-                feedback = "\nYour previous reply was not valid JSON in the requested form."
-                continue
-            if not text or len(text) > MAX_CHANGE_CHARS:
-                feedback = f"\nYour previous draft was empty or over {MAX_CHANGE_CHARS} characters."
-                continue
-            if mode == "teach" and not items:
-                feedback = "\nYour previous reply had no add_to_course items."
-                continue
-            draft, add = (wanted or sec, text), items
-            progress("verifying", skill=target["label"])
-            verified, reason = await _verify(sections, target, *draft)
-            if not verified:
-                feedback = (f"\nYour previous draft was: \"{text}\". A checker found that, even "
-                            f"with it added, the course does not show the skill. Its reason: "
-                            f"{reason or 'not given'}" +
-                            ("\nDescribe only what the course already does; if it does not do "
-                             "what the skill requires, it is fine for the check to fail."
-                             if mode == "show" else
-                             "\nAddress that reason in what you propose to add and in the text."))
+        async def draft_in(mode: str, feedback: str = "") -> dict:
+            """Up to two drafts in one mode, each checked; the last one is kept."""
+            prompt = SHOW_PROMPT if mode == "show" else TEACH_PROMPT
+            attempts, draft, add, verified, reason = 0, None, [], False, ""
+            while attempts < 2 and not verified:
+                attempts += 1
+                progress("drafting" if attempts == 1 else "redrafting", skill=target["label"])
+                reply = usage.count(await judge_llm.ainvoke([("user", prompt.format(
+                    course=course_text(sections), skill=target["label"],
+                    definition=target["description"] or "n/a",
+                    sections=", ".join(f'"{n}"' for n in ([wanted] if wanted else sections)),
+                    feedback=feedback))]))
+                try:
+                    data = json.loads(reply.content)
+                    sec = _section(sections, data.get("section")) or wanted or list(sections)[-1]
+                    text = " ".join(str(data["text"]).split())
+                    after = " ".join(str(data.get("after") or "").split())
+                    items = (data.get("add_to_course") or []) if mode == "teach" else []
+                    items = [" ".join(str(x).split()) for x in items if str(x).strip()][:6]
+                except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
+                    feedback = "\nYour previous reply was not valid JSON in the requested form."
+                    continue
+                if not text or len(text) > MAX_CHANGE_CHARS:
+                    feedback = f"\nYour previous draft was empty or over {MAX_CHANGE_CHARS} characters."
+                    continue
+                if mode == "teach" and not items:
+                    feedback = "\nYour previous reply had no add_to_course items."
+                    continue
+                section_name = wanted or sec
+                head, _ = split_at(sections[section_name], after)
+                placed = after if after and head != sections[section_name].rstrip() else ""
+                draft, add = (section_name, text, placed), items
+                progress("verifying", skill=target["label"])
+                verified, reason = await _verify(sections, target, *draft)
+                if not verified:
+                    feedback = (f"\nYour previous draft was: \"{text}\". A checker found that, even "
+                                f"with it added, the course does not show the skill. Its reason: "
+                                f"{reason or 'not given'}" +
+                                ("\nDescribe only what the course already does; if it does not do "
+                                 "what the skill requires, it is fine for the check to fail."
+                                 if mode == "show" else
+                                 "\nAddress that reason in what you propose to add and in the text."))
+            return {"mode": mode, "draft": draft, "add": add, "verified": verified,
+                    "reason": reason, "attempts": attempts}
+
+        result = await draft_in(mode)
+        described = None
+        if mode == "show" and not result["verified"]:
+            # Describing what the course already does was not enough: the course does not
+            # cover the skill yet. What the teacher wants is the skill, so propose the change
+            # that teaches it, building on why the description failed. Logged as such.
+            described = result
+            result = await draft_in("teach", (
+                "\nA description of what the course already does was not enough. A checker's "
+                f"reason: {described['reason'] or 'not given'}\nPropose what the course would "
+                "add so that it covers what is missing."))
+        mode, draft, add = result["mode"], result["draft"], result["add"]
+        verified, reason = result["verified"], result["reason"]
+        attempts = result["attempts"] + (described["attempts"] if described else 0)
         if draft is None:
             raise ToolProblem("could not draft a text change; try again or ask the teacher "
                               "to write it")
         change = {"skill_id": target["id"], "label": target["label"], "mode": mode,
                   "add_to_course": add, "section": draft[0], "text": draft[1],
+                  "after": draft[2],                      # line it is placed after ("" = end)
+                  # the assistant first tried describing what the course does, and that
+                  # failed; this change (teach) was its own next step, not the teacher's ask
+                  "tried_description": described is not None,
+                  "description_reason": described["reason"] if described else "",
                   "verified": verified, "reason": reason, "attempts": attempts,
                   "edited_by_teacher": False,
                   "definition": target.get("description", ""),   # what ESCO requires
@@ -778,11 +842,19 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         w["text_changes"].append(change)
         n = len(w["text_changes"])
         event = {"t": _now(), "type": "text_change_proposed", "change": n, "mode": mode,
-                 "skill": target["id"], "verified": verified, "attempts": attempts}
+                 "skill": target["id"], "verified": verified, "attempts": attempts,
+                 "tried_description": described is not None}
         out = {"change": n, "mode": mode, "target_skill": target["label"]}
+        if described is not None:
+            out["note"] = ("A description of what the course already does could not show this "
+                           "skill, because: " + (described["reason"] or "not given") + ". So this "
+                           "is a change for the course to start teaching it. Tell the teacher "
+                           "that in one sentence, in plain words, before presenting it.")
         if mode == "teach":
             out["add_to_course"] = add
-        out.update({"add_to_section": draft[0], "check_passed": verified,
+        out.update({"add_to_section": draft[0],
+                    "placed": f"after the line \"{draft[2]}\"" if draft[2] else "at the end",
+                    "check_passed": verified,
                     "status": change["status"]})
         if verified:
             out["suggested_text"] = draft[1]
@@ -844,7 +916,7 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
                 raise ToolProblem(f"the text is over {MAX_CHANGE_CHARS} characters")
             if text != c["text"]:
                 progress("verifying", skill=c["label"])
-                ok, why = await _verify(w["sections"], skill, c["section"], text)
+                ok, why = await _verify(w["sections"], skill, c["section"], text, c.get("after"))
                 c.update(text=text, edited_by_teacher=True, verified=ok, reason=why)
         c["status"] = "accepted" if decision == "accept" else "rejected"
         events = [{"t": _now(), "type": f"text_change_{c['status']}", "change": change,

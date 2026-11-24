@@ -234,7 +234,7 @@
   .change .ba[open] > summary::before { transform: rotate(90deg); }
   .change .ba > summary:hover { text-decoration: underline; text-decoration-color: var(--lime); }
   .change .h2 { margin: 8px 0 2px; color: var(--grey-3); font-size: 12.5px; }
-  .change .sec { white-space: pre-wrap; max-height: 220px; overflow-y: auto; background: var(--bg);
+  .change .sec { position: relative; white-space: pre-wrap; max-height: 300px; overflow-y: auto; background: var(--bg);
                  border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 13px; }
   .change .sec mark { background: var(--lime-soft); color: var(--text); border-bottom: 2px solid var(--lime); padding: 0 1px; }
   .change .check.ok::before { content: "✓ "; color: var(--lime); font-weight: 800; }
@@ -513,19 +513,19 @@ const T = {
     kindShow: "texto da página", kindTeach: "alteração à UC", toAdd: "Acrescentar à unidade curricular:",
     failedBecause: "Porque falhou:",
     chStatus: { proposed: "Por decidir", accepted: "Aceite", rejected: "Rejeitada", failed: "Falhou a verificação" },
-    chSkill: "Competência", chWhere: "Onde", chWhereText: sec => `acrescentar no fim da secção “${sec}”`,
+    chSkill: "Competência", chWhere: "Onde", chWhereText: (sec, after) => after ? `secção “${sec}”, depois de “${after}”` : `acrescentar no fim da secção “${sec}”`,
     chProposedText: "Texto proposto", chAcceptedText: "Texto aceite", chEdited: "(com as suas palavras)",
     chCheckOk: "Verificação: com este texto, a competência passa a ser reconhecida no texto da UC.",
     chCheckFail: "Verificação: mesmo com este texto, a competência não é reconhecida.",
     chDone: {
       proposed: "Ainda não decidiu. Diga no chat se aceita, quer editar ou rejeita.",
       failed: "Não passou a verificação: com este texto, a competência não fica demonstrada. Veja abaixo o que faltaria. No chat, pode pedir uma nova proposta que o cubra, ou escrever o texto com as suas palavras.",
-      accepted: n => n ? `Aceite. A competência ${n} está na sua lista. A página não foi alterada: copie o texto no fim.` : "Aceite. A página não foi alterada: copie o texto no fim.",
+      accepted: n => n ? `Aceite. A competência ${n} está na sua lista. A página não foi alterada: copie o texto destacado para lá.` : "Aceite. A página não foi alterada: copie o texto destacado para lá.",
       rejected: "Rejeitada: nada foi alterado.",
     },
     modeShow: "Mostrar o que já ensina", modeTeach: "Ensinar algo novo",
     chMissing: "O que faltaria", chEsco: "O que a ESCO exige", chFailedDraft: "Ver o rascunho que não passou",
-    baShow: "Ver antes e depois", baBefore: "Antes", baAfter: "Depois (o texto novo está destacado)",
+    inSection: sec => `Na secção «${sec}», com o texto novo destacado:`,
     resultSections: "Secções com as alterações aceites (para colar na página)",
     whyRemove: "Porquê?", removedBecause: "Removida:",
     reasonHelp: { not_in_text: "O texto não diz realmente isto. A sugestão estava errada.",
@@ -590,19 +590,19 @@ const T = {
     kindShow: "page text", kindTeach: "course change", toAdd: "Add to the course:",
     failedBecause: "Why it failed:",
     chStatus: { proposed: "To decide", accepted: "Accepted", rejected: "Rejected", failed: "Failed the check" },
-    chSkill: "Skill", chWhere: "Where", chWhereText: sec => `add at the end of the “${sec}” section`,
+    chSkill: "Skill", chWhere: "Where", chWhereText: (sec, after) => after ? `“${sec}” section, after “${after}”` : `add at the end of the “${sec}” section`,
     chProposedText: "Proposed text", chAcceptedText: "Accepted text", chEdited: "(in your words)",
     chCheckOk: "Check: with this text, the skill is recognised in the course text.",
     chCheckFail: "Check: even with this text, the skill is not recognised.",
     chDone: {
       proposed: "Not decided yet. Say in the chat whether you accept, want to edit or reject it.",
       failed: "Did not pass the check: with this text, the skill is not shown. See below what would be missing. In the chat, you can ask for a new proposal that covers it, or write the text in your own words.",
-      accepted: n => n ? `Accepted. Skill ${n} is on your list. The page was not changed: copy the text at the end.` : "Accepted. The page was not changed: copy the text at the end.",
+      accepted: n => n ? `Accepted. Skill ${n} is on your list. The page was not changed: copy the highlighted text into it.` : "Accepted. The page was not changed: copy the highlighted text into it.",
       rejected: "Rejected: nothing was changed.",
     },
     modeShow: "Show what it already teaches", modeTeach: "Teach something new",
     chMissing: "What would be missing", chEsco: "What ESCO requires", chFailedDraft: "See the draft that did not pass",
-    baShow: "See before and after", baBefore: "Before", baAfter: "After (the new text is highlighted)",
+    inSection: sec => `In the “${sec}” section, with the new text highlighted:`,
     resultSections: "Sections with the accepted changes (to paste into the page)",
     whyRemove: "Why?", removedBecause: "Removed:",
     reasonHelp: { not_in_text: "The text doesn't really say this. The suggestion was wrong.",
@@ -1054,11 +1054,12 @@ function changeCard(c, open) {
   const done = c.status === "accepted" ? s.chDone.accepted(skillNo) : s.chDone[c.status] || "";
   const draftHtml = `${c.add_to_course.length ? `<p class="h">${s.toAdd}</p><ul>${c.add_to_course.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
       <p class="h">${c.status === "accepted" ? s.chAcceptedText : s.chProposedText} ${c.edited ? s.chEdited : ""}</p>
-      <div class="txt">${esc(c.text)}</div>
-      ${c.section_text ? `<details class="ba"><summary>${s.baShow}</summary>
-        <p class="h2">${s.baBefore} · ${esc(c.section)}</p><div class="sec">${esc(c.section_text)}</div>
-        <p class="h2">${s.baAfter}</p><div class="sec">${esc(c.section_text.trimEnd())}\n<mark>${esc(c.text)}</mark></div>
-      </details>` : ""}`;
+      ${c.section_text
+        // the section as it would read, the new text highlighted where it goes
+        ? `<p class="h2">${esc(s.inSection(c.section))}</p>
+           <div class="sec">${c.around[0] ? esc(c.around[0]) + "\n" : ""}<mark>${esc(c.text)}</mark>${
+             c.around[1] ? "\n" + esc(c.around[1]) : ""}</div>`
+        : `<div class="txt">${esc(c.text)}</div>`}`;
   // a failed draft leads with what is missing; the draft itself only on request
   const draft = c.status === "failed"
     ? `${c.reason ? `<p class="h">${s.chMissing}</p><p class="why">${esc(c.reason)}</p>` : ""}
@@ -1075,7 +1076,7 @@ function changeCard(c, open) {
       <p class="what">${esc(done)}</p>
       <dl>
         <dt>${s.chSkill}</dt><dd>${skillNo ? `<button class="ref" data-n="${skillNo}">${skillNo}. ${esc(c.label)}</button>` : esc(c.label)}</dd>
-        <dt>${s.chWhere}</dt><dd>${esc(s.chWhereText(c.section))}</dd>
+        <dt>${s.chWhere}</dt><dd>${esc(s.chWhereText(c.section, c.around && c.around[1] ? c.around[0].split("\n").pop() : ""))}</dd>
       </dl>
       ${draft}
     </div></details>`;
@@ -1134,6 +1135,11 @@ function renderPanel() {
     occs.map(o => occCard(o, openOcc.has(String(o.rank)) || gapNew.includes(String(o.rank)))).join("");
   if (rej.length) h += `<details class="removed-group" ${rejOpen ? "open" : ""}><summary>${t().rejected} (${rej.length})</summary>${rej.map(s => skillCard(s, false)).join("")}</details>`;
   p.innerHTML = h;
+  // a long section: scroll its box to the new text
+  p.querySelectorAll(".change .sec mark").forEach(m => {
+    const box = m.closest(".sec");
+    box.scrollTop = Math.max(0, m.offsetTop - 60);
+  });
 
   // highlight what is new, and bring the first new thing into view
   const fresh = [

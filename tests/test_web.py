@@ -207,7 +207,7 @@ def test_suggested_messages_follow_the_conversation():
     state = {"queries": ["use pointers", "x"], "known": [k("a", "pending"), k("b", "pending")]}
     texts = [c["text"] for c in suggestions(state, "pt")]
     assert texts == ["Porquê a número 1?", "Manter todas as sugeridas",
-                     "Há alguma coisa sobre use pointers?", "Há alguma coisa sobre "]
+                     "Procurar outro tema na ESCO: "]   # the model's own search phrases: not offered
 
     state["known"] = [k("a", "accepted"), k("b", "rejected")]
     assert [c["key"] for c in suggestions(state, "pt")][0] == "jobs"
@@ -270,29 +270,38 @@ def test_reply_tokens_are_streamed_from_the_conversation_model_only(tmp_path):
 
 
 
-def test_suggestions_are_not_repeated_and_prefer_specific_topics():
+def test_suggestions_are_not_repeated_and_follow_searches_and_failed_drafts():
     from esco_agent.web.app import suggestions
 
-    state = {"queries": ["understand C programmes", "manage dynamic memory"],
+    state = {"queries": ["x"],
              "known": [{"id": "a", "label": "a", "status": "pending", "origin": "x"},
                        {"id": "b", "label": "b", "status": "pending", "origin": "x"}],
              "events": []}
     texts = [c["text"] for c in suggestions(state, "pt")]
     assert "Porquê a número 1?" in texts
-    assert "Há alguma coisa sobre manage dynamic memory?" in texts      # specific first
-
-    asked = {"porquê a número 1?", "há alguma coisa sobre manage dynamic memory?"}
-    texts = [c["text"] for c in suggestions(state, "pt", asked)]
+    texts = [c["text"] for c in suggestions(state, "pt", {"porquê a número 1?"})]
     assert "Porquê a número 2?" in texts and "Porquê a número 1?" not in texts
-    assert "Há alguma coisa sobre understand C programmes?" in texts
 
-    state["events"] = [{"type": "search", "topic": "Understand C programmes"}]
-    texts = [c["text"] for c in suggestions(state, "pt", asked)]
-    assert not any("understand C" in x for x in texts)                  # already searched
+    # the latest search found skills the text doesn't show: offer text for the first
+    state["events"] = [{"type": "search", "topic": "old"}, {"type": "search", "topic": "manipulate DNA"}]
+    state["offered"] = {
+        "o": {"id": "o", "label": "older one", "origin": "search 'old'"},
+        "g": {"id": "g", "label": "genetic engineering", "origin": "search 'manipulate DNA'"}}
+    texts = [c["text"] for c in suggestions(state, "pt")]
+    assert "Sugere texto para cobrir «genetic engineering»" in texts
+    assert not any("older one" in x for x in texts)
 
-    state["text_changes"] = [{"skill_id": "z", "status": "failed"}]
-    keys = [c["key"] for c in suggestions(state, "en")]
-    assert keys[0] == "reword_change" and "accept_change" not in keys
+    # a draft that only described the course failed: offer to teach the skill instead
+    state["text_changes"] = [{"skill_id": "g", "label": "genetic engineering",
+                              "status": "failed", "mode": "show"}]
+    chips = suggestions(state, "pt")
+    assert [c["key"] for c in chips][:2] == ["teach", "reword_change"]
+    assert chips[0]["text"] == "Sugere uma alteração para a UC passar a ensinar «genetic engineering»"
+    assert "accept_change" not in [c["key"] for c in chips]
+    assert not any(c["key"] == "text" for c in chips)     # that skill already has a change
+    state["text_changes"][0]["mode"] = "teach"            # a failed teaching draft: reword only
+    assert [c["key"] for c in suggestions(state, "en")][0] == "reword_change"
+
 
 
 def test_decisions_from_the_finish_check_are_marked(tmp_path):
@@ -387,6 +396,17 @@ def test_a_whole_page_is_split_by_its_headings():
     assert kept["Contents"].startswith("The C Programming course")
     assert dropped == ["requisites", "assessment", "teaching methods", "bibliography"]
     assert split_page("Students write C programs.\nThey use make.") is None
+    # a qualified heading of a left-out section ends the section above it (20 Nov genetics
+    # page: the bibliography had been judged and drafted against as part of Contents)
+    kept, dropped = split_page("Objectives\nTo manipulate DNA.\nContents\nTHEME I. PCR\n"
+                               "TOPIC V. Mutagenesis - Ames Test\nAbbreviated bibliography\n"
+                               "Palladino, M.A. (2015) Concepts of Genetics. Pearson")
+    assert kept["Contents"] == "THEME I. PCR\nTOPIC V. Mutagenesis - Ames Test"
+    assert dropped == ["bibliography"]
+    # but a long line ending in such a word is text, not a heading
+    kept, _ = split_page("Objectives\nStudents learn to read the scientific bibliography\n"
+                         "Contents\nPCR")
+    assert "scientific bibliography" in kept["Objectives"]
 
     c, sessions = client(tmp_path := __import__("pathlib").Path(__import__("tempfile").mkdtemp()))
     sid = c.post("/api/session", json={"email": "a@b.pt", "language": "pt", "course_name": "Programação",
@@ -465,3 +485,14 @@ def test_familiarity_is_optional_for_the_api():
     """The page requires it; the API accepts older clients and stores nothing."""
     from esco_agent.web.app import FAMILIARITY
     assert FAMILIARITY == ("none", "low", "medium", "high")
+
+
+def test_accepted_text_is_shown_and_kept_where_it_was_placed():
+    from esco_agent.web.app import panel, sections_after
+    state = {"sections": {"Contents": "THEME I. PCR\nTOPIC V. Ames\nnotes"}, "known": [],
+             "text_changes": [{"skill_id": "g", "label": "genetic engineering", "mode": "teach",
+                               "section": "Contents", "after": "TOPIC V. Ames",
+                               "text": "TOPIC VI. Cloning", "verified": True, "status": "accepted"}]}
+    assert panel(state)["text_changes"][0]["around"] == ("THEME I. PCR\nTOPIC V. Ames", "notes")
+    assert sections_after(state)["Contents"] == "THEME I. PCR\nTOPIC V. Ames\nTOPIC VI. Cloning\nnotes"
+    assert state["sections"]["Contents"] == "THEME I. PCR\nTOPIC V. Ames\nnotes"   # original kept
