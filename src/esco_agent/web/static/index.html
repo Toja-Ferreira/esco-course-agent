@@ -350,7 +350,13 @@
   body.embed { --bar: 116px; }
   body.embed .card { padding: 36px 40px; }
   body.embed .card h1 { font-size: 30px; }
-  body.embed #expected { height: 150px; }
+  #expected-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  #expected-list .row { display: flex; gap: 6px; align-items: center; justify-content: flex-start; margin: 0; }
+  #expected-list .row .num { width: 22px; text-align: right; color: var(--grey-3); font-size: 13px; }
+  #expected-list .row input { flex: 1; margin: 0; }
+  #expected-list .row button { background: none; border: 0; color: var(--grey-3); cursor: pointer;
+    font-size: 18px; line-height: 1; padding: 4px 6px; border-radius: 4px; }
+  #expected-list .row button:hover { color: var(--text); background: var(--line); }
   body.embed .card .lead, body.embed .how { font-size: 17px; }
   body.embed label.field, body.embed fieldset.choice legend, body.embed fieldset.choice label { font-size: 17px; }
   body.embed .hint, body.embed .privacy { font-size: 14.5px; }
@@ -434,7 +440,8 @@
     <input type="text" id="uc-name" maxlength="150" autocomplete="off">
     <label class="field" for="expected"><span id="t-expected"></span>
       <div class="hint" id="t-expected-hint"></div></label>
-    <textarea id="expected" rows="9"></textarea>
+    <div id="expected-list"></div>
+    <button type="button" class="btn small outline" id="expected-add"></button>
     <div class="row">
       <div class="privacy" id="t-privacy"></div>
       <button class="btn" id="start" disabled></button>
@@ -496,7 +503,8 @@ const T = {
     escoLevel: "Qual é a sua familiaridade com a ESCO?", escoLow: "Baixa", escoMedium: "Média", escoHigh: "Alta",
     ucName: "Nome da unidade curricular", ucNamePh: "Ex.: Programação em C",
     expected: "Que competências desenvolve esta unidade curricular?",
-    expectedHint: "Pelas suas palavras, uma por linha. Escreva antes de ver qualquer sugestão (cerca de 10 minutos). O assistente não vê esta lista.",
+    expectedHint: "Pelas suas palavras, uma competência por campo. Escreva antes de ver qualquer sugestão (cerca de 10 minutos). O assistente não vê esta lista.",
+    expectedAdd: "+ Adicionar competência", expectedPh: "ex.: programar em C", expectedRemove: "Remover",
     privacy: "A conversa e a forma como usa a ferramenta são registadas, para o estudo. O email não é guardado: apenas um código derivado dele, para ligar as suas sessões.",
     start: "Continuar", send: "Enviar", finish: "Terminar",
     placeholder: "Escreva aqui…",
@@ -576,7 +584,8 @@ const T = {
     escoLevel: "How familiar are you with ESCO?", escoLow: "Low", escoMedium: "Medium", escoHigh: "High",
     ucName: "Course name", ucNamePh: "E.g. C Programming",
     expected: "Which skills does this course develop?",
-    expectedHint: "In your own words, one per line. Write them before you see any suggestion (about 10 minutes). The assistant does not see this list.",
+    expectedHint: "In your own words, one skill per field. Write them before you see any suggestion (about 10 minutes). The assistant does not see this list.",
+    expectedAdd: "+ Add a skill", expectedPh: "e.g. programming in C", expectedRemove: "Remove",
     privacy: "Your conversation and how you use the tool are recorded, for the study. Your email is not stored: only a code derived from it, to link your sessions.",
     start: "Continue", send: "Send", finish: "Finish",
     placeholder: "Write here…",
@@ -771,6 +780,9 @@ function applyLang() {
   $("t-s1-steps").innerHTML = s.s1Steps.map(x => `<li>${x}</li>`).join("");   // fixed text, not user input
   $("t-email").textContent = s.email; $("t-uc-name").textContent = s.ucName;
   for (const k of ["Used", "No", "Yes", "Level", "Low", "Medium", "High"]) $(`t-esco-${k.toLowerCase()}`).textContent = s[`esco${k}`]; $("uc-name").placeholder = s.ucNamePh; $("t-expected").textContent = s.expected; $("t-expected-hint").textContent = s.expectedHint;
+  $("expected-add").textContent = s.expectedAdd;
+  document.querySelectorAll("#expected-list input").forEach(i => i.placeholder = s.expectedPh);
+  document.querySelectorAll("#expected-list .row button").forEach(b => b.title = b.ariaLabel = s.expectedRemove);
   $("t-privacy").textContent = s.privacy; $("start").textContent = s.start;
   $("send").setAttribute("aria-label", s.send); $("send").title = s.send;
   $("finish").textContent = s.finish; $("help").textContent = s.help; $("box").placeholder = s.placeholder;
@@ -786,6 +798,41 @@ function applyLang() {
 $("langs").addEventListener("click", e => { if (e.target.dataset.lang && !session) { lang = e.target.dataset.lang; applyLang(); } });
 
 // --- 1. before you start ---
+// The skills the teacher expects, one per field (a free-text box gave run-together text).
+// Plain words, no ESCO search: the list must be theirs, before they see any suggestion.
+const MAX_EXPECTED = 25;
+function expectedItems() {
+  return [...document.querySelectorAll("#expected-list input")]
+    .map(i => i.value.trim().replace(/\s+/g, " ")).filter(v => v.length >= 3);
+}
+function renumberExpected() {
+  document.querySelectorAll("#expected-list .row").forEach((r, i) => r.querySelector(".num").textContent = `${i + 1}.`);
+  $("expected-add").disabled = document.querySelectorAll("#expected-list .row").length >= MAX_EXPECTED;
+}
+function addExpected(focus = true) {
+  const list = $("expected-list");
+  if (list.children.length >= MAX_EXPECTED) return;
+  const row = document.createElement("div"); row.className = "row";
+  row.innerHTML = `<span class="num"></span><input type="text" maxlength="200" placeholder="${esc(t().expectedPh)}">
+    <button type="button" title="${esc(t().expectedRemove)}" aria-label="${esc(t().expectedRemove)}">×</button>`;
+  const input = row.querySelector("input");
+  input.addEventListener("input", canStart);
+  input.addEventListener("keydown", e => {           // Enter: next field (a new one at the end)
+    if (e.key !== "Enter" || e.isComposing) return;
+    e.preventDefault();
+    const next = row.nextElementSibling?.querySelector("input");
+    if (next) next.focus(); else if (input.value.trim()) addExpected();
+  });
+  row.querySelector("button").addEventListener("click", () => {
+    if (list.children.length > 1) row.remove(); else input.value = "";
+    renumberExpected(); canStart();
+  });
+  list.appendChild(row); renumberExpected();
+  if (focus) input.focus();
+}
+$("expected-add").addEventListener("click", () => addExpected());
+for (let i = 0; i < 3; i++) addExpected(false);
+
 // "Have you used ESCO before?" -> none, or low / medium / high
 function familiarity() {
   const used = document.querySelector('input[name="esco-used"]:checked')?.value;
@@ -800,13 +847,13 @@ document.querySelectorAll('input[name="esco-used"], input[name="esco-level"]').f
   }));
 function canStart() {
   const emailOk = me.logged_in || $("email").value.includes("@");
-  $("start").disabled = !(emailOk && familiarity() && $("uc-name").value.trim() && $("expected").value.trim().length >= 5);
+  $("start").disabled = !(emailOk && familiarity() && $("uc-name").value.trim() && expectedItems().length >= 1);
 }
-["email", "uc-name", "expected"].forEach(id => $(id).addEventListener("input", canStart));
+["email", "uc-name"].forEach(id => $(id).addEventListener("input", canStart));
 $("start").addEventListener("click", async () => {
   $("start").disabled = true;
   try {
-    const r = await api("api/session", { email: $("email").value, language: lang, expected: $("expected").value,
+    const r = await api("api/session", { email: $("email").value, language: lang, expected: expectedItems().join("\n"),
                                          course_name: $("uc-name").value, esco_familiarity: familiarity() });
     session = r.session; stage = r.stage; remember(session);
     if (r.course_name) $("course-name").textContent = r.course_name;

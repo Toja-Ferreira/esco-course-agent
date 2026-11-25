@@ -480,6 +480,7 @@ def test_session_file_records_familiarity_version_usage_and_opened_cards(tmp_pat
     assert c.post("/api/ui", json={"session": sid, "event": "open", "kind": "script"}).status_code == 400
     data = saved(sessions, sid)
     assert data["esco_familiarity"] == "medium"
+    assert data["expected_skills_list"] == ["programar em C"]     # one per field
     assert data["ui"] == [{**data["ui"][0], "event": "open", "kind": "skill", "number": 1}]
     assert data["agent"]["skills"]            # saving the card event kept the agent's state
     assert len(data["app_version"]["code"]) == 12

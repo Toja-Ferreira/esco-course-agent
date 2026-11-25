@@ -367,6 +367,8 @@ class Sessions:
             "language": s["language"], "course_name": s["course_name"],
             "started": s["created"], "finished": s.get("finished"),
             "expected_skills_before": s["expected"],
+            # one per field on the start screen (one per line, for older sessions)
+            "expected_skills_list": [ln.strip() for ln in s["expected"].splitlines() if ln.strip()],
             "model": served or self.model,
             "app_version": VERSION,           # commit + hash of the code that ran
             "esco_familiarity": s.get("esco_familiarity"),   # none / low / medium / high
