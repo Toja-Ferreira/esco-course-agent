@@ -1,0 +1,550 @@
+{
+ "course": "tourism-economics",
+ "tool": "ESCO Open Access Mapping 1.3.0",
+ "url": "https://ec.europa.eu/esco/open-access-mapping/en/linking-tool",
+ "settings": {
+  "language": "en",
+  "top_k": 15,
+  "split": "tool default",
+  "noise": "tool default"
+ },
+ "kept": "top 5 per line (of 15)",
+ "run": "2026-11-25",
+ "lines": [
+  {
+   "line": "Learning outcomes",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Introdução à Economia do Turismo aims at offering the students their first contact with the basic concepts of the economics of tourism. More specifically , the purpose of this course is to apply basic microeconomics and macroeconomics concepts to tourism.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "economics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "macro-economics",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "microeconomics",
+     "type": "knowledge"
+    },
+    {
+     "label": "economics",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "It is intended to provide students with basic competences that makes them more qualified to deal professionally with the new challenges and demands that tourism sector faces.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "teach tourism practices",
+     "type": "skill/competence"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "provide training in sustainable tourism development and management",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "By the end of this course, the students should be able to:",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "• Understand various concepts relevant in the context of tourism.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "explain tourism principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "provide information related to tourism",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Apply the key concepts and techniques of economics to the analysis of the tourism market.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "market of tourism",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "present facts and figures on the tourism industry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "analysis of the market",
+     "type": "knowledge"
+    },
+    {
+     "label": "economics",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "• Identifify and interpret a set of indicators related to tourism economics.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "present facts and figures on the tourism industry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "measure sustainability of tourism activities",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "gather numerical data regarding the tourist sector",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "• Recognize tourism as one of the key sectors of development in all countries and a major source of income, jobs and wealth creation.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourist resources with potential for development",
+     "type": "knowledge"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "local tourism industry",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism-related geographical areas",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Understand how tourism can contribute to the Sustainable Development Goals.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "sustainable tourism",
+     "type": "knowledge"
+    },
+    {
+     "label": "educate on sustainable tourism",
+     "type": "skill/competence"
+    },
+    {
+     "label": "examine the sustainability of tourism practices",
+     "type": "skill/competence"
+    },
+    {
+     "label": "offer instruction in sustainable tourism development and management",
+     "type": "skill/competence"
+    },
+    {
+     "label": "environmental impact of tourism",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Recognize the importance of innovation in tourism.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "tourism industry",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism product development",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourist resources for further development",
+     "type": "knowledge"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Contents",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "1. Basic principles of economic analysis",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "economics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "economic analysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "economic principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "principles of mathematical economics",
+     "type": "knowledge"
+    },
+    {
+     "label": "principles of business economics",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "2. Theoretical framework and conceptualization of tourism.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "explain tourism principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "give an account of tourism strategies",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "3. Evolution of tourism in Portugal and at international level.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "Portuguese language",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourist resources for further development",
+     "type": "knowledge"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "boost local tourism",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "4. Tourist motivations",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "explain tourism principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism market",
+     "type": "knowledge"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "foster local tourism",
+     "type": "skill/competence"
+    },
+    {
+     "label": "give an account of tourism strategies",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "5. The tourism market",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "tourism market",
+     "type": "knowledge"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "local tourism industry",
+     "type": "knowledge"
+    },
+    {
+     "label": "present facts and figures on the tourism industry",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "5.1 Economic analysis of tourism demand and supply",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "market of tourism",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "gather numerical data regarding the tourist sector",
+     "type": "skill/competence"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "present facts and figures on the tourism industry",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "5.2 The price mechanism",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "pricing tactics",
+     "type": "knowledge"
+    },
+    {
+     "label": "assemble pricing strategies",
+     "type": "skill/competence"
+    },
+    {
+     "label": "market pricing",
+     "type": "knowledge"
+    },
+    {
+     "label": "pricing products",
+     "type": "skill/competence"
+    },
+    {
+     "label": "discuss prices",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "5.3 Market structures",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "vertical market principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "analysis of the market",
+     "type": "knowledge"
+    },
+    {
+     "label": "market analysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "market entry strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "market entry scheme",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "5.4 Governmental interventation",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "government engagement",
+     "type": "knowledge"
+    },
+    {
+     "label": "government position",
+     "type": "knowledge"
+    },
+    {
+     "label": "government administration",
+     "type": "knowledge"
+    },
+    {
+     "label": "government policy direction",
+     "type": "knowledge"
+    },
+    {
+     "label": "government policy compliance",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "6. Tourism Satellite Account.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector protocols",
+     "type": "knowledge"
+    },
+    {
+     "label": "automated tourism services",
+     "type": "knowledge"
+    },
+    {
+     "label": "purposes of different satellites",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "7. The economic impact of tourism.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "tourism industry",
+     "type": "knowledge"
+    },
+    {
+     "label": "environment and its impact on tourism",
+     "type": "knowledge"
+    },
+    {
+     "label": "travel, tourism and leisure",
+     "type": "skill/competence"
+    },
+    {
+     "label": "present facts and figures on the tourism industry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector policies",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "8. Other topics of tourism economics- sustainability and innovation in tourism.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "examine the sustainability of tourism practices",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tourism sector",
+     "type": "knowledge"
+    },
+    {
+     "label": "sustainable tourism",
+     "type": "knowledge"
+    },
+    {
+     "label": "tourism sector strategies",
+     "type": "knowledge"
+    },
+    {
+     "label": "offer instruction in sustainable tourism development and management",
+     "type": "skill/competence"
+    }
+   ]
+  }
+ ]
+}

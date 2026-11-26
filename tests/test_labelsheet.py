@@ -81,3 +81,17 @@ def test_agree_matches_rows_by_course_and_skill(tmp_path):
     assert res["lenient (wrong vs not)"]["agreement"] == 1.0
     assert res["confusion"]["right"]["borderline"] == 1
     assert [d["skill"] for d in res["disagreements"]] == ["skill 1"]
+
+
+def test_agree_compares_a_skill_on_every_line_it_appears(tmp_path):
+    """The same skill on two lines of a course is two rows to compare, not one."""
+    from esco_agent import labelsheet
+    base = [{"course": "c", "row": n, "skill": "tourism market", "skill_id": "u:tm",
+             "esco_definition": "", "evidence": line, "verdict": "", "note": "", "reuse_level": ""}
+            for n, line in ((1, "5. The tourism market"), (2, "4. Tourist motivations"))]
+    a = [{**r, "verdict": v} for r, v in zip(base, ("right", "wrong"))]
+    b = [{**r, "verdict": v} for r, v in zip(base, ("right", "borderline"))]
+    pa, pb = tmp_path / "a.csv", tmp_path / "b.csv"
+    labelsheet.write_sheet(str(pa), a); labelsheet.write_sheet(str(pb), b)
+    res = labelsheet.agree(str(pa), str(pb), n_boot=20)
+    assert res["n"] == 2 and res["three verdicts"]["agreement"] == 0.5

@@ -247,7 +247,7 @@ University IT has not answered POF requests for months, so a new WSO2 client (or
 ## 2026-11-19 — Generic skills grouped (ESCO reuse level)
 
 - The plain-chat comparison showed the assistant's list leading with generic skills (think analytically, create solutions to problems), which made it look less sharp than the chat's course-specific topics. ESCO marks each skill's reuse level (transversal, cross-sector, sector-specific, occupation-specific). Transversal skills now come after the course-specific ones in the first answer (so their numbers are higher) and sit under their own "Transversais" heading in the panel. Nothing is removed; the teacher still decides. Reuse level is saved per skill, so the analysis can report acceptance of generic vs specific skills.
-- Not changed: the judge. Its precision (e.g. "organise information, objects and resources" kept on the word "organisation") will be measured on hand-labelled suggestions before any prompt change.
+- Not changed: the judge. Its precision (e.g. "organise information, objects and resources" kept on the word "organisation") will be measured on labelled suggestions before any prompt change.
 
 ## 2026-11-19 — Why "operating systems" never reached the judge (C course)
 
@@ -331,21 +331,21 @@ Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstr
   ("recognise the importance of innovation" -> "seek innovation in current practices"). Lowest strict
   precision: plurilingual education and tourism economics (0.57 each).
 - Course-specific 0.790 vs transversal 0.750 (n=12): no clear difference.
-- Human check (19 rows, first 3-4 per course, labelled independently before seeing Claude's
+- Human check (19 rows, superseded by the author's labels of all 93 on 26 Nov; first 3-4 per course, labelled independently before seeing Claude's
   labels): agreement 16/19 = 0.84, Cohen's kappa 0.31 (low because nearly all sampled rows are
   "right"). Disagreements: 2 where Claude was stricter (apply teaching strategies, promote
   sustainability), 1 more lenient (probability theory).
 
-## 23 Nov 2026 — judge precision from full human labels
+## 23 Nov 2026 — judge precision from full LLM labels (Gemini)
 
-- All 93 first-turn suggestions (6 courses, 6 candidates per phrase) labelled by hand, blind to the second rater, with
+- All 93 first-turn suggestions (6 courses, 6 candidates per phrase) labelled by an LLM (Gemini) with
   the fixed rule (`results/2026-11-20_labels.csv`): right 78, borderline 15, wrong 0.
   Strict precision **0.839 [0.750, 0.903]**, lenient **1.000** (95% bootstrap over courses).
   Course-specific 0.852 (n=81), transversal 0.750 (n=12). Lowest course: tourism economics
   0.571 (n=7, small).
 - Second rater: the Claude labels of 20 Nov. Three verdicts: agreement 0.92 [0.87, 0.97],
   κ 0.76 [0.58, 0.90], AC1 0.91 [0.84, 0.96]. Strict split (right vs not): κ 0.82, AC1 0.92.
-  Lenient split (wrong vs not): κ 0.00 only because the human label set has no "wrong"
+  Lenient split (wrong vs not): κ 0.00 only because the Gemini label set has no "wrong"
   (kappa paradox: one category); AC1 0.98. Bootstrap over rows (2000).
 - All 7 disagreements go one way: Claude one step stricter. 5 right → borderline, all
   activity skills (electronic test procedures, build electronic prototypes, develop
@@ -353,8 +353,8 @@ Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstr
   the rule "right only if students are shown doing it" read more strictly. 2 borderline →
   wrong: "inform on interest rates", "demonstrate willingness to learn" (shared words).
 - This replaces the 20 Nov agreement figure (19 rows, κ 0.31), which was a small-sample
-  effect. The human labels are the reported precision; the Claude labels (strict 0.785)
-  are a stricter lower bound.
+  effect. Both raters are LLMs (Gemini, Claude). Superseded on 26 Nov: the reported precision
+  now comes from the author's labels of all 93 (strict 0.871); Gemini and Claude are checks.
 - Files: `results/2026-11-23_labels_score.json`, `results/2026-11-23_agreement.json`
   (`python -m esco_agent.labelsheet score` / `agree`).
 
@@ -371,3 +371,82 @@ Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstr
   text changes drafted / passed / accepted, tool use and time per turn, grounding flags checked
   by hand, cost per session, and the position of cited sentences within each page (a U shape
   would mean lost-in-the-middle in the judge; then split long pages per judge call).
+
+## 25–26 Nov 2026 — ESCO Open Access Mapping tool vs linker and agent
+
+- Tool: ESCO Open Access Mapping 1.3.0 (EC, published 16 Sep 2026), English, Top K 15, its own
+  line split; 6 study courses run once each, copied by hand from the web page; only the top 5 per
+  line were kept, so the tool's ranks 6–15 were not recorded (`results/esco-tool/`).
+- It split the texts into 148 lines and marked 25 as noise, 8 of them real content
+  ("13 - Transistors", "Normal distribution", "Algorithm definition"…): short topic lines are dropped.
+  Both retrievers lose these lines; the agent reads them. 22 of the tool's names could not be
+  matched to an English ESCO v1.2.1 skill label (several look like broad field names: "law",
+  "programming", "travel, tourism and leisure"); they were labelled by name.
+- Labels: 608 rows (top 3 of each retriever on the tool's 123 non-noise lines, blind, shuffled)
+  labelled by an LLM (Gemini, in about 15 minutes) and again by a second LLM (Claude); no human
+  labels. Agreement 0.78 [0.75, 0.81], κ 0.65 [0.60, 0.70], AC1 0.69 [0.64, 0.73]; almost all
+  disagreements are one step apart and systematic (Claude rates topic headings and teaching skills
+  higher). Orderings that hold under both raters are the findings; values are given for both.
+  The labelling rule was clarified after labelling (teaching skills, topic headings) and the
+  labels were not redone.
+- **Retriever vs retriever** (the tool vs this project's linker on raw lines; the linker here is the
+  bare retriever, not the agent's pipeline). The tool's top 3 is its first 3 candidates as shown.
+  Over the top 3 the tool is more precise: strict P@3 0.242 vs 0.182, paired difference +0.061
+  [+0.022, +0.100] (Gemini); 0.320 vs 0.203, +0.117 [+0.071, +0.163] (Claude); lenient +0.131 /
+  +0.164. At rank 1 the difference depends on the rater: strict P@1 0.350 vs 0.317, +0.033
+  [−0.041, +0.106] (Gemini); 0.455 vs 0.350, +0.106 [+0.024, +0.187] (Claude). With the 22
+  unmatched names counted as wrong, the strict top-3 difference is +0.030 [−0.007, +0.068]
+  (Gemini) and +0.061 [+0.019, +0.106] (Claude): part of the tool's advantage is these names.
+  Intervals: 95% bootstrap over lines, paired.
+- Wrong-sense matches come from both: the tool "Ohm's Law" → canon law, "Node and mesh laws" →
+  network standards; the linker "Its association in series and parallel." → parallel park
+  vehicles, "Polynomial and rational functions." → feed livestock; "Ohm's Law" → law of
+  obligation was ranked by both.
+- Neither retriever is precise on single lines: 32–46% of rank-1 candidates and 18–32% of top-3
+  candidates are fully right (both systems, both raters). The agent's first list is a different
+  measurement: suggestions already filtered by an LLM judge, each with the sentences it cites,
+  labelled on its own sheet: 79–84% fully right by the two LLMs (87% by the author, 26 Nov). The 71 of them that also appear on the
+  retriever sheet are 72–76% fully right when judged there against single lines (90% / 86% on
+  their own sheet).
+- Review effort, per fully right skill: the agent shows 93 suggestions, 78 fully right: about
+  1.2 reviews per right skill (1.3 with Claude's labels). The tool shows K candidates on each of
+  123 lines: at K=1, 123 candidates, 34 distinct fully right skills (Gemini; 42 Claude): about
+  2.9–3.6 reviews per right skill; at K=3, 369 candidates, 217 distinct skills, 58–69 fully
+  right: about 5.3–6.4 (6.5–7.1 with the unmatched names counted as wrong). A skill counts as
+  right if it is right on any line of the course. The agent's own LLM filtering is not counted
+  as review effort.
+- Relative recall of the agent: of the fully right skills found by the agent or by the tool's
+  top 3, the agent has 0.73–0.90, depending on the rater and on the 22 unmatched names: 78 / (78
+  + 15) = 0.84 (Gemini; 0.90 with those names counted as wrong), 73 / (73 + 27) = 0.73 (Claude;
+  0.83). With partly right skills counted: 0.54–0.65. This is an upper bound: the tool's ranks 4–5
+  hold 97 skills never labelled (counted right, recall falls to 0.37–0.41; 9 of the 38 skills
+  only the agent found are at the tool's ranks 4–5), ranks 6–15 were not recorded, lines the tool
+  marks as noise are not included, and the agent's skills were judged with its own evidence.
+- The 93 agent rows (`results/2026-11-20_labels.csv`) were labelled by Gemini; the commit that
+  added them (d91ab1f) calls them "full human labels".
+- Limitation: 4 tool names are alternative labels shared by several ESCO concepts and resolve to the
+  alphabetically first one ("confidence" → show confidence, "speak foreign languages" → speak different
+  languages, "electrical current" → electricity principles, "Cascading Style Sheets" → style sheet languages).
+- Audit of this comparison and the changes it led to: `results/2026-11-26_comparison_audit.md`.
+- Files: `results/2026-11-26_tool_vs_linker.csv` (Gemini) and `_claude.csv` (Claude), key with the
+  top-3 rule `results/2026-11-26_tool_vs_linker.top3.key.json`, scores
+  `results/2026-11-26_tool_vs_linker_score_top3_{gemini,claude}.json`, coverage
+  `results/2026-11-26_tool_coverage_top3_{gemini,claude}.json`, agreement
+  `results/2026-11-26_tool_vs_linker_agreement.json`; `python -m esco_agent.compare_tool`.
+
+## 26 Nov 2026 — judge precision from the author's labels (all 93)
+
+- All 93 first-turn suggestions labelled by the author with the fixed rule
+  (`results/2026-11-26_labels_human.csv`): right 81, borderline 8, wrong 4. Strict precision
+  **0.871 [0.793, 0.934]**, lenient **0.957 [0.907, 0.991]** (95% bootstrap over courses).
+  Course-specific 0.889 (n=81), transversal 0.750 (n=12). These are now the reported precision;
+  the LLM labels (Gemini 0.839, Claude 0.785) are checks.
+- Agreement with Gemini: 0.84, κ 0.37, AC1 0.82 (strict split κ 0.52, AC1 0.84). With Claude:
+  0.81, κ 0.35, AC1 0.77 (strict κ 0.40, AC1 0.76). No right-vs-wrong disagreements: the
+  author's 4 wrong are borderline for Gemini and borderline or wrong (2/2) for Claude. κ is low
+  because about 85% of rows are right (chance agreement 0.70–0.75); AC1 holds up.
+- Limitation: the author had seen some of the LLM labels and their disagreements before
+  labelling, so these labels are not fully independent of them.
+- Supersedes the 20 Nov 19-row human check (agreement 16/19 with Claude).
+- Files: `results/2026-11-26_labels_human.csv`, `results/2026-11-26_labels_human_score.json`
+  (`python -m esco_agent.labelsheet score` / `agree`).

@@ -1,0 +1,274 @@
+{
+  "industrial-electronics": {
+    "lines": 28,
+    "noise_lines": 4,
+    "tool_candidates_to_review_top_k": 360,
+    "tool_distinct_in_top3": 51,
+    "agent_suggestions": 19,
+    "both": 13,
+    "only_tool_top3": 38,
+    "only_agent": 6,
+    "only_agent_in_tool_ranks_4_5": 2,
+    "agent_labelled": {
+      "right": 17,
+      "borderline": 2,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 4,
+      "borderline": 4,
+      "wrong": 30,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 2,
+      "borderline": 1,
+      "wrong": 1,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 4,
+      "borderline": 4,
+      "wrong": 35,
+      "unlabelled": 27
+    },
+    "tool_rank1_right": 8,
+    "tool_top3_right": 13,
+    "tool_top3_right_unknown": 2
+  },
+  "maths-and-statistics": {
+    "lines": 32,
+    "noise_lines": 11,
+    "tool_candidates_to_review_top_k": 315,
+    "tool_distinct_in_top3": 48,
+    "agent_suggestions": 22,
+    "both": 10,
+    "only_tool_top3": 38,
+    "only_agent": 12,
+    "only_agent_in_tool_ranks_4_5": 3,
+    "agent_labelled": {
+      "right": 18,
+      "borderline": 4,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 2,
+      "borderline": 7,
+      "wrong": 29,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 0,
+      "borderline": 3,
+      "wrong": 0,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 2,
+      "borderline": 7,
+      "wrong": 32,
+      "unlabelled": 15
+    },
+    "tool_rank1_right": 7,
+    "tool_top3_right": 11,
+    "tool_top3_right_unknown": 0
+  },
+  "molecular-cell-biology-labs": {
+    "lines": 20,
+    "noise_lines": 2,
+    "tool_candidates_to_review_top_k": 270,
+    "tool_distinct_in_top3": 32,
+    "agent_suggestions": 16,
+    "both": 7,
+    "only_tool_top3": 25,
+    "only_agent": 9,
+    "only_agent_in_tool_ranks_4_5": 2,
+    "agent_labelled": {
+      "right": 15,
+      "borderline": 1,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 2,
+      "borderline": 7,
+      "wrong": 16,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 0,
+      "borderline": 1,
+      "wrong": 0,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 2,
+      "borderline": 7,
+      "wrong": 19,
+      "unlabelled": 17
+    },
+    "tool_rank1_right": 2,
+    "tool_top3_right": 6,
+    "tool_top3_right_unknown": 0
+  },
+  "plurilingual-intercultural-education": {
+    "lines": 17,
+    "noise_lines": 2,
+    "tool_candidates_to_review_top_k": 225,
+    "tool_distinct_in_top3": 20,
+    "agent_suggestions": 14,
+    "both": 8,
+    "only_tool_top3": 12,
+    "only_agent": 6,
+    "only_agent_in_tool_ranks_4_5": 1,
+    "agent_labelled": {
+      "right": 10,
+      "borderline": 4,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 2,
+      "borderline": 7,
+      "wrong": 3,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 2,
+      "borderline": 1,
+      "wrong": 0,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 2,
+      "borderline": 7,
+      "wrong": 6,
+      "unlabelled": 7
+    },
+    "tool_rank1_right": 5,
+    "tool_top3_right": 8,
+    "tool_top3_right_unknown": 2
+  },
+  "programming-fundamentals": {
+    "lines": 28,
+    "noise_lines": 3,
+    "tool_candidates_to_review_top_k": 375,
+    "tool_distinct_in_top3": 42,
+    "agent_suggestions": 15,
+    "both": 13,
+    "only_tool_top3": 29,
+    "only_agent": 2,
+    "only_agent_in_tool_ranks_4_5": 1,
+    "agent_labelled": {
+      "right": 14,
+      "borderline": 1,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 2,
+      "borderline": 5,
+      "wrong": 22,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 1,
+      "borderline": 0,
+      "wrong": 0,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 2,
+      "borderline": 6,
+      "wrong": 23,
+      "unlabelled": 21
+    },
+    "tool_rank1_right": 9,
+    "tool_top3_right": 14,
+    "tool_top3_right_unknown": 1
+  },
+  "tourism-economics": {
+    "lines": 23,
+    "noise_lines": 3,
+    "tool_candidates_to_review_top_k": 300,
+    "tool_distinct_in_top3": 24,
+    "agent_suggestions": 7,
+    "both": 4,
+    "only_tool_top3": 20,
+    "only_agent": 3,
+    "only_agent_in_tool_ranks_4_5": 0,
+    "agent_labelled": {
+      "right": 4,
+      "borderline": 3,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 3,
+      "borderline": 6,
+      "wrong": 11,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 1,
+      "borderline": 0,
+      "wrong": 0,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 3,
+      "borderline": 7,
+      "wrong": 17,
+      "unlabelled": 10
+    },
+    "tool_rank1_right": 3,
+    "tool_top3_right": 6,
+    "tool_top3_right_unknown": 1
+  },
+  "TOTAL": {
+    "lines": 148,
+    "noise_lines": 25,
+    "tool_candidates_to_review_top_k": 1845,
+    "tool_distinct_in_top3": 217,
+    "agent_suggestions": 93,
+    "both": 55,
+    "only_tool_top3": 162,
+    "only_agent": 38,
+    "only_agent_in_tool_ranks_4_5": 9,
+    "agent_labelled": {
+      "right": 78,
+      "borderline": 15,
+      "wrong": 0
+    },
+    "only_tool_top3_labelled": {
+      "right": 15,
+      "borderline": 36,
+      "wrong": 111,
+      "unlabelled": 0
+    },
+    "only_tool_top3_unknown_labelled": {
+      "right": 6,
+      "borderline": 6,
+      "wrong": 1,
+      "unlabelled": 0
+    },
+    "only_tool_top5_labelled": {
+      "right": 15,
+      "borderline": 38,
+      "wrong": 132,
+      "unlabelled": 97
+    },
+    "tool_rank1_right": 34,
+    "tool_top3_right": 58,
+    "tool_top3_right_unknown": 6,
+    "relative_recall": {
+      "strict, tool top 3": 0.8387096774193549,
+      "strict, tool top 3, unknown tool labels as wrong": 0.896551724137931,
+      "partly right counted, tool top 3": 0.6458333333333334,
+      "strict, tool top 5, unlabelled as not right (upper bound)": 0.8387096774193549,
+      "strict, tool top 5, unlabelled as right (lower bound)": 0.4105263157894737
+    },
+    "reviews_per_right_skill": {
+      "agent": 1.1923076923076923,
+      "tool K=1": 3.6176470588235294,
+      "tool K=3": 6.362068965517241,
+      "tool K=3, unknown tool labels as wrong": 7.096153846153846
+    }
+  }
+}

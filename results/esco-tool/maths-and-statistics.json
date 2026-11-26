@@ -1,0 +1,616 @@
+{
+ "course": "maths-and-statistics",
+ "tool": "ESCO Open Access Mapping 1.3.0",
+ "url": "https://ec.europa.eu/esco/open-access-mapping/en/linking-tool",
+ "settings": {
+  "language": "en",
+  "top_k": 15,
+  "split": "tool default",
+  "noise": "tool default"
+ },
+ "kept": "top 5 per line (of 15)",
+ "run": "2026-11-25",
+ "lines": [
+  {
+   "line": "Learning outcomes",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "The curricular unit aims to work on basic concepts in specific areas of mathematics, namely Calculus and Probability and Statistics.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "mathematical subjects",
+     "type": "knowledge"
+    },
+    {
+     "label": "mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "educate on mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "practice mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "algebra",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Thus, the objectives focus on:",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Mathematically formulate simple problems arising from the performance of multiple functions in the management area.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "apply analytical mathematical methods",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematical modelling",
+     "type": "knowledge"
+    },
+    {
+     "label": "mathematical economics",
+     "type": "knowledge"
+    },
+    {
+     "label": "applying mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "management and administration",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Solve simple problems using such arithmetic and geometric progressions.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "maths",
+     "type": "knowledge"
+    },
+    {
+     "label": "apply mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematical computation",
+     "type": "knowledge"
+    },
+    {
+     "label": "algebra",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Graphically interpret real functions of real variable.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "interpret mathematical information",
+     "type": "skill/competence"
+    },
+    {
+     "label": "interpret current data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematical representation",
+     "type": "knowledge"
+    },
+    {
+     "label": "MultiDimensional eXpressions",
+     "type": "knowledge"
+    },
+    {
+     "label": "interpret pictograms",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Apply the functions in modeling real hypotheses.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "scientific model",
+     "type": "knowledge"
+    },
+    {
+     "label": "probable theory",
+     "type": "knowledge"
+    },
+    {
+     "label": "develop predictive models",
+     "type": "skill/competence"
+    },
+    {
+     "label": "devise predictive models",
+     "type": "skill/competence"
+    },
+    {
+     "label": "statistical modeling",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Collect, organize and define a set of data through exploratory data analysis techniques.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "performing data analysis",
+     "type": "skill/competence"
+    },
+    {
+     "label": "data anlysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "develop data sets",
+     "type": "skill/competence"
+    },
+    {
+     "label": "gather and analyse data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "data analysis",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Determine punctual and interval indicators of population parameters.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "project human population trends",
+     "type": "skill/competence"
+    },
+    {
+     "label": "human population studies",
+     "type": "skill/competence"
+    },
+    {
+     "label": "demography",
+     "type": "knowledge"
+    },
+    {
+     "label": "national population census",
+     "type": "knowledge"
+    },
+    {
+     "label": "growth rate information collecting",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Use software as a tool for data analysis.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "carry out data analysis using specific software",
+     "type": "skill/competence"
+    },
+    {
+     "label": "implement data analysis",
+     "type": "skill/competence"
+    },
+    {
+     "label": "data anlysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "perform an online data analysis",
+     "type": "skill/competence"
+    },
+    {
+     "label": "data analysis",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Contents",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "1. Percentages and Interest.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Concepts.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Application in the resolution of financial problems.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "financial purview",
+     "type": "knowledge"
+    },
+    {
+     "label": "counsel on financial matters",
+     "type": "skill/competence"
+    },
+    {
+     "label": "debt schemes",
+     "type": "knowledge"
+    },
+    {
+     "label": "financial capability",
+     "type": "knowledge"
+    },
+    {
+     "label": "financial management",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "2. Successions of Real Numbers.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "ability to understand and work with numbers",
+     "type": "skill/competence"
+    },
+    {
+     "label": "study of mystical relation between numbers and events",
+     "type": "knowledge"
+    },
+    {
+     "label": "demonstrate an understanding of numbers",
+     "type": "skill/competence"
+    },
+    {
+     "label": "numeracy",
+     "type": "knowledge"
+    },
+    {
+     "label": "sequence of digits",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "General information.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Properties and arithmetic and geometric progressions.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "geometry",
+     "type": "knowledge"
+    },
+    {
+     "label": "explain geometric dimensions and tolerances",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematics",
+     "type": "knowledge"
+    },
+    {
+     "label": "triangle geometry",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "3. Functions of Real Variable.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "MultiDimensional eXpressions",
+     "type": "knowledge"
+    },
+    {
+     "label": "mathematical simulation",
+     "type": "knowledge"
+    },
+    {
+     "label": "Monte Carlo model",
+     "type": "knowledge"
+    },
+    {
+     "label": "mean-variance analysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "algebra",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "General information.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Polynomial and rational functions.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "phenomenology",
+     "type": "knowledge"
+    },
+    {
+     "label": "MultiDimensional eXpressions",
+     "type": "knowledge"
+    },
+    {
+     "label": "apply functional programming principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "similitudes",
+     "type": "knowledge"
+    },
+    {
+     "label": "trigonometric functions",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Logarithmic and exponential functions.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "algebra",
+     "type": "knowledge"
+    },
+    {
+     "label": "mathematics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "formulae",
+     "type": "knowledge"
+    },
+    {
+     "label": "trigonometric functions",
+     "type": "knowledge"
+    },
+    {
+     "label": "maths",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "4. Organization and Description of Data. / Types of variables and scales of measures",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "manage data quantitatively",
+     "type": "skill/competence"
+    },
+    {
+     "label": "measure data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "science of data",
+     "type": "knowledge"
+    },
+    {
+     "label": "quantitative data analysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "fundamental data analysis",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Sample characteristics.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Graphical representations.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "5. Variables and Probability Distributions.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "probability theory",
+     "type": "knowledge"
+    },
+    {
+     "label": "work with probabilities",
+     "type": "skill/competence"
+    },
+    {
+     "label": "calculate the odds",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematics and statistics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "statistical modeling",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "Distribution and parameters of a random variable.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "statistical modeling",
+     "type": "knowledge"
+    },
+    {
+     "label": "statistics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "mathematics and statistics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "probability theory",
+     "type": "knowledge"
+    },
+    {
+     "label": "work with probabilities",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Normal distribution.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "The central limit theorem.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "principles of theory of constraints",
+     "type": "knowledge"
+    },
+    {
+     "label": "control theory",
+     "type": "knowledge"
+    },
+    {
+     "label": "set theory",
+     "type": "knowledge"
+    },
+    {
+     "label": "identify boundaries",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Steiner principle",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "6. Point and Interval Estimation.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "calculate point loads",
+     "type": "skill/competence"
+    },
+    {
+     "label": "determine the duration of a touchpoint",
+     "type": "skill/competence"
+    },
+    {
+     "label": "estimating distances",
+     "type": "skill/competence"
+    },
+    {
+     "label": "calculating and estimating",
+     "type": "skill/competence"
+    },
+    {
+     "label": "surveying calculation performance",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Point estimates.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "The confidence intervals and level of confidence.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "confidence",
+     "type": "knowledge"
+    },
+    {
+     "label": "confidence showing",
+     "type": "skill/competence"
+    },
+    {
+     "label": "inspire trust and confidence",
+     "type": "skill/competence"
+    },
+    {
+     "label": "demonstrate trustworthiness",
+     "type": "skill/competence"
+    },
+    {
+     "label": "establish trust and confidence of the patient",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Interval estimates for the mean, variance and proportions.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "calculating and estimating",
+     "type": "skill/competence"
+    },
+    {
+     "label": "make estimations",
+     "type": "skill/competence"
+    },
+    {
+     "label": "statistics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "quantitative analysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "concentrations calculating",
+     "type": "skill/competence"
+    }
+   ]
+  }
+ ]
+}

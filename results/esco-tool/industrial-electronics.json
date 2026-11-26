@@ -1,0 +1,659 @@
+{
+ "course": "industrial-electronics",
+ "tool": "ESCO Open Access Mapping 1.3.0",
+ "url": "https://ec.europa.eu/esco/open-access-mapping/en/linking-tool",
+ "settings": {
+  "language": "en",
+  "top_k": 15,
+  "split": "tool default",
+  "noise": "tool default"
+ },
+ "kept": "top 5 per line (of 15)",
+ "run": "2026-11-25",
+ "lines": [
+  {
+   "line": "Learning outcomes",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "Using instrumentation and measurement equipment.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "use measurement apparatus",
+     "type": "skill/competence"
+    },
+    {
+     "label": "scientific measuring equipment operating",
+     "type": "skill/competence"
+    },
+    {
+     "label": "using precision measuring equipment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "prepare measuring equipment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "use precision measuring equipment",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Recognize the basic principles of electronics.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "electronics principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "aspects of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "application of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "fields of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "explain electronics and automation principles",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Perform accurate measurements with appropriate laboratory instruments.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "perform measurements using instruments",
+     "type": "skill/competence"
+    },
+    {
+     "label": "science of measurement",
+     "type": "knowledge"
+    },
+    {
+     "label": "calibrate of the laboratory equipment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "carry out measurements which are work-related",
+     "type": "skill/competence"
+    },
+    {
+     "label": "apply instruments for food measurement",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Learn the fundamental concepts of electronics.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "electronics principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "application of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "fields of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronics and automation",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Know the passive and active components for electronic circuits.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "electronic components",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronic components",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronics principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "application of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "assembly of electronic circuits",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Building electronic circuits.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "assembly of electronic circuits",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronic components",
+     "type": "knowledge"
+    },
+    {
+     "label": "build electrical and electronic equipment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "constructing electronic prototypes",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Acquire skills to design electronic circuits.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "assembly of electronic circuits",
+     "type": "skill/competence"
+    },
+    {
+     "label": "designing electronic systems",
+     "type": "skill/competence"
+    },
+    {
+     "label": "designing electrical or electronic systems or equipment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electronics principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "constructing electronic prototypes",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Undertake analysis and testing of electronic circuits.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "test circuitry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "functioning of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronics principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "testing procedures for electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "testing of electronic units",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Contents",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "1 - Basic concepts of electronics;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "electronics principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "aspects of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "fundamentals of electrical engineering",
+     "type": "knowledge"
+    },
+    {
+     "label": "explain electronics and automation principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "basic electricals",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "2 - Ohm's Law;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "laws of obligation",
+     "type": "knowledge"
+    },
+    {
+     "label": "canon law",
+     "type": "knowledge"
+    },
+    {
+     "label": "law",
+     "type": "skill/competence"
+    },
+    {
+     "label": "procedural laws",
+     "type": "knowledge"
+    },
+    {
+     "label": "adhere to OHSAS 18001",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Association of resistors in series and parallel;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "chain variations",
+     "type": "knowledge"
+    },
+    {
+     "label": "fit residual current devices",
+     "type": "skill/competence"
+    },
+    {
+     "label": "assemblies of wires",
+     "type": "knowledge"
+    },
+    {
+     "label": "parallel property",
+     "type": "knowledge"
+    },
+    {
+     "label": "blasting circuit connecting",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "3 - The power voltage and current, voltmeter, ammeter and ohmmeter.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "voltage meter operating",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electrical characteristics measuring",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electricity meter reading",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electricity meters fitting",
+     "type": "skill/competence"
+    },
+    {
+     "label": "voltage",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "4 - Node and mesh laws.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "network guidelines",
+     "type": "knowledge"
+    },
+    {
+     "label": "procedural rules and regulations",
+     "type": "knowledge"
+    },
+    {
+     "label": "building rules",
+     "type": "knowledge"
+    },
+    {
+     "label": "define firewall rules",
+     "type": "skill/competence"
+    },
+    {
+     "label": "construction systems of norms",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "5 - Voltage divider, current divider.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "voltage changing",
+     "type": "skill/competence"
+    },
+    {
+     "label": "voltage",
+     "type": "knowledge"
+    },
+    {
+     "label": "electric voltage",
+     "type": "knowledge"
+    },
+    {
+     "label": "devices for electrical switching",
+     "type": "knowledge"
+    },
+    {
+     "label": "electricals",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "6 - Concept of Power and Energy, Joule's Law.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "energies",
+     "type": "knowledge"
+    },
+    {
+     "label": "explain energy principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electricity and energy",
+     "type": "skill/competence"
+    },
+    {
+     "label": "conservation of energy",
+     "type": "knowledge"
+    },
+    {
+     "label": "energy conservation",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "7 - nodal analysis, mesh analysis.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "fundamental analysis",
+     "type": "knowledge"
+    },
+    {
+     "label": "apply structural analysis",
+     "type": "skill/competence"
+    },
+    {
+     "label": "MDX",
+     "type": "knowledge"
+    },
+    {
+     "label": "analysis procedures",
+     "type": "knowledge"
+    },
+    {
+     "label": "Metasploit",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "8 - Introduction to alternate current, frequency and period;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "electrical current",
+     "type": "knowledge"
+    },
+    {
+     "label": "explain electricity principles",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electrical current",
+     "type": "knowledge"
+    },
+    {
+     "label": "basic electricals",
+     "type": "knowledge"
+    },
+    {
+     "label": "electric current",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "9 - The function generator and the oscilloscope.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "function generator operating",
+     "type": "skill/competence"
+    },
+    {
+     "label": "optical oscillator",
+     "type": "knowledge"
+    },
+    {
+     "label": "typology of optical instruments",
+     "type": "knowledge"
+    },
+    {
+     "label": "optical instrument",
+     "type": "knowledge"
+    },
+    {
+     "label": "engineering of optical instruments",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "10 - The condenser and coil;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "cold winding",
+     "type": "knowledge"
+    },
+    {
+     "label": "hot coiling process circuits",
+     "type": "knowledge"
+    },
+    {
+     "label": "refrigeration cycle coolants",
+     "type": "knowledge"
+    },
+    {
+     "label": "adjust insulating tube winding machinery",
+     "type": "skill/competence"
+    },
+    {
+     "label": "use insulating tube winding machinery",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Its association in series and parallel.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "parallel property",
+     "type": "knowledge"
+    },
+    {
+     "label": "MDX",
+     "type": "knowledge"
+    },
+    {
+     "label": "chain variations",
+     "type": "knowledge"
+    },
+    {
+     "label": "similitudes",
+     "type": "knowledge"
+    },
+    {
+     "label": "a numerical sequence",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "11 - The transformer.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "12 - Semiconductors;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "semiconductors",
+     "type": "knowledge"
+    },
+    {
+     "label": "semiconductors designing",
+     "type": "skill/competence"
+    },
+    {
+     "label": "testing semiconductors",
+     "type": "skill/competence"
+    },
+    {
+     "label": "semiconductor components checking",
+     "type": "skill/competence"
+    },
+    {
+     "label": "semiconductor crystals producing",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "diode and the transistor.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "electronic components",
+     "type": "knowledge"
+    },
+    {
+     "label": "electronic components",
+     "type": "knowledge"
+    },
+    {
+     "label": "semiconductors",
+     "type": "knowledge"
+    },
+    {
+     "label": "types of electronics",
+     "type": "knowledge"
+    },
+    {
+     "label": "small electronic components",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "13 - Transistors.",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "14 - Introduction to power supplies.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "supply with power outlets",
+     "type": "skill/competence"
+    },
+    {
+     "label": "electricity basics",
+     "type": "knowledge"
+    },
+    {
+     "label": "power current",
+     "type": "knowledge"
+    },
+    {
+     "label": "electrical supplies procuring",
+     "type": "skill/competence"
+    },
+    {
+     "label": "incoming electrical supplies receiving",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "15 - Operational Amplifiers.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "amplification",
+     "type": "knowledge"
+    },
+    {
+     "label": "audio equipment",
+     "type": "knowledge"
+    },
+    {
+     "label": "operate audio equipment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "tune up the PA",
+     "type": "skill/competence"
+    },
+    {
+     "label": "operate sound",
+     "type": "skill/competence"
+    }
+   ]
+  }
+ ]
+}

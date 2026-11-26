@@ -133,10 +133,35 @@ SPLITS = {  # name: (categories, how a verdict maps into them)
 }
 
 
+def _rows_by(rows: list[dict], key) -> dict:
+    out = {}
+    for r in rows:
+        k = key(r)
+        if k in out:
+            raise ValueError(f"two rows share {k}")
+        out[k] = r
+    return out
+
+
 def agree(path_a: str, path_b: str, n_boot: int = 2000, seed: int = 0) -> dict:
-    key = lambda r: (r["course"], r.get("skill_id") or r["skill"])
-    a = {key(r): r for r in read_sheet(path_a) if r["verdict"] in VERDICTS}
-    b = {key(r): r for r in read_sheet(path_b) if r["verdict"] in VERDICTS}
+    """Matched by course, row number and skill, so a skill that appears on several
+    lines of a course is compared on every line (matching by course and skill alone
+    kept only one of them: 387 of 608 rows of the tool-vs-linker sheet, 26 Nov).
+    Sheets numbered differently fall back to course and skill, if that is unique."""
+    rows_a, rows_b = read_sheet(path_a), read_sheet(path_b)
+    skill = lambda r: r.get("skill_id") or r["skill"]
+    by_row = lambda r: (r["course"], str(r.get("row", "")))
+    pos_a = {by_row(r): skill(r) for r in rows_a}
+    pos_b = {by_row(r): skill(r) for r in rows_b}
+    common = set(pos_a) & set(pos_b)
+    same_numbering = bool(common) and all(pos_a[k] == pos_b[k] for k in common)
+    key = (lambda r: (*by_row(r), skill(r))) if same_numbering else (lambda r: (r["course"], skill(r)))
+    try:
+        a = {k: r for k, r in _rows_by(rows_a, key).items() if r["verdict"] in VERDICTS}
+        b = {k: r for k, r in _rows_by(rows_b, key).items() if r["verdict"] in VERDICTS}
+    except ValueError:
+        raise SystemExit("The sheets are numbered differently and a skill repeats within a "
+                         "course, so rows can't be matched.") from None
     both = sorted(set(a) & set(b))
     if not both:
         raise SystemExit("No suggestion has a verdict in both sheets.")

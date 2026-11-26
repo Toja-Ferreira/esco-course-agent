@@ -1,0 +1,1005 @@
+{
+  "n": 608,
+  "only_in_a": 0,
+  "only_in_b": 0,
+  "three verdicts": {
+    "agreement": 0.7828947368421053,
+    "kappa": 0.6474092558584998,
+    "ac1": 0.6874522937923515,
+    "chance_kappa": 0.38425705505540164,
+    "chance_ac1": 0.30536920013850416,
+    "agreement_ci95": [
+      0.75,
+      0.8125
+    ],
+    "kappa_ci95": [
+      0.5966699945209222,
+      0.6958326176853024
+    ],
+    "ac1_ci95": [
+      0.6388744605222197,
+      0.7319785420771687
+    ]
+  },
+  "strict (right vs not)": {
+    "agreement": 0.9078947368421053,
+    "kappa": 0.7207211640992833,
+    "ac1": 0.8628203062046738,
+    "chance_kappa": 0.6702032115650969,
+    "chance_ac1": 0.3285794667590028,
+    "agreement_ci95": [
+      0.8848273026315789,
+      0.930921052631579
+    ],
+    "kappa_ci95": [
+      0.6498675231040371,
+      0.7902161906954649
+    ],
+    "ac1_ci95": [
+      0.8245903260905403,
+      0.898884946781551
+    ]
+  },
+  "lenient (wrong vs not)": {
+    "agreement": 0.8717105263157895,
+    "kappa": 0.7462464551340361,
+    "ac1": 0.7439640651319483,
+    "chance_kappa": 0.4944327822022161,
+    "chance_ac1": 0.4989395775623269,
+    "agreement_ci95": [
+      0.84375,
+      0.8980263157894737
+    ],
+    "kappa_ci95": [
+      0.6935326306242724,
+      0.797164515684305
+    ],
+    "ac1_ci95": [
+      0.6889050593558339,
+      0.7960679048476293
+    ]
+  },
+  "confusion": {
+    "right": {
+      "right": 98,
+      "borderline": 12,
+      "wrong": 1
+    },
+    "borderline": {
+      "right": 42,
+      "borderline": 99,
+      "wrong": 3
+    },
+    "wrong": {
+      "right": 1,
+      "borderline": 73,
+      "wrong": 279
+    }
+  },
+  "disagreements": [
+    {
+      "course": "industrial-electronics",
+      "skill": "teach energy principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "6 - Concept of Power and Energy, Joule's Law."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "calibrate laboratory equipment",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Perform accurate measurements with appropriate laboratory instruments."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "adjust voltage",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "5 - Voltage divider, current divider."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "think analytically",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "7 - nodal analysis, mesh analysis."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electricity principles",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Association of resistors in series and parallel;"
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "interpret circuit diagrams",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Association of resistors in series and parallel;"
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "build electronic prototypes",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "Building electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electricity",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "8 - Introduction to alternate current, frequency and period;"
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "test instrumentation equipment",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Using instrumentation and measurement equipment."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "using precision measuring equipment",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Using instrumentation and measurement equipment."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "physics",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "6 - Concept of Power and Energy, Joule's Law."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "teach electricity principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "8 - Introduction to alternate current, frequency and period;"
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electronics",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Building electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "power electronics",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "14 - Introduction to power supplies."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "operate precision measuring equipment",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Perform accurate measurements with appropriate laboratory instruments."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electronics principles",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Undertake analysis and testing of electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "printed circuit boards",
+      "a": "borderline",
+      "b": "wrong",
+      "evidence": "Know the passive and active components for electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "design electronic systems",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Acquire skills to design electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electronics",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Undertake analysis and testing of electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "test semiconductors",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "12 - Semiconductors;"
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "design integrated circuits",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Acquire skills to design electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electricity",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "14 - Introduction to power supplies."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "operate precision measuring equipment",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Using instrumentation and measurement equipment."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "design integrated circuits",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "12 - Semiconductors;"
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "teach electronics and automation principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Recognize the basic principles of electronics."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electronics principles",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Know the passive and active components for electronic circuits."
+    },
+    {
+      "course": "industrial-electronics",
+      "skill": "electricity principles",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "8 - Introduction to alternate current, frequency and period;"
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "statistical analysis system software",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Use software as a tool for data analysis."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "risk modelling",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "5. Variables and Probability Distributions."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "process data",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "4. Organization and Description of Data. / Types of variables and scales of measures"
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "mathematics and statistics",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Distribution and parameters of a random variable."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "scientific modelling",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Apply the functions in modeling real hypotheses."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "teach mathematics",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "The curricular unit aims to work on basic concepts in specific areas of mathematics, namely Calculus and Probability and Statistics."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "advise on financial matters",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Application in the resolution of financial problems."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "create data sets",
+      "a": "wrong",
+      "b": "right",
+      "evidence": "Collect, organize and define a set of data through exploratory data analysis techniques."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "carry out calculations",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "Mathematically formulate simple problems arising from the performance of multiple functions in the management area."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "algebra",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Polynomial and rational functions."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "execute analytical mathematical calculations",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "Mathematically formulate simple problems arising from the performance of multiple functions in the management area."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "calculating and estimating",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Interval estimates for the mean, variance and proportions."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "interpret visual literacy",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "Graphically interpret real functions of real variable."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "ability to understand and work with numbers",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "2. Successions of Real Numbers."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "teach basic numeracy skills",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "The curricular unit aims to work on basic concepts in specific areas of mathematics, namely Calculus and Probability and Statistics."
+    },
+    {
+      "course": "maths-and-statistics",
+      "skill": "develop predictive models",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "Apply the functions in modeling real hypotheses."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "biological chemistry",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "02. Plan and execute, with rigour and safety, techniques for the extraction, quantification and analysis of proteins and nucleic acids."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "biochemistry",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "C6. Spectrophotometric and colorimetric methods for biomolecule quantification (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "apply safety procedures in laboratory",
+      "a": "right",
+      "b": "wrong",
+      "evidence": "03. Identify, prevent and discuss sources of error in experimental procedures."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "analyse experimental laboratory data",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "03. Identify, prevent and discuss sources of error in experimental procedures."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "genomics",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C8. Conventional PCR and RT-PCR:"
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "clinical cytology",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "C1. Review of basic concepts in cell and molecular biology (O1)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "gather experimental data",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "03. Identify, prevent and discuss sources of error in experimental procedures."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "genomics",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C5. Extraction of nucleic acids (DNA and RNA) from biological samples (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "biology",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "01. Understand the fundamentals of cell and molecular biology laboratory techniques and their operating principles."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "report the results of treatment",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "04. Analyse, synthesise and discuss experimental results, communicating them in writing in a scientific and structured manner."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "biology",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "C1. Review of basic concepts in cell and molecular biology (O1)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "perform PCR covid test",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C8. Conventional PCR and RT-PCR:"
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "diagnostic methods in medical laboratory",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C6. Spectrophotometric and colorimetric methods for biomolecule quantification (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "conduct genome research",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "genotypic typing by PCR-RFLP \u2014 principles, enzymatic digestion and fragment pattern analysis (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "biological chemistry",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C6. Spectrophotometric and colorimetric methods for biomolecule quantification (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "assist in the production of laboratory documentation",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "05. Organise a clear, complete and traceable laboratory notebook."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "analyse experimental laboratory data",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "experimental design, execution and interpretation;"
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "label medical laboratory samples",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "05. Organise a clear, complete and traceable laboratory notebook."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "evaluate genetic data",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "genotypic typing by PCR-RFLP \u2014 principles, enzymatic digestion and fragment pattern analysis (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "laboratory methods in biomedical sciences",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "01. Understand the fundamentals of cell and molecular biology laboratory techniques and their operating principles."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "biological chemistry",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C4. Extraction of proteins from biological material (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "gather experimental data",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "experimental design, execution and interpretation;"
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "genomics",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "genotypic typing by PCR-RFLP \u2014 principles, enzymatic digestion and fragment pattern analysis (O2, O3, O4)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "assist in the production of laboratory documentation",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "C2. Preparation of the laboratory notebook in Biosciences: recording, traceability and good practices (O4, O5, O6)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "laboratory methods in biomedical sciences",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "C2. Preparation of the laboratory notebook in Biosciences: recording, traceability and good practices (O4, O5, O6)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "report analysis results",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "C3. Organisation of scientific reports: structure, critical analysis and discussion of results (O3, O4, O5, O7)."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "disseminate results to the scientific community",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "04. Analyse, synthesise and discuss experimental results, communicating them in writing in a scientific and structured manner."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "molecular biology",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "01. Understand the fundamentals of cell and molecular biology laboratory techniques and their operating principles."
+    },
+    {
+      "course": "molecular-cell-biology-labs",
+      "skill": "prepare scientific reports",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "C3. Organisation of scientific reports: structure, critical analysis and discussion of results (O3, O4, O5, O7)."
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "teach intercultural communication methods",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Debate different issues related to plurilingual and intercultural education;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "foreign languages for international careers",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Mobilise strategies for developing plurilingual and intercultural competence;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "language acquisition",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "- Be aware of the role of languages and language learning in personal and social development;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "study acquisition of language",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Plural approaches and language teaching in the first years of school."
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "foreign languages for international careers",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "The world of languages and the languages of the world."
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "speak different languages",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "The world of languages and the languages of the world."
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "language teaching methods",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Discuss the educational implications of different types of language policies;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "study acquisition of language",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Learn about different approaches to language education;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "speak different languages",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Create and develop a taste for other languages and cultures as forms of communication and expression;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "perform manual work autonomously",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Demonstrate the ability to work autonomously and as part of a team;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "handle tasks independently",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "- Demonstrate the ability to work autonomously and as part of a team;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "modern languages",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "The speaker and his/her languages: linguistic biographies and tools for recording experiences of contact with other languages and cultures."
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "demonstrate intercultural competences in hospitality services",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "- Mobilise strategies for developing plurilingual and intercultural competence;"
+    },
+    {
+      "course": "plurilingual-intercultural-education",
+      "skill": "apply intercultural teaching strategies",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "- Mobilise strategies for developing plurilingual and intercultural competence;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "task algorithmisation",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "1. Introduction to Algorithm"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "use markup languages",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "2.1. W3C Browsers and Standards"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "maintain responsive design",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "\u2022 Is able to develop a responsive web application of medium complexity"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "\u2022 Identifies the current languages and technologies appropriate for web application development;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "use scripting programming",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "1.4. How to code an algorithm"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "ASP.NET",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Identifies the current languages and technologies appropriate for web application development;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "object-oriented modelling",
+      "a": "borderline",
+      "b": "wrong",
+      "evidence": "\u2022 Autonomously analyzes and processes programming concepts, models and techniques;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "4. Web Application Development"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "use markup languages",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "3.3. Web programming languages"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "data storage",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "4.3. Storage layer"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "use markup languages",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Recognizes and knows how to use the style language CSS, client language JavaScript, server lanaguages PHP and ASP.NET"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "use scripting programming",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Autonomously analyzes and processes programming concepts, models and techniques;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "design application interfaces",
+      "a": "borderline",
+      "b": "wrong",
+      "evidence": "4.1. Front-End Development"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "\u2022 Knows and knows how to use web page markup language HTML;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "3.4. Responsive web application development frameworks"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "Sass",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "3.2. Cascading Style Sheets (CSS)"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "\u2022 Is able to develop a responsive web application of medium complexity"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "4.1. Front-End Development"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "use software design patterns",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Designs algorithms based on real situations of simple to moderate complexity, applying appropriate programming methodologies;"
+    },
+    {
+      "course": "programming-fundamentals",
+      "skill": "web programming",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "3.1. HyperText Markup Language (HTML)"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "provide training in sustainable tourism development and management",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Understand how tourism can contribute to the Sustainable Development Goals."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "develop tourism products",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Recognize the importance of innovation in tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "report touristic facts",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Apply the key concepts and techniques of economics to the analysis of the tourism market."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach tourism principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "4. Tourist motivations"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "measure sustainability of tourism activities",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Identifify and interpret a set of indicators related to tourism economics."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach tourism principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "2. Theoretical framework and conceptualization of tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "develop tourism policies",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Recognize tourism as one of the key sectors of development in all countries and a major source of income, jobs and wealth creation."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach tourism principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "It is intended to provide students with basic competences that makes them more qualified to deal professionally with the new challenges and demands that tourism sector faces."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "tourism market",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "Introdu\u00e7\u00e3o \u00e0 Economia do Turismo aims at offering the students their first contact with the basic concepts of the economics of tourism. More specifically , the purpose of this course is to apply basic microeconomics and macroeconomics concepts to tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "handle touristic quantitative data",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "5.1 Economic analysis of tourism demand and supply"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "travel, tourism and leisure",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "7. The economic impact of tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "provide training in sustainable tourism development and management",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "8. Other topics of tourism economics- sustainability and innovation in tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach tourism principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Introdu\u00e7\u00e3o \u00e0 Economia do Turismo aims at offering the students their first contact with the basic concepts of the economics of tourism. More specifically , the purpose of this course is to apply basic microeconomics and macroeconomics concepts to tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach economic principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "1. Basic principles of economic analysis"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "educate on sustainable tourism",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Understand how tourism can contribute to the Sustainable Development Goals."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "report touristic facts",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Identifify and interpret a set of indicators related to tourism economics."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "assess an area as a tourism destination",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Identifify and interpret a set of indicators related to tourism economics."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "measure sustainability of tourism activities",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Understand how tourism can contribute to the Sustainable Development Goals."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "government policy",
+      "a": "right",
+      "b": "borderline",
+      "evidence": "5.4 Governmental interventation"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "travel, tourism and leisure",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "4. Tourist motivations"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "educate on sustainable tourism",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "8. Other topics of tourism economics- sustainability and innovation in tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach economic principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "Introdu\u00e7\u00e3o \u00e0 Economia do Turismo aims at offering the students their first contact with the basic concepts of the economics of tourism. More specifically , the purpose of this course is to apply basic microeconomics and macroeconomics concepts to tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "travel, tourism and leisure",
+      "a": "borderline",
+      "b": "right",
+      "evidence": "6. Tourism Satellite Account."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "teach tourism principles",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "\u2022 Understand various concepts relevant in the context of tourism."
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "tourism sector policies",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "5. The tourism market"
+    },
+    {
+      "course": "tourism-economics",
+      "skill": "measure sustainability of tourism activities",
+      "a": "wrong",
+      "b": "borderline",
+      "evidence": "8. Other topics of tourism economics- sustainability and innovation in tourism."
+    }
+  ]
+}

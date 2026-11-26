@@ -1,0 +1,680 @@
+{
+ "course": "programming-fundamentals",
+ "tool": "ESCO Open Access Mapping 1.3.0",
+ "url": "https://ec.europa.eu/esco/open-access-mapping/en/linking-tool",
+ "settings": {
+  "language": "en",
+  "top_k": 15,
+  "split": "tool default",
+  "noise": "tool default"
+ },
+ "kept": "top 5 per line (of 15)",
+ "run": "2026-11-25",
+ "lines": [
+  {
+   "line": "Learning outcomes",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "• Autonomously analyzes and processes programming concepts, models and techniques;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "programming",
+     "type": "skill/competence"
+    },
+    {
+     "label": "read programming",
+     "type": "skill/competence"
+    },
+    {
+     "label": "employ programming languages for computer code creation",
+     "type": "skill/competence"
+    },
+    {
+     "label": "use automatic programming",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Assembly computer programming paradigms",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Designs algorithms based on real situations of simple to moderate complexity, applying appropriate programming methodologies;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "algorithmic",
+     "type": "knowledge"
+    },
+    {
+     "label": "task algorithm development",
+     "type": "knowledge"
+    },
+    {
+     "label": "computational science",
+     "type": "knowledge"
+    },
+    {
+     "label": "MATLAB algorithms",
+     "type": "knowledge"
+    },
+    {
+     "label": "programming",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "• Knows the syntax, lexicon and semantics of the JAVA programming language;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "Java (computer programming)",
+     "type": "knowledge"
+    },
+    {
+     "label": "use basic programming language skills",
+     "type": "skill/competence"
+    },
+    {
+     "label": "use object-oriented programming",
+     "type": "skill/competence"
+    },
+    {
+     "label": "programming",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Apache Tomcat",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Differentiates data types as well as their specific uses;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "types of unstructured data",
+     "type": "knowledge"
+    },
+    {
+     "label": "types of data infrastructure",
+     "type": "knowledge"
+    },
+    {
+     "label": "data models",
+     "type": "knowledge"
+    },
+    {
+     "label": "data engineering",
+     "type": "knowledge"
+    },
+    {
+     "label": "data science",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Knows and uses selection and repetition structures, adapting them to specific programming situations;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "use programming design patterns",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Assembly computer programming paradigms",
+     "type": "knowledge"
+    },
+    {
+     "label": "APL programming paradigms",
+     "type": "knowledge"
+    },
+    {
+     "label": "Lisp coding techniques",
+     "type": "knowledge"
+    },
+    {
+     "label": "programming",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "• Works in group, articulating tasks whenever necessary;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "work in groups",
+     "type": "skill/competence"
+    },
+    {
+     "label": "working in teams",
+     "type": "skill/competence"
+    },
+    {
+     "label": "work collaboratively",
+     "type": "skill/competence"
+    },
+    {
+     "label": "manage teamwork",
+     "type": "skill/competence"
+    },
+    {
+     "label": "teamwork approaches",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Knows and knows how to use web page markup language HTML;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "use HTML",
+     "type": "skill/competence"
+    },
+    {
+     "label": "markup programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "JSSS",
+     "type": "knowledge"
+    },
+    {
+     "label": "W3C standards",
+     "type": "knowledge"
+    },
+    {
+     "label": "create content for web elements",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "• Identifies the current languages and technologies appropriate for web application development;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "Ajax framework for web applications development",
+     "type": "knowledge"
+    },
+    {
+     "label": "ASP.NET framework",
+     "type": "knowledge"
+    },
+    {
+     "label": "WebCMS software systems",
+     "type": "knowledge"
+    },
+    {
+     "label": "World Wide Web Consortium standards",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Recognizes and knows how to use the style language CSS, client language JavaScript, server lanaguages PHP and ASP.NET",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "use html",
+     "type": "skill/competence"
+    },
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "JSSS",
+     "type": "knowledge"
+    },
+    {
+     "label": "Joomla",
+     "type": "knowledge"
+    },
+    {
+     "label": "Drupal",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "• Is able to develop a responsive web application of medium complexity",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "ensure responsive design of website",
+     "type": "skill/competence"
+    },
+    {
+     "label": "AJAX Framework for Web Application Development",
+     "type": "knowledge"
+    },
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "use HTML",
+     "type": "skill/competence"
+    },
+    {
+     "label": "design and develop front-end website",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Contents",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "1. Introduction to Algorithm",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "algorithms",
+     "type": "knowledge"
+    },
+    {
+     "label": "computational science",
+     "type": "knowledge"
+    },
+    {
+     "label": "task algorithm development",
+     "type": "knowledge"
+    },
+    {
+     "label": "computer science",
+     "type": "knowledge"
+    },
+    {
+     "label": "programming",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "1.1. Algorithm definition",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "1.2. Data Structures Representation",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "data structuring methods",
+     "type": "knowledge"
+    },
+    {
+     "label": "data architecture",
+     "type": "knowledge"
+    },
+    {
+     "label": "data models",
+     "type": "knowledge"
+    },
+    {
+     "label": "structure information",
+     "type": "skill/competence"
+    },
+    {
+     "label": "create data models",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "1.3. Sequential, conditional, and cyclic instructions",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "make current procedure instructions",
+     "type": "skill/competence"
+    },
+    {
+     "label": "execute working instructions",
+     "type": "skill/competence"
+    },
+    {
+     "label": "perform procedures according to written directions",
+     "type": "skill/competence"
+    },
+    {
+     "label": "following instructions and procedures",
+     "type": "skill/competence"
+    },
+    {
+     "label": "giving instructions",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "1.4. How to code an algorithm",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "algorithm",
+     "type": "knowledge"
+    },
+    {
+     "label": "task algorithm development",
+     "type": "knowledge"
+    },
+    {
+     "label": "programming",
+     "type": "skill/competence"
+    },
+    {
+     "label": "MATLAB algorithms",
+     "type": "knowledge"
+    },
+    {
+     "label": "computational science",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "2. World Wide Web",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "World Wide Web Consortium standards",
+     "type": "knowledge"
+    },
+    {
+     "label": "web services",
+     "type": "knowledge"
+    },
+    {
+     "label": "Yahoo",
+     "type": "knowledge"
+    },
+    {
+     "label": "WeBWorK",
+     "type": "knowledge"
+    },
+    {
+     "label": "WebCMS",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "2.1. W3C Browsers and Standards",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "W3C standards",
+     "type": "knowledge"
+    },
+    {
+     "label": "use HTML",
+     "type": "skill/competence"
+    },
+    {
+     "label": "JSSS",
+     "type": "knowledge"
+    },
+    {
+     "label": "AJAX Framework Features for Web Development",
+     "type": "knowledge"
+    },
+    {
+     "label": "JavaScript Framework",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "3. Introduction to Web Programming",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "Ajax framework for web applications development",
+     "type": "knowledge"
+    },
+    {
+     "label": "Drupal",
+     "type": "knowledge"
+    },
+    {
+     "label": "use html",
+     "type": "skill/competence"
+    },
+    {
+     "label": "server side programming",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "3.1. HyperText Markup Language (HTML)",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "use XHTML",
+     "type": "skill/competence"
+    },
+    {
+     "label": "markup programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "JSSS",
+     "type": "knowledge"
+    },
+    {
+     "label": "W3C standards",
+     "type": "knowledge"
+    },
+    {
+     "label": "Hypertext Preprocessor",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "3.2. Cascading Style Sheets (CSS)",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "Cascading Style Sheets",
+     "type": "knowledge"
+    },
+    {
+     "label": "CSS",
+     "type": "knowledge"
+    },
+    {
+     "label": "Sass",
+     "type": "knowledge"
+    },
+    {
+     "label": "JSSS",
+     "type": "knowledge"
+    },
+    {
+     "label": "W3C standards",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "3.3. Web programming languages",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "use Html",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Ajax framework for web applications development",
+     "type": "knowledge"
+    },
+    {
+     "label": "ASP.NET framework",
+     "type": "knowledge"
+    },
+    {
+     "label": "W3C standards",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "3.4. Responsive web application development frameworks",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "Ajax Framework features for web applications development",
+     "type": "knowledge"
+    },
+    {
+     "label": "W3C standards",
+     "type": "knowledge"
+    },
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "JavaScript Framework",
+     "type": "knowledge"
+    },
+    {
+     "label": "ASP.NET framework",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "4. Web Application Development",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "Ajax framework for web applications development",
+     "type": "knowledge"
+    },
+    {
+     "label": "WebCMS",
+     "type": "knowledge"
+    },
+    {
+     "label": "WebSphere application server",
+     "type": "knowledge"
+    },
+    {
+     "label": "ASP.NET framework",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "4.1. Front-End Development",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "design and develop front-end website",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Ajax software development environments",
+     "type": "knowledge"
+    },
+    {
+     "label": "web programming",
+     "type": "knowledge"
+    },
+    {
+     "label": "ASP.NET framework",
+     "type": "knowledge"
+    },
+    {
+     "label": "JavaScript Framework",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "4.2. Back-Office Development",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "office IT software",
+     "type": "knowledge"
+    },
+    {
+     "label": "work with office systems",
+     "type": "skill/competence"
+    },
+    {
+     "label": "Backbox",
+     "type": "knowledge"
+    },
+    {
+     "label": "Visual Studio",
+     "type": "knowledge"
+    },
+    {
+     "label": "ThinkFree Office",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "4.3. Storage layer",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "data storage",
+     "type": "knowledge"
+    },
+    {
+     "label": "cloud storage and data management",
+     "type": "skill/competence"
+    },
+    {
+     "label": "implement media storage solutions",
+     "type": "skill/competence"
+    },
+    {
+     "label": "enterprise data storage",
+     "type": "knowledge"
+    },
+    {
+     "label": "define database physical storage structure",
+     "type": "skill/competence"
+    }
+   ]
+  }
+ ]
+}

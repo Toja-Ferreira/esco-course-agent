@@ -1,0 +1,493 @@
+{
+ "course": "molecular-cell-biology-labs",
+ "tool": "ESCO Open Access Mapping 1.3.0",
+ "url": "https://ec.europa.eu/esco/open-access-mapping/en/linking-tool",
+ "settings": {
+  "language": "en",
+  "top_k": 15,
+  "split": "tool default",
+  "noise": "tool default"
+ },
+ "kept": "top 5 per line (of 15)",
+ "run": "2026-11-25",
+ "lines": [
+  {
+   "line": "Learning outcomes",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "01. Understand the fundamentals of cell and molecular biology laboratory techniques and their operating principles.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "laboratory methods of biomedical science",
+     "type": "knowledge"
+    },
+    {
+     "label": "methods used in biomedical laboratory",
+     "type": "knowledge"
+    },
+    {
+     "label": "carry out cell culture analyses",
+     "type": "skill/competence"
+    },
+    {
+     "label": "laboratory-based techniques",
+     "type": "knowledge"
+    },
+    {
+     "label": "educate on medical laboratory technology principles",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "02. Plan and execute, with rigour and safety, techniques for the extraction, quantification and analysis of proteins and nucleic acids.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "proteomics",
+     "type": "knowledge"
+    },
+    {
+     "label": "protein",
+     "type": "knowledge"
+    },
+    {
+     "label": "biological chemistry",
+     "type": "knowledge"
+    },
+    {
+     "label": "biochemistry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "processing of enzymes",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "03. Identify, prevent and discuss sources of error in experimental procedures.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "interpret results of laboratory experiments",
+     "type": "skill/competence"
+    },
+    {
+     "label": "experimental data gathering",
+     "type": "skill/competence"
+    },
+    {
+     "label": "laboratory-based techniques",
+     "type": "knowledge"
+    },
+    {
+     "label": "conduct laboratory investigations",
+     "type": "skill/competence"
+    },
+    {
+     "label": "test procedures",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "04. Analyse, synthesise and discuss experimental results, communicating them in writing in a scientific and structured manner.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "gathering of experimental data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "disclose scientific results",
+     "type": "skill/competence"
+    },
+    {
+     "label": "interpret results of laboratory experiments",
+     "type": "skill/competence"
+    },
+    {
+     "label": "impart analytical findings",
+     "type": "skill/competence"
+    },
+    {
+     "label": "use lab results",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "06. Search for, select and integrate relevant bibliographic information to contextualise and interpret laboratory protocols and results.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "follow the laboratory manual",
+     "type": "skill/competence"
+    },
+    {
+     "label": "assist in documenting laboratory procedures",
+     "type": "skill/competence"
+    },
+    {
+     "label": "laboratory-based sciences",
+     "type": "knowledge"
+    },
+    {
+     "label": "read lab results",
+     "type": "skill/competence"
+    },
+    {
+     "label": "perform laboratory investigation",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "05. Organise a clear, complete and traceable laboratory notebook.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "help with the production of laboratory documentation",
+     "type": "skill/competence"
+    },
+    {
+     "label": "use laboratory manuals",
+     "type": "skill/competence"
+    },
+    {
+     "label": "laboratory equipment",
+     "type": "knowledge"
+    },
+    {
+     "label": "laboratory equipment use",
+     "type": "skill/competence"
+    },
+    {
+     "label": "label samples of medical laboratory",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "O7. Produce a structured scientific report for the dissemination of experimental results.",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "preparing scientific reports",
+     "type": "skill/competence"
+    },
+    {
+     "label": "disclose scientific results",
+     "type": "skill/competence"
+    },
+    {
+     "label": "write scientific publications",
+     "type": "skill/competence"
+    },
+    {
+     "label": "gathering of experimental data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "communicate analytical findings",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "Contents",
+   "noise": true,
+   "candidates": []
+  },
+  {
+   "line": "C1. Review of basic concepts in cell and molecular biology (O1).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "fundamentals of biology",
+     "type": "knowledge"
+    },
+    {
+     "label": "cell sciences",
+     "type": "knowledge"
+    },
+    {
+     "label": "molecular biology",
+     "type": "knowledge"
+    },
+    {
+     "label": "biology",
+     "type": "skill/competence"
+    },
+    {
+     "label": "biological and related sciences",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "C2. Preparation of the laboratory notebook in Biosciences: recording, traceability and good practices (O4, O5, O6).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "help with the production of laboratory documentation",
+     "type": "skill/competence"
+    },
+    {
+     "label": "consider laboratory manuals",
+     "type": "skill/competence"
+    },
+    {
+     "label": "laboratory methods of biomedical science",
+     "type": "knowledge"
+    },
+    {
+     "label": "bio-safety in biomedical laboratory",
+     "type": "knowledge"
+    },
+    {
+     "label": "laboratory-based sciences",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "C3. Organisation of scientific reports: structure, critical analysis and discussion of results (O3, O4, O5, O7).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "preparing of scientific reports",
+     "type": "skill/competence"
+    },
+    {
+     "label": "scientific publications",
+     "type": "knowledge"
+    },
+    {
+     "label": "disclose scientific results",
+     "type": "skill/competence"
+    },
+    {
+     "label": "write scientific publications",
+     "type": "skill/competence"
+    },
+    {
+     "label": "file scientific documentation",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "C4. Extraction of proteins from biological material (O2, O3, O4).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "proteomics",
+     "type": "knowledge"
+    },
+    {
+     "label": "protein",
+     "type": "knowledge"
+    },
+    {
+     "label": "biological chemistry",
+     "type": "knowledge"
+    },
+    {
+     "label": "biochemistry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "processing enzymes",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "C5. Extraction of nucleic acids (DNA and RNA) from biological samples (O2, O3, O4).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "send biological samples to the laboratory",
+     "type": "skill/competence"
+    },
+    {
+     "label": "genomics",
+     "type": "knowledge"
+    },
+    {
+     "label": "proteomic research",
+     "type": "knowledge"
+    },
+    {
+     "label": "interpretation of biological samples",
+     "type": "knowledge"
+    },
+    {
+     "label": "biological data collecting",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "C6. Spectrophotometric and colorimetric methods for biomolecule quantification (O2, O3, O4).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "biochemistry",
+     "type": "skill/competence"
+    },
+    {
+     "label": "biological chemistry",
+     "type": "knowledge"
+    },
+    {
+     "label": "medical biochemistry",
+     "type": "knowledge"
+    },
+    {
+     "label": "proteomic research",
+     "type": "knowledge"
+    },
+    {
+     "label": "routine biochemistry analysers",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "C7. Agarose gel electrophoresis and SDS-PAGE (O2, O3, O4).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "gel permeation chromatography",
+     "type": "knowledge"
+    },
+    {
+     "label": "HPLC",
+     "type": "knowledge"
+    },
+    {
+     "label": "sulphuric acid",
+     "type": "knowledge"
+    },
+    {
+     "label": "electrolyte",
+     "type": "knowledge"
+    },
+    {
+     "label": "electrolytic passivation procedure",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "C8. Conventional PCR and RT-PCR:",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "perform PCR covid test",
+     "type": "skill/competence"
+    },
+    {
+     "label": "genomic study",
+     "type": "knowledge"
+    },
+    {
+     "label": "send biological samples to the laboratory",
+     "type": "skill/competence"
+    },
+    {
+     "label": "biomarkers principles",
+     "type": "knowledge"
+    },
+    {
+     "label": "proteomic research",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "experimental design, execution and interpretation;",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "experimental data gathering",
+     "type": "skill/competence"
+    },
+    {
+     "label": "analyze experimental laboratory data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "laboratory simulations carrying out",
+     "type": "skill/competence"
+    },
+    {
+     "label": "experiment",
+     "type": "skill/competence"
+    },
+    {
+     "label": "implement chemical experiments",
+     "type": "skill/competence"
+    }
+   ]
+  },
+  {
+   "line": "genotypic typing by PCR-RFLP — principles, enzymatic digestion and fragment pattern analysis (O2, O3, O4).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "genomics",
+     "type": "knowledge"
+    },
+    {
+     "label": "carry out genome research",
+     "type": "skill/competence"
+    },
+    {
+     "label": "analyze genetic data",
+     "type": "skill/competence"
+    },
+    {
+     "label": "analyse laboratory data in medical genetics",
+     "type": "skill/competence"
+    },
+    {
+     "label": "molecular biology",
+     "type": "knowledge"
+    }
+   ]
+  },
+  {
+   "line": "C9. Extraction and functional characterisation of mitochondria: isolation by differential centrifugation and assessment of respiratory activity as an introduction to the study of organelles in cell biology (O1, O2, O3, O4).",
+   "noise": false,
+   "candidates": [
+    {
+     "label": "study of microscopic anatomy of cells",
+     "type": "knowledge"
+    },
+    {
+     "label": "microscopically examine cell specimens",
+     "type": "skill/competence"
+    },
+    {
+     "label": "study of cells",
+     "type": "knowledge"
+    },
+    {
+     "label": "pathology at cellular level",
+     "type": "knowledge"
+    },
+    {
+     "label": "osmosis",
+     "type": "knowledge"
+    }
+   ]
+  }
+ ]
+}
