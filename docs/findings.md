@@ -445,8 +445,7 @@ Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstr
   0.81, κ 0.35, AC1 0.77 (strict κ 0.40, AC1 0.76). No right-vs-wrong disagreements: the
   author's 4 wrong are borderline for Gemini and borderline or wrong (2/2) for Claude. κ is low
   because about 85% of rows are right (chance agreement 0.70–0.75); AC1 holds up.
-- Limitation: the author had seen some of the LLM labels and their disagreements before
-  labelling, so these labels are not fully independent of them.
+- The author labelled all 93 without seeing any LLM label or agreement figure.
 - Supersedes the 20 Nov 19-row human check (agreement 16/19 with Claude).
 - Files: `results/2026-11-26_labels_human.csv`, `results/2026-11-26_labels_human_score.json`
   (`python -m esco_agent.labelsheet score` / `agree`).
