@@ -303,3 +303,26 @@ def test_first_turn_gives_up_then_try_again_fails_again_then_works(tmp_path):
     # the conversation goes on from the successful first turn
     r = c.post("/api/message", json={"session": sid, "text": "obrigado"})
     assert r.status_code == 200
+
+
+def test_retries_after_a_timeout_do_not_count_toward_the_daily_limit(tmp_path, monkeypatch):
+    """The limit is 1 turn: the first turn uses it (and fails). Pressing "Try again"
+    twice is still allowed; so is the automatic retry inside a call. A new chat
+    message after that is refused."""
+    import esco_agent.web.app as webapp
+    from test_assistant import Agent
+    monkeypatch.setattr(webapp, "DAILY_LIMIT", 1)
+    StallingJudge.stall = True
+    c, sessions = _web(tmp_path, Agent(AIMessage("De nada.")), StallingJudge())
+    sid, done = begin(c, lang="pt")
+    assert done["stage"] == "first_turn_failed" and sessions._used_today == 1
+    press = {"session": sid, "text": "Tentar novamente", "from_button": "retry_first_turn"}
+    assert c.post("/api/message", json=press).status_code == 200       # fails again, not counted
+    StallingJudge.stall = False
+    r = c.post("/api/message", json=press)                              # works, not counted
+    assert r.status_code == 200 and r.json()["stage"] == "chat" and sessions._used_today == 1
+    log = saved(sessions, sid)
+    assert [e["event"] for e in log["first_turn"]] == ["gave up", "retry", "gave up", "retry", "ok"]
+    assert log["llm_timeouts"]["calls"][0]["outcome"] == "retried"     # the automatic retry, logged
+    r = c.post("/api/message", json={"session": sid, "text": "obrigado"})
+    assert r.status_code == 400 and "limit" in r.json()["detail"]

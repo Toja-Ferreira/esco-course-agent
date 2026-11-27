@@ -459,7 +459,9 @@ class Sessions:
         if retry and from_button != "retry_first_turn" and \
                 text.lower() != RETRY_FIRST_TURN.get(s["language"], RETRY_FIRST_TURN["en"]).lower():
             raise Problem("Press «Try again» to continue. / Carregue em «Tentar novamente» para continuar.")
-        if s["stage"] in ("chat", "contents", "first_turn_failed"):
+        # retries after a timeout ("Try again", and the automatic retry inside a call)
+        # don't count toward the daily limit; they are logged as retries
+        if s["stage"] in ("chat", "contents"):
             self._count_turn()
         async with s["lock"]:
             queue: asyncio.Queue = asyncio.Queue()
