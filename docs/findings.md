@@ -449,3 +449,12 @@ Labels and one-line reasons in results/2026-11-20_labels_claude.csv. 95% bootstr
 - Supersedes the 20 Nov 19-row human check (agreement 16/19 with Claude).
 - Files: `results/2026-11-26_labels_human.csv`, `results/2026-11-26_labels_human_score.json`
   (`python -m esco_agent.labelsheet score` / `agree`).
+
+## 27 Nov 2026 — candidates per search phrase restored to 6
+
+- 6 candidates per search phrase was the documented decision (0a71976, 19 Nov; README
+  "Candidates per search phrase 4 → 6, adopted as the default"), and the 93 labelled
+  first-turn suggestions of 20 Nov were made with 6. Commit 53fb1c6 (23 Nov, "Study
+  logging …") set `PER_QUERY_K` back to 4 without saying so: **the deployed agent ran
+  with 4 from 53fb1c6 until this commit**, which restores 6 (`tests/test_suggest.py`
+  pins it). Sessions in that period used 4 candidates per phrase.

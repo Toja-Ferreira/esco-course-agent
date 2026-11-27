@@ -42,7 +42,7 @@ from esco_agent import usage
 from esco_agent.coverage import data_only, judge_coverage, split_sentences
 
 WHOLE_TEXT_K = 15       # candidates from the course as one query
-PER_QUERY_K = 4         # candidates from each sentence or LLM query
+PER_QUERY_K = 6         # candidates from each sentence or LLM query (0a71976: 6 adopted over 4)
 MAX_QUERIES = 25        # LLM queries used
 MIN_SENTENCE_WORDS = 5  # skip headings like "Objectives" or "TP component:"
 JUDGE_BATCH = 30        # candidates per judge call (calls run in parallel)

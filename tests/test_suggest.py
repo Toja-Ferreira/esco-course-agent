@@ -155,3 +155,14 @@ def test_stability_counts_flips():
     assert [(r["label"], r["suggested"], r["candidate"]) for r in st["rows"]] == [
         ("A", 3, 3), ("B", 1, 2), ("C", 1, 2)]
     assert st["judge_flips"] == 2
+
+
+def test_candidates_per_search_phrase_is_the_documented_six():
+    """6 was adopted over 4 (0a71976, README "Candidates per search phrase 4 -> 6");
+    53fb1c6 set it back to 4 without saying so. The 93 labelled first-turn
+    suggestions were made with 6."""
+    import inspect
+
+    from esco_agent import suggest
+    assert suggest.PER_QUERY_K == 6
+    assert inspect.signature(suggest.gather_candidates).parameters["per_query_k"].default == 6
