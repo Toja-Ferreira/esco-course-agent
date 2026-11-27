@@ -9,7 +9,9 @@ Every client is built here (deepseek()) and every call goes through call():
     content (DeepSeek's keep-alive lines do not reset it, unlike the HTTP read
     timeout, which is set to the same value as a second guard);
   - a timed-out call is retried once; if it times out again, LLMTimeout ends the
-    turn (the web app tells the teacher and logs it);
+    turn (the web app tells the teacher and logs it). A streamed reply is retried
+    only if none of it has reached the page yet; otherwise the turn ends at once
+    and the text shown so far is kept, marked as interrupted (LLMTimeout.partial);
   - other transient errors (connection, rate limit, server errors) are retried
     twice with a short pause, as the client's own default did (it is turned off:
     its retries were silent, and with its 600 s default timeout one stalled call
@@ -33,6 +35,7 @@ from datetime import datetime, timezone
 from esco_agent import usage
 
 _current: ContextVar[list | None] = ContextVar("esco_llm_timeouts", default=None)
+_shown: ContextVar[list | None] = ContextVar("esco_llm_shown", default=None)   # text sent to the page
 MESSAGE = {"pt": "⚠ O modelo não respondeu a tempo. Tente novamente dentro de momentos.",
            "en": "⚠ The model did not answer in time. Please try again in a moment."}
 
@@ -53,15 +56,25 @@ def stream_gap_s() -> float:
 
 
 class LLMTimeout(Exception):
-    def __init__(self, call: str):
-        super().__init__(f"the model did not answer in time ({call}, after one retry)")
-        self.call = call
+    """partial: the text of a streamed reply that had already reached the page
+    when it stalled ("" if none)."""
+    def __init__(self, call: str, partial: str = ""):
+        super().__init__(f"the model did not answer in time ({call})")
+        self.call, self.partial = call, partial
 
 
 def start() -> list[dict]:
     log: list[dict] = []
     _current.set(log)
+    _shown.set([])
     return log
+
+
+def shown(text: str) -> None:
+    """The web app calls this for each piece of a streamed reply it sends to the page."""
+    sent = _shown.get()
+    if sent is not None:
+        sent.append(text)
 
 
 def _note(call: str, attempt: int, outcome: str) -> None:
@@ -114,6 +127,8 @@ async def call(llm, messages, name: str, streamed: bool = False):
     whole call is limited here too."""
     timeouts = errors = 0
     while True:
+        sent = _shown.get()
+        before = len(sent) if sent is not None else 0
         try:
             coro = llm.ainvoke(messages)
             reply = await (coro if streamed else asyncio.wait_for(coro, call_timeout_s()))
@@ -121,6 +136,10 @@ async def call(llm, messages, name: str, streamed: bool = False):
         except Exception as exc:
             if _is_timeout(exc):
                 timeouts += 1
+                partial = "".join(sent[before:]) if streamed and sent is not None else ""
+                if partial:      # the teacher has seen part of it: no retry, keep what was shown
+                    _note(name, timeouts, "interrupted")
+                    raise LLMTimeout(name, partial) from exc
                 if timeouts > 1:
                     _note(name, timeouts, "gave up")
                     raise LLMTimeout(name) from exc
@@ -134,5 +153,6 @@ async def call(llm, messages, name: str, streamed: bool = False):
 
 def summary(log: list[dict]) -> dict:
     """The session file's "llm_timeouts"."""
-    return {"count": len(log), "gave_up": sum(e["outcome"] == "gave up" for e in log),
-            "calls": log}
+    return {"count": len(log),
+            "gave_up": sum(e["outcome"] in ("gave up", "interrupted") for e in log),
+            "interrupted": sum(e["outcome"] == "interrupted" for e in log), "calls": log}

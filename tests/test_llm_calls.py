@@ -41,7 +41,7 @@ def test_a_stalled_call_is_retried_once_then_gives_up():
     assert time.monotonic() - t0 < 1.5                     # two limits of 0.2 s, not an hour
     assert [(e["call"], e["attempt"], e["outcome"]) for e in log] == [("judge", 1, "retried"),
                                                                        ("judge", 2, "gave up")]
-    assert llm_calls.summary(log) == {"count": 2, "gave_up": 1, "calls": log}
+    assert llm_calls.summary(log) == {"count": 2, "gave_up": 1, "interrupted": 0, "calls": log}
 
 
 def test_a_stall_then_an_answer_succeeds_on_the_retry():
@@ -181,4 +181,125 @@ def test_web_turn_ends_with_a_message_and_the_session_file_logs_it(tmp_path):
     assert (log["count"], log["gave_up"]) == (2, 1)
     assert {e["call"] for e in log["calls"]} == {"conversation"}
     r = c.post("/api/message", json={"session": sid, "text": "e agora?"})   # the session goes on
+    assert r.status_code == 200
+
+
+# --- a streamed reply that stalls after part of it reached the page ----------------
+
+def test_streamed_reply_is_not_retried_once_text_has_reached_the_page():
+    class CutOff:
+        calls = 0
+
+        async def ainvoke(self, messages):
+            CutOff.calls += 1
+            llm_calls.shown("Three occupations fit: ")   # streamed to the page
+            raise asyncio.TimeoutError()
+    log = llm_calls.start()
+    with pytest.raises(llm_calls.LLMTimeout) as err:
+        asyncio.run(llm_calls.call(CutOff(), [], "conversation", streamed=True))
+    assert err.value.partial == "Three occupations fit: " and CutOff.calls == 1
+    assert [(e["attempt"], e["outcome"]) for e in log] == [(1, "interrupted")]
+    assert llm_calls.summary(log)["interrupted"] == 1
+
+
+def test_streamed_reply_is_retried_if_nothing_had_reached_the_page():
+    class Silent:
+        calls = 0
+
+        async def ainvoke(self, messages):
+            Silent.calls += 1
+            if Silent.calls == 1:
+                raise asyncio.TimeoutError()             # stalled before its first chunk
+            llm_calls.shown("ok")
+            return AIMessage("ok")
+    log = llm_calls.start()
+    assert asyncio.run(llm_calls.call(Silent(), [], "conversation", streamed=True)).content == "ok"
+    assert [e["outcome"] for e in log] == ["retried"]
+
+
+class CutOffAgent:
+    """The conversation model stalls after part of its reply was streamed."""
+    def bind_tools(self, tools):
+        return self
+
+    async def ainvoke(self, messages):
+        llm_calls.shown("Partial reply about ")
+        raise asyncio.TimeoutError()
+
+
+def _web(tmp_path, agent, judge=None):
+    from fastapi.testclient import TestClient
+    from langgraph.checkpoint.memory import InMemorySaver
+    from test_assistant import FAKE_ESCO, Judge
+
+    from esco_agent.assistant import build_assistant
+    from esco_agent.web.app import Sessions, create_app
+    sessions = Sessions(graph=build_assistant(FAKE_ESCO, agent, judge or Judge(), InMemorySaver()),
+                        model="fake", results_dir=str(tmp_path))
+    return TestClient(create_app(sessions)), sessions
+
+
+def test_web_keeps_an_interrupted_reply_marked_and_does_not_retry(tmp_path):
+    c, sessions = _web(tmp_path, CutOffAgent())
+    sid, _ = begin(c, lang="en")
+    r = c.post("/api/message", json={"session": sid, "text": "which occupations?"})
+    assert r.status_code == 200, r.text
+    new = [m for m in r.json()["new"] if m["role"] == "assistant"]
+    assert new[0]["content"] == "Partial reply about " and new[0]["interrupted"] is True
+    assert "did not answer in time" in new[1]["content"]
+    log = saved(sessions, sid)["llm_timeouts"]
+    assert (log["count"], log["interrupted"]) == (1, 1) and log["calls"][0]["call"] == "conversation"
+
+
+# --- the first turn gives up: "Try again" -------------------------------------------
+
+class StallingJudge:
+    """The queries/judge model; stalls while `stall` is set."""
+    stall = True
+
+    def __init__(self):
+        from test_assistant import Judge
+        self.judge = Judge()
+
+    async def ainvoke(self, messages):
+        if StallingJudge.stall:
+            await asyncio.sleep(3600)
+        return await self.judge.ainvoke(messages)
+
+
+def test_first_turn_gives_up_then_try_again_fails_again_then_works(tmp_path):
+    from test_assistant import Agent
+    StallingJudge.stall = True
+    c, sessions = _web(tmp_path, Agent(AIMessage("De nada.")), StallingJudge())
+    sid, done = begin(c, lang="pt")                   # the course text is complete: first turn runs
+    s = sessions.sessions[sid]
+    sections, expected = dict(s["sections"]), s["expected"]
+    assert done["stage"] == "first_turn_failed"
+    assert done["chips"] == [{"key": "retry_first_turn", "text": "Tentar novamente", "send": True}]
+    assert "não respondeu a tempo" in done["new"][-1]["content"]
+
+    # anything but the button is refused, and changes nothing
+    r = c.post("/api/message", json={"session": sid, "text": "então?"})
+    assert r.status_code == 400 and "Tentar novamente" in r.json()["detail"]
+
+    # the button, while the model still stalls: a second failure, the button again
+    r = c.post("/api/message", json={"session": sid, "text": "Tentar novamente",
+                                     "from_button": "retry_first_turn"})
+    assert r.status_code == 200, r.text
+    assert r.json()["stage"] == "first_turn_failed" and r.json()["chips"][0]["key"] == "retry_first_turn"
+
+    # the model answers again: the button reruns the first turn on the same text
+    StallingJudge.stall = False
+    r = c.post("/api/message", json={"session": sid, "text": "Tentar novamente",
+                                     "from_button": "retry_first_turn"})
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert out["stage"] == "chat" and "computer programming" in out["new"][-1]["content"]
+    assert s["sections"] == sections and s["expected"] == expected
+    log = saved(sessions, sid)
+    assert [e["event"] for e in log["first_turn"]] == ["gave up", "retry", "gave up", "retry", "ok"]
+    assert log["first_turn"][0]["call"] == "queries"
+    assert log["llm_timeouts"]["gave_up"] == 2
+    # the conversation goes on from the successful first turn
+    r = c.post("/api/message", json={"session": sid, "text": "obrigado"})
     assert r.status_code == 200

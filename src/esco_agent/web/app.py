@@ -182,6 +182,9 @@ def panel(state: dict) -> dict:
 
 # --- suggested next messages ----------------------------------------------------
 
+# shown when the first turn could not finish (the model stalled twice)
+RETRY_FIRST_TURN = {"pt": "Tentar novamente", "en": "Try again"}
+
 CHIPS = {
     "pt": {"keep_all": "Manter todas as sugeridas",
            "why": "Porquê a número {n}?",
@@ -339,7 +342,9 @@ class Sessions:
         return s
 
     def _config(self, s: dict) -> dict:
-        return {"configurable": {"thread_id": s["id"]}}
+        # a retried first turn starts a fresh thread, so nothing of the failed one is kept
+        n = s.get("thread_n", 0)
+        return {"configurable": {"thread_id": s["id"] if not n else f"{s['id']}-{n}"}}
 
     async def _state(self, s: dict) -> dict:
         if not s["started"]:
@@ -375,6 +380,8 @@ class Sessions:
             "usage": s.get("usage"),          # LLM calls and tokens, whole session
             # LLM calls that timed out: retried once, or the turn was ended ("gave up")
             "llm_timeouts": llm_calls.summary(s.get("llm_timeouts", [])),
+            # the first turn's attempts: gave up (which call), retry (the teacher's button), ok
+            "first_turn": s.get("first_turn_log", []),
             "ui": s.get("ui", []),            # cards the teacher opened, with times
             "chat": s["chat"],            # what the teacher saw, with button use marked
             "resumed": s.get("resumed", []),   # times the page was reloaded and picked up again
@@ -448,7 +455,11 @@ class Sessions:
             raise Problem("That message is too long. / Essa mensagem é demasiado longa.")
         if s["stage"] in ("finished",):
             raise Problem("This session is finished. / Esta sessão terminou.")
-        if s["stage"] in ("chat", "contents"):
+        retry = s["stage"] == "first_turn_failed"
+        if retry and from_button != "retry_first_turn" and \
+                text.lower() != RETRY_FIRST_TURN.get(s["language"], RETRY_FIRST_TURN["en"]).lower():
+            raise Problem("Press «Try again» to continue. / Carregue em «Tentar novamente» para continuar.")
+        if s["stage"] in ("chat", "contents", "first_turn_failed"):
             self._count_turn()
         async with s["lock"]:
             queue: asyncio.Queue = asyncio.Queue()
@@ -464,6 +475,8 @@ class Sessions:
                                   "Esta sessão atingiu o limite de mensagens; carregue em Terminar.")
                 s["turns"] += 1
                 work = asyncio.create_task(self._converse(s, text))
+            elif retry:
+                work = asyncio.create_task(self._retry_first_turn(s))
             else:
                 work = asyncio.create_task(self._intake(s, text))
             while not work.done():
@@ -477,10 +490,24 @@ class Sessions:
                 yield queue.get_nowait()
             try:
                 state = work.result()
-            except llm_calls.LLMTimeout:
-                # the model stalled twice: end the turn with a short message, not an error
+            except llm_calls.LLMTimeout as e:
+                # the model stalled: end the turn with a short message, not an error. A reply
+                # cut off after part of it was shown is kept, marked as interrupted.
+                if e.partial:
+                    self._say(s, "assistant", e.partial, interrupted=True)
                 self._say(s, "assistant", llm_calls.MESSAGE.get(s["language"], llm_calls.MESSAGE["en"]),
                           llm_timeout=True)
+                if s.pop("in_first_turn", False):
+                    # no first answer yet: offer to run it again on the same course text
+                    s["stage"] = "first_turn_failed"
+                    s.setdefault("first_turn_log", []).append({"t": _now(), "event": "gave up",
+                                                               "call": e.call})
+                    self.save(s)
+                    label = RETRY_FIRST_TURN.get(s["language"], RETRY_FIRST_TURN["en"])
+                    yield {"done": {"stage": s["stage"], "new": s["chat"][start:],
+                                    "course_name": s["course_name"], **panel({}),
+                                    "chips": [{"key": "retry_first_turn", "text": label, "send": True}]}}
+                    return
                 state = await self._state(s)
                 self.save(s, state)
                 yield {"done": {"stage": s["stage"], "new": s["chat"][start:],
@@ -513,12 +540,28 @@ class Sessions:
             self._say(s, "assistant", r["reply"])    # for a page: which sections were used
         if r["stage"] != "ready":
             return {}
+        return await self._first_turn(s)
+
+    async def _first_turn(self, s: dict) -> dict:
+        """The first answer, from the course text the intake collected."""
         s["started"] = True
+        s["in_first_turn"] = True
         state = await self._run(s, {"sections": s["sections"], "language": s["language"],
                                     "messages": [HumanMessage(course_message(s["sections"]))]})
+        s.pop("in_first_turn", None)
+        if s.get("first_turn_log"):
+            s["first_turn_log"].append({"t": _now(), "event": "ok"})
         self._say(s, "assistant", state["messages"][-1].content)
         s["stage"] = "chat"
         return state
+
+    async def _retry_first_turn(self, s: dict) -> dict:
+        """The teacher pressed "Try again" after the first turn gave up: the same course
+        text and expected skills, on a fresh thread; logged as a retry."""
+        s["thread_n"] = s.get("thread_n", 0) + 1
+        s.setdefault("first_turn_log", []).append({"t": _now(), "event": "retry",
+                                                   "attempt": s["thread_n"] + 1})
+        return await self._first_turn(s)
 
     async def _converse(self, s: dict, text: str) -> dict:
         graph = await self.graph()
@@ -568,6 +611,7 @@ class Sessions:
                 text = message.content if isinstance(message.content, str) else ""
                 if text and meta.get("langgraph_node") == "agent":
                     report({"token": text})
+                    llm_calls.shown(text)       # the teacher has seen part of this reply
         return (await graph.aget_state(self._config(s))).values
 
     async def log_ui(self, sid: str, event: str, kind: str, number: int | None) -> None:

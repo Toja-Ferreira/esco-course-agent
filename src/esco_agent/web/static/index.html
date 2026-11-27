@@ -949,6 +949,9 @@ function addMessage(m, animate = false) {
   } else if (m.role === "assistant" && m.grounding_issues) {
     // the reply quotes something not in the course, or a skill that doesn't exist
     div.innerHTML = `<div class="bubble">${md(m.content)}<div class="flag">${esc(t().flagged)}</div></div>`;
+  } else if (m.role === "assistant" && m.interrupted) {
+    // a reply the model stopped writing: what was shown is kept, marked
+    div.innerHTML = `<div class="bubble">${md(m.content)}<div class="flag">${lang === "pt" ? "Resposta interrompida" : "Reply interrupted"}</div></div>`;
   } else {
     div.innerHTML = `<div class="bubble">${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}</div>`;
   }
@@ -1035,7 +1038,7 @@ async function streamMessage(body) {
 function renderChips() {
   // The server suggests next messages from the state of the conversation.
   const box = $("chips"); box.innerHTML = "";
-  if (stage !== "chat") return;
+  if (stage !== "chat" && stage !== "first_turn_failed") return;   // the latter: "Try again" only
   for (const c of panelState.chips || []) {
     const b = document.createElement("button"); b.className = "chip";
     b.textContent = c.send ? c.text : c.text.trimEnd() + "…";
