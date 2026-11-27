@@ -25,6 +25,7 @@ from langchain_core.tools import tool
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import InjectedState, ToolNode, tools_condition
 
+from esco_agent import llm_calls
 from esco_agent.coverage import judge_coverage, split_sentences
 
 LINK_K = 20
@@ -150,7 +151,8 @@ def build_graph(mcp_tools: list, llm, coverage_llm, checkpointer=None):
         }
 
     async def agent(state: AgentState):
-        reply = await llm_with_tools.ainvoke([SystemMessage(SYSTEM), *state["messages"]])
+        reply = await llm_calls.call(llm_with_tools, [SystemMessage(SYSTEM), *state["messages"]],
+                                     "conversation", streamed=True)
         return {"messages": [reply]}
 
     def route_start(state: AgentState) -> str:

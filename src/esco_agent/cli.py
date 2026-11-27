@@ -18,11 +18,11 @@ import uuid
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from langchain_deepseek import ChatDeepSeek
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.checkpoint.memory import InMemorySaver
 
+from esco_agent import llm_calls
 from esco_agent.graph import build_graph
 from esco_agent.mcp_client import server_config
 
@@ -53,8 +53,8 @@ def show(messages, trace: bool) -> None:
 
 async def chat(course: str, trace: bool) -> None:
     model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
-    llm = ChatDeepSeek(model=model, temperature=0)
-    coverage_llm = llm.bind(response_format={"type": "json_object"})
+    llm = llm_calls.deepseek(streamed=True, model=model)
+    coverage_llm = llm_calls.deepseek(json_output=True, model=model)
 
     client = MultiServerMCPClient(server_config())
     async with client.session("esco") as session:   # one server for the whole chat

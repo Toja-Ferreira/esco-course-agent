@@ -244,7 +244,7 @@ def _make(args) -> None:
     import os
 
     from dotenv import load_dotenv
-    from langchain_deepseek import ChatDeepSeek
+    from esco_agent import llm_calls
     from langchain_mcp_adapters.client import MultiServerMCPClient
     from langchain_mcp_adapters.tools import load_mcp_tools
 
@@ -255,8 +255,7 @@ def _make(args) -> None:
     load_dotenv()
 
     async def run():
-        llm = ChatDeepSeek(model=os.environ.get("DEEPSEEK_MODEL", "deepseek-chat"),
-                           temperature=0).bind(response_format={"type": "json_object"})
+        llm = llm_calls.deepseek(json_output=True)
         rows = []
         async with MultiServerMCPClient(server_config()).session("esco") as session:
             tools = {t.name: t for t in await load_mcp_tools(session)}

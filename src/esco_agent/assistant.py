@@ -62,7 +62,7 @@ from langchain_core.messages import AIMessage, SystemMessage, ToolMessage
 from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, MessagesState, StateGraph
 
-from esco_agent import usage
+from esco_agent import llm_calls, usage
 from esco_agent.coverage import judge_coverage, split_sentences
 from esco_agent.suggest import (Sections, _shorten, as_sections, course_text,
                                 gather_candidates, numbered_sentences, propose_queries,
@@ -511,8 +511,8 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         system = SYSTEM.format(language=LANGUAGES[state["language"]],
                                state=render_state(state["known"], state.get("occupations"),
                                                   state.get("text_changes")))
-        return {"messages": [usage.count(await llm_with_tools.ainvoke(
-            [SystemMessage(system), *state["messages"]]))]}
+        return {"messages": [await llm_calls.call(
+            llm_with_tools, [SystemMessage(system), *state["messages"]], "conversation", streamed=True)]}
 
     # --- tools. Each takes the working copy `w` of the state, changes it in
     # --- place, and returns (result for the LLM, events for the log).
@@ -722,9 +722,9 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
         result = await suggest_skills([skill], judge_llm, revised)
         if any(e["text"] in new for s in result["suggested"] for e in s["evidence"]):
             return True, ""
-        reply = usage.count(await judge_llm.ainvoke([("user", WHY_PROMPT.format(
+        reply = await llm_calls.call(judge_llm, [("user", WHY_PROMPT.format(
             course=course_text(revised), skill=skill["label"],
-            definition=skill.get("description") or "n/a"))]))
+            definition=skill.get("description") or "n/a"))], "why not shown")
         try:
             reason = " ".join(str(json.loads(reply.content)["reason"]).split())[:300]
         except (json.JSONDecodeError, KeyError, TypeError):
@@ -773,11 +773,11 @@ def build_assistant(esco: Esco, llm, judge_llm, checkpointer=None):
             while attempts < 2 and not verified:
                 attempts += 1
                 progress("drafting" if attempts == 1 else "redrafting", skill=target["label"])
-                reply = usage.count(await judge_llm.ainvoke([("user", prompt.format(
+                reply = await llm_calls.call(judge_llm, [("user", prompt.format(
                     course=course_text(sections), skill=target["label"],
                     definition=target["description"] or "n/a",
                     sections=", ".join(f'"{n}"' for n in ([wanted] if wanted else sections)),
-                    feedback=feedback))]))
+                    feedback=feedback))], "draft")
                 try:
                     data = json.loads(reply.content)
                     sec = _section(sections, data.get("section")) or wanted or list(sections)[-1]
@@ -1021,10 +1021,11 @@ def deepseek_models():
     """(model name, conversation LLM, JSON-mode LLM for queries, judging and drafting)."""
     import os
 
-    from langchain_deepseek import ChatDeepSeek
+    from esco_agent.llm_calls import deepseek
     model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
-    llm = ChatDeepSeek(model=model, temperature=0)
-    return model, llm, llm.bind(response_format={"type": "json_object"})
+    # the conversation's reply is streamed: a limit on the gap between chunks;
+    # the JSON calls come in one piece: a limit on the whole call (llm_calls)
+    return model, deepseek(streamed=True, model=model), deepseek(json_output=True, model=model)
 
 
 # --- command line -------------------------------------------------------------

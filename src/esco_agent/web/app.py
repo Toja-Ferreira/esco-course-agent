@@ -44,7 +44,7 @@ from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
 
-from esco_agent import usage
+from esco_agent import llm_calls, usage
 from esco_agent.assistant import MAX_NOTE, insert_text, split_at, REJECT_REASONS, SKILL_URI, _now, course_message, export
 from esco_agent.grounding import check_reply
 from esco_agent.suggest import course_text
@@ -373,6 +373,8 @@ class Sessions:
             "app_version": VERSION,           # commit + hash of the code that ran
             "esco_familiarity": s.get("esco_familiarity"),   # none / low / medium / high
             "usage": s.get("usage"),          # LLM calls and tokens, whole session
+            # LLM calls that timed out: retried once, or the turn was ended ("gave up")
+            "llm_timeouts": llm_calls.summary(s.get("llm_timeouts", [])),
             "ui": s.get("ui", []),            # cards the teacher opened, with times
             "chat": s["chat"],            # what the teacher saw, with button use marked
             "resumed": s.get("resumed", []),   # times the page was reloaded and picked up again
@@ -475,6 +477,16 @@ class Sessions:
                 yield queue.get_nowait()
             try:
                 state = work.result()
+            except llm_calls.LLMTimeout:
+                # the model stalled twice: end the turn with a short message, not an error
+                self._say(s, "assistant", llm_calls.MESSAGE.get(s["language"], llm_calls.MESSAGE["en"]),
+                          llm_timeout=True)
+                state = await self._state(s)
+                self.save(s, state)
+                yield {"done": {"stage": s["stage"], "new": s["chat"][start:],
+                                "course_name": s["course_name"], **panel(state),
+                                "chips": suggestions(state, s["language"], self._asked(s))}}
+                return
             except Exception:
                 self._say(s, "assistant", "⚠ " + ("Ocorreu um erro. Tente novamente."
                                                  if s["language"] == "pt" else
@@ -539,10 +551,12 @@ class Sessions:
         graph = await self.graph()
         report = s.get("progress") or (lambda _: None)
         turn = usage.start()                # every LLM call of this turn adds to it
+        timeouts = llm_calls.start()        # and every timed-out call
         try:
             return await self._stream(s, graph, graph_input, report)
         finally:
             s["usage"] = usage.add(s.get("usage"), turn)
+            s.setdefault("llm_timeouts", []).extend(timeouts)
 
     async def _stream(self, s: dict, graph, graph_input: dict, report) -> dict:
         async for mode, chunk in graph.astream(graph_input, self._config(s),

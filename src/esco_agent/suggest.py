@@ -38,7 +38,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from esco_agent import usage
+from esco_agent import llm_calls, usage
 from esco_agent.coverage import data_only, judge_coverage, split_sentences
 
 WHOLE_TEXT_K = 15       # candidates from the course as one query
@@ -119,7 +119,7 @@ def sentence_queries(course: str | Sections) -> list[str]:
 async def propose_queries(llm, course: str | Sections) -> list[str]:
     """llm: chat model bound to JSON output. Returns [] if the reply is unusable
     (the caller then falls back to whole-text candidates only)."""
-    reply = usage.count(await llm.ainvoke([("user", QUERY_PROMPT.format(course=course_text(course)))]))
+    reply = await llm_calls.call(llm, [("user", QUERY_PROMPT.format(course=course_text(course)))], "queries")
     try:
         items = json.loads(reply.content)["queries"]
     except (json.JSONDecodeError, KeyError, TypeError):
@@ -250,7 +250,6 @@ def _main() -> None:
     import os
 
     from dotenv import load_dotenv
-    from langchain_deepseek import ChatDeepSeek
     from langchain_mcp_adapters.client import MultiServerMCPClient
     from langchain_mcp_adapters.tools import load_mcp_tools
 
@@ -283,8 +282,7 @@ def _main() -> None:
     import time
 
     async def run():
-        llm = ChatDeepSeek(model=os.environ.get("DEEPSEEK_MODEL", "deepseek-chat"),
-                           temperature=0).bind(response_format={"type": "json_object"})
+        llm = llm_calls.deepseek(json_output=True)
         client = MultiServerMCPClient(server_config())
         runs = []
         async with client.session("esco") as session:

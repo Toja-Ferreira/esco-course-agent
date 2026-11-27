@@ -16,7 +16,7 @@ import json
 import re
 from dataclasses import dataclass, field
 
-from esco_agent import usage
+from esco_agent import llm_calls, usage
 
 def data_only(text: str) -> str:
     """Course text goes into prompts between <course> markers. Remove anything in
@@ -137,7 +137,7 @@ async def judge_coverage(llm, sentences: list[str], occupation: str,
         skills="\n".join(f"{i}. {s}" for i, s in enumerate(skill_labels, 1)),
     )
     messages = [("user", prompt)]
-    reply = usage.count(await llm.ainvoke(messages))
+    reply = await llm_calls.call(llm, messages, "judge")
     good, problems = parse_and_validate(reply.content, numbers, len(sentences))
     first_ok = not problems
 
@@ -146,7 +146,7 @@ async def judge_coverage(llm, sentences: list[str], occupation: str,
         messages += [("assistant", reply.content),
                      ("user", RETRY.format(problems="\n".join(f"- {p}" for p in problems),
                                            numbers=sorted(todo)))]
-        reply = usage.count(await llm.ainvoke(messages))
+        reply = await llm_calls.call(llm, messages, "judge retry")
         again, _ = parse_and_validate(reply.content, todo, len(sentences))
         good.update(again)
         for n in todo - set(again):

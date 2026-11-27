@@ -30,6 +30,7 @@ from pathlib import Path
 
 import numpy as np
 
+from esco_agent import llm_calls
 from esco_agent.grounding import _norm
 from esco_agent.suggest import course_text, load_sections
 
@@ -124,7 +125,7 @@ def bootstrap_courses(rows: list[dict], key: str, n_boot: int, seed: int) -> tup
 
 
 async def ask(llm, sections: dict) -> list[dict]:
-    reply = await llm.ainvoke(PROMPT.format(course=course_text(sections)))
+    reply = await llm_calls.call(llm, PROMPT.format(course=course_text(sections)), "baseline")
     try:
         items = json.loads(reply.content).get("skills", [])
     except (json.JSONDecodeError, AttributeError):
